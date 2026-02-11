@@ -51,4 +51,28 @@ body {
 
 .card:hover {
   transform: translateY(-10px) scale(1.05);
-  bac
+  background: linear-gradient(145deg, #ff2f95, #ED0677);
+  box-shadow: 0 15px 35px rgba(237,6,119,0.5);
+}
+
+@media (max-width: 768px) {
+  .container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <div class="card">Report 1</div>
+  <div class="card">Report 2</div>
+  <div class="card">Report 3</div>
+  <div class="card">Report 4</div>
+  <div class="card">Report 5</div>
+  <div class="card">Report 6</div>
+</div>
+
+</body>
+</html>
