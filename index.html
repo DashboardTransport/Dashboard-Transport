@@ -12,14 +12,12 @@
   font-family: 'Trueno';
   src: url('fonts/TruenoRG.woff2') format('woff2');
   font-weight: 400;
-  font-style: normal;
 }
 
 @font-face {
   font-family: 'Trueno';
   src: url('fonts/TruenoBold.woff2') format('woff2');
   font-weight: 700;
-  font-style: normal;
 }
 
 *{
@@ -35,8 +33,8 @@ body{
   display:flex;
   justify-content:center;
   align-items:center;
-  overflow:hidden;
   position:relative;
+  overflow:hidden;
   color:#4a2c35;
 
   background:
@@ -45,7 +43,6 @@ body{
     linear-gradient(135deg, #FFECF0, #FFEFA3);
 }
 
-/* Subtle grid */
 body::after{
   content:"";
   position:absolute;
@@ -62,12 +59,9 @@ body::after{
   position:relative;
   width:600px;
   height:600px;
-  display:flex;
-  justify-content:center;
-  align-items:center;
 }
 
-/* Thin Glow Circle Line */
+/* glow circle */
 .circle-wrapper::before{
   content:"";
   position:absolute;
@@ -76,29 +70,12 @@ body::after{
   border-radius:50%;
   border:2px solid rgba(255,132,161,0.35);
   box-shadow:0 0 25px rgba(255,132,161,0.35);
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
 }
 
-/* ================= BUBBLE ================= */
-.card{
+/* ================= ITEM CONTAINER ================= */
+.item{
   position:absolute;
-  width:150px;
-  height:150px;
-  border-radius:50%;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  text-align:center;
-  padding:15px;
-  cursor:pointer;
-  transition:all 0.35s ease;
-
-  font-size:15px;
-  font-weight:700;
-  letter-spacing:1px;
-  text-transform:uppercase;
-
-  background:linear-gradient(145deg, #FF84A1, #FFEFA3);
-  color:#4a2c35;
-
-  box-shadow:
-    inset 0 0 25px rgba(25
+  top:
