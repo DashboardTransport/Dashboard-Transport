@@ -36,9 +36,10 @@ body{
     radial-gradient(circle at 20% 30%, #FF84A1 0%, transparent 55%),
     radial-gradient(circle at 80% 70%, #FFEFA3 0%, transparent 60%),
     linear-gradient(135deg, #FFECF0, #FFEFA3);
+  position:relative;
 }
 
-/* subtle grid */
+/* subtle futuristic grid */
 body::after{
   content:"";
   position:absolute;
@@ -65,7 +66,7 @@ body::after{
   height:500px;
   border-radius:50%;
   border:2px solid rgba(255,132,161,0.35);
-  box-shadow:0 0 30px rgba(255,132,161,0.4);
+  box-shadow:0 0 40px rgba(255,132,161,0.45);
   top:50%;
   left:50%;
   transform:translate(-50%,-50%);
@@ -81,27 +82,34 @@ body::after{
   align-items:center;
   justify-content:center;
   text-align:center;
-  padding:20px;
+  padding:18px;
+
   font-weight:700;
-  font-size:15px;
-  letter-spacing:1px;
+  font-size:13px;
+  letter-spacing:0.5px;
+  line-height:1.2;
   text-transform:uppercase;
+
   cursor:pointer;
-  transition:0.3s ease;
+  transition:all 0.3s ease;
 
   background:linear-gradient(145deg,#FF84A1,#FFEFA3);
   color:#4a2c35;
 
   box-shadow:
-    inset 0 0 25px rgba(255,255,255,0.8),
+    inset 0 0 25px rgba(255,255,255,0.85),
     0 15px 35px rgba(255,132,161,0.35);
 }
 
+/* hover effect */
 .card:hover{
-  transform:scale(1.1);
+  transform:scale(1.12);
+  box-shadow:
+    inset 0 0 35px rgba(255,255,255,1),
+    0 25px 50px rgba(255,132,161,0.6);
 }
 
-/* ================= PERFECT CIRCLE (NO ROTATE BUG) ================= */
+/* ================= PERFECT 360° POSITION ================= */
 
 .card:nth-child(1){ top:50%; left:50%; transform:translate(-50%,-50%) translate(250px,0); }
 .card:nth-child(2){ top:50%; left:50%; transform:translate(-50%,-50%) translate(125px,216px); }
@@ -120,7 +128,7 @@ body::after{
   <div class="card">Seafreight</div>
   <div class="card">Landfreight</div>
   <div class="card">KPI</div>
-  <div class="card">Administratives</div>
+  <div class="card">Administrative</div>
   <div class="card">Others</div>
 </div>
 
