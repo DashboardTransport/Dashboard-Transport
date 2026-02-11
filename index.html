@@ -1,16 +1,124 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>TEST</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anteraja Internal Portal</title>
+
+<!-- Catchy Modern Font -->
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600&display=swap" rel="stylesheet">
+
 <style>
-body { background: black; color: white; text-align: center; }
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Space Grotesk', sans-serif;
+}
+
+body{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  color:white;
+
+  /* Futuristic Magenta Gradient */
+  background:
+    radial-gradient(circle at 20% 30%, rgba(237,6,119,0.45), transparent 45%),
+    radial-gradient(circle at 80% 70%, rgba(237,6,119,0.35), transparent 50%),
+    linear-gradient(135deg, #0f0f14, #1c0f1a);
+}
+
+/* HEADER */
+header{
+  height:100px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:28px;
+  font-weight:600;
+  letter-spacing:2px;
+
+  /* Transparent glass feel */
+  background:rgba(255,255,255,0.05);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(255,255,255,0.1);
+}
+
+/* MAIN */
+.main{
+  flex:1;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+/* GRID */
+.container{
+  display:grid;
+  grid-template-columns:repeat(3,200px);
+  gap:60px;
+}
+
+/* FUTURISTIC BUBBLE */
+.card{
+  width:200px;
+  height:200px;
+  border-radius:50%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  font-size:16px;
+  font-weight:600;
+  cursor:pointer;
+  transition:0.3s ease;
+
+  /* Gradient bubble */
+  background:linear-gradient(145deg, #FFCB05, #ED0677);
+  color:white;
+
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.6),
+    0 0 30px rgba(237,6,119,0.4);
+}
+
+.card:hover{
+  transform:translateY(-10px) scale(1.05);
+  box-shadow:
+    0 15px 40px rgba(0,0,0,0.7),
+    0 0 50px rgba(237,6,119,0.7);
+}
+
+/* Responsive */
+@media(max-width:900px){
+  .container{
+    grid-template-columns:repeat(2,180px);
+    gap:40px;
+  }
+  .card{
+    width:180px;
+    height:180px;
+  }
+}
 </style>
 </head>
+
 <body>
 
-<h1>PORTAL ANTERAJA</h1>
+<header>
+  FIRMAN JOMBLO
+</header>
 
-<div style="width:200px;height:200px;background:yellow;border-radius:50%;margin:20px auto;">
+<div class="main">
+  <div class="container">
+    <div class="card">Operational</div>
+    <div class="card">Monitoring</div>
+    <div class="card">Reporting</div>
+    <div class="card">Performance</div>
+    <div class="card">Finance</div>
+    <div class="card">Settings</div>
+  </div>
 </div>
 
 </body>
