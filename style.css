@@ -19,14 +19,20 @@ body {
 /* SIDEBAR */
 .sidebar {
   width: 240px;
-  background: #111;
-  color: #fff;
+  background: linear-gradient(
+    180deg,
+    #FFCB05 0%,
+    #d4a700 50%,
+    #1a1a1a 100%
+  );
+  color: #111;
   padding: 24px;
 }
 
 .sidebar h2 {
   font-size: 20px;
-  font-weight: 600;
+  font-weight: 700;
+  color: #111;
 }
 
 /* MAIN CONTENT */
