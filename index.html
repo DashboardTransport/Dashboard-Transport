@@ -36,7 +36,7 @@ body{
     linear-gradient(135deg, #FFECF0, #FFEFA3);
 }
 
-/* subtle grid */
+/* Subtle grid */
 body::after{
   content:"";
   position:absolute;
@@ -48,8 +48,8 @@ body::after{
   pointer-events:none;
 }
 
-/* ================= CONTAINER ================= */
-.arc-wrapper{
+/* ================= WRAPPER ================= */
+.circle-wrapper{
   position:relative;
   width:600px;
   height:600px;
@@ -58,31 +58,28 @@ body::after{
   align-items:center;
 }
 
-/* glowing arc line */
-.arc-wrapper::before{
+/* Thin Glow Circle Line */
+.circle-wrapper::before{
   content:"";
   position:absolute;
-  width:520px;
-  height:520px;
+  width:500px;
+  height:500px;
   border-radius:50%;
   border:2px solid rgba(255,132,161,0.35);
-  border-bottom-color:transparent;
-  border-left-color:transparent;
-  transform:rotate(-45deg);
-  box-shadow:0 0 25px rgba(255,132,161,0.4);
+  box-shadow:0 0 25px rgba(255,132,161,0.35);
 }
 
 /* ================= BUBBLE ================= */
 .card{
   position:absolute;
-  width:160px;
-  height:160px;
+  width:150px;
+  height:150px;
   border-radius:50%;
   display:flex;
   justify-content:center;
   align-items:center;
   text-align:center;
-  padding:20px;
+  padding:15px;
   cursor:pointer;
   transition:0.35s ease;
 
@@ -104,22 +101,34 @@ body::after{
     0 20px 45px rgba(255,132,161,0.6);
 }
 
-/* ================= PERFECT SYMMETRY ================= */
+/* ================= PERFECT 360° DISTRIBUTION ================= */
+/* 360 / 6 = 60deg each */
 
-/* angle distribution */
-.card:nth-child(1){ transform:rotate(-90deg) translate(260px) rotate(90deg); }
-.card:nth-child(2){ transform:rotate(-45deg) translate(260px) rotate(45deg); }
-.card:nth-child(3){ transform:rotate(-10deg) translate(260px) rotate(10deg); }
-.card:nth-child(4){ transform:rotate(10deg) translate(260px) rotate(-10deg); }
-.card:nth-child(5){ transform:rotate(45deg) translate(260px) rotate(-45deg); }
-.card:nth-child(6){ transform:rotate(90deg) translate(260px) rotate(-90deg); }
+.card:nth-child(1){
+  transform: rotate(0deg) translate(250px) rotate(0deg);
+}
+.card:nth-child(2){
+  transform: rotate(60deg) translate(250px) rotate(-60deg);
+}
+.card:nth-child(3){
+  transform: rotate(120deg) translate(250px) rotate(-120deg);
+}
+.card:nth-child(4){
+  transform: rotate(180deg) translate(250px) rotate(-180deg);
+}
+.card:nth-child(5){
+  transform: rotate(240deg) translate(250px) rotate(-240deg);
+}
+.card:nth-child(6){
+  transform: rotate(300deg) translate(250px) rotate(-300deg);
+}
 
 </style>
 </head>
 
 <body>
 
-<div class="arc-wrapper">
+<div class="circle-wrapper">
     <div class="card">Airfreight</div>
     <div class="card">Seafreight</div>
     <div class="card">Landfreight</div>
