@@ -1,1 +1,2 @@
 TruenoRG.woff2
+TruenoBold.woff2
