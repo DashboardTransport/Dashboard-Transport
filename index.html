@@ -1,66 +1,72 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Anteraja Internal Portal</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600&display=swap" rel="stylesheet">
+<title>Anteraja Internal Dashboard</title>
 
 <style>
+
+/* ================= FONT ================= */
+@font-face {
+  font-family: 'Trueno';
+  src: url('fonts/TruenoRG.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
 *{
   margin:0;
   padding:0;
   box-sizing:border-box;
-  font-family:'Space Grotesk', sans-serif;
+  font-family:'Trueno', sans-serif;
 }
 
+/* ================= BODY BACKGROUND ================= */
 body{
   min-height:100vh;
   display:flex;
   flex-direction:column;
-  color:white;
-  overflow:hidden;
   position:relative;
+  overflow:hidden;
+  color:#4a2c35;
 
-  /* Refined background using your palette */
   background:
-    radial-gradient(circle at 30% 25%, rgba(255,132,161,0.35), transparent 45%),
-    radial-gradient(circle at 75% 70%, rgba(255,239,163,0.25), transparent 50%),
-    linear-gradient(135deg, #141218, #1c1620);
+    radial-gradient(circle at 20% 30%, #FF84A1 0%, transparent 55%),
+    radial-gradient(circle at 80% 70%, #FFEFA3 0%, transparent 60%),
+    linear-gradient(135deg, #FFECF0, #FFEFA3);
 }
 
-/* Subtle grid */
+/* Subtle futuristic grid */
 body::after{
   content:"";
   position:absolute;
   inset:0;
   background-image:
-    linear-gradient(rgba(255,236,240,0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,236,240,0.06) 1px, transparent 1px);
-  background-size:40px 40px;
+    linear-gradient(rgba(255,132,161,0.15) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,132,161,0.15) 1px, transparent 1px);
+  background-size:60px 60px;
   pointer-events:none;
 }
 
-/* HEADER */
+/* ================= HEADER ================= */
 header{
-  height:110px;
+  height:120px;
   display:flex;
   justify-content:center;
   align-items:center;
-  background:rgba(255,236,240,0.05);
-  backdrop-filter:blur(10px);
-  border-bottom:1px solid rgba(255,236,240,0.1);
-  position:relative;
+  background:rgba(255,255,255,0.55);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(255,132,161,0.35);
   z-index:2;
 }
 
 header img{
-  height:55px;
-  filter:drop-shadow(0 0 20px rgba(255,132,161,0.6));
+  height:60px;
+  filter:drop-shadow(0 8px 25px rgba(255,132,161,0.45));
 }
 
-/* MAIN */
+/* ================= MAIN ================= */
 .main{
   flex:1;
   display:flex;
@@ -70,51 +76,52 @@ header img{
   z-index:2;
 }
 
-/* SEMI CIRCLE LAYOUT */
+/* ================= ARC CONTAINER ================= */
 .arc-container{
   position:relative;
-  width:700px;
-  height:350px;
+  width:820px;
+  height:420px;
 }
 
-/* BUBBLE STYLE */
+/* ================= BUBBLE CARD ================= */
 .card{
   position:absolute;
-  width:170px;
-  height:170px;
+  width:190px;
+  height:190px;
   border-radius:50%;
   display:flex;
   justify-content:center;
   align-items:center;
   text-align:center;
-  font-weight:600;
+  padding:20px;
   cursor:pointer;
-  transition:0.3s ease;
-  color:#2a1f28;
+  transition:0.35s ease;
+
+  font-size:17px;
+  letter-spacing:0.5px;
 
   background:linear-gradient(145deg, #FF84A1, #FFEFA3);
+  color:#4a2c35;
 
   box-shadow:
-    inset 0 0 25px rgba(255,236,240,0.5),
-    0 10px 30px rgba(0,0,0,0.6),
-    0 0 35px rgba(255,132,161,0.4);
+    inset 0 0 35px rgba(255,255,255,0.75),
+    0 15px 35px rgba(255,132,161,0.35);
 }
 
 .card:hover{
   transform:scale(1.08);
   box-shadow:
-    inset 0 0 35px rgba(255,236,240,0.7),
-    0 15px 40px rgba(0,0,0,0.7),
-    0 0 55px rgba(255,132,161,0.6);
+    inset 0 0 45px rgba(255,255,255,0.9),
+    0 20px 45px rgba(255,132,161,0.6);
 }
 
-/* Position semi circle */
-.card:nth-child(1){ left:0; top:150px; }
-.card:nth-child(2){ left:100px; top:40px; }
-.card:nth-child(3){ left:265px; top:0px; }
-.card:nth-child(4){ left:430px; top:40px; }
-.card:nth-child(5){ left:530px; top:150px; }
-.card:nth-child(6){ left:265px; top:180px; }
+/* ================= SEMI-CIRCLE POSITION ================= */
+.card:nth-child(1){ left:0; top:200px; }
+.card:nth-child(2){ left:150px; top:60px; }
+.card:nth-child(3){ left:320px; top:0px; }
+.card:nth-child(4){ left:500px; top:60px; }
+.card:nth-child(5){ left:630px; top:200px; }
+.card:nth-child(6){ left:320px; top:240px; }
 
 </style>
 </head>
@@ -131,7 +138,7 @@ header img{
     <div class="card">Seafreight</div>
     <div class="card">Landfreight</div>
     <div class="card">KPI</div>
-    <div class="card">Porno</div>
+    <div class="card">Administratives</div>
     <div class="card">Others</div>
   </div>
 </div>
