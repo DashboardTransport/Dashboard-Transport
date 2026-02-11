@@ -1,0 +1,98 @@
+/* RESET */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* BODY */
+body {
+  font-family: Arial, sans-serif;
+  background: #f3f4f6;
+}
+
+/* ===== LAYOUT UTAMA ===== */
+.app {
+  display: flex;
+  height: 100vh;
+}
+
+/* ===== SIDEBAR (GELAP) ===== */
+.sidebar {
+  width: 240px;
+  background: #0f172a; /* dark sidebar */
+  color: #e5e7eb;
+  padding: 20px;
+}
+
+.sidebar h2 {
+  color: #ffffff;
+  font-size: 18px;
+}
+
+/* ===== MAIN AREA ===== */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== HEADER (MAGENTA GRADIENT) ===== */
+.header {
+  background: linear-gradient(
+    135deg,
+    #ed0677,
+    #ff5fa2
+  );
+  color: #ffffff;
+  padding: 20px;
+}
+
+/* ===== CONTENT ===== */
+.content {
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* ===== BANNER ===== */
+.box {
+  height: 120px;
+  background: linear-gradient(
+    135deg,
+    #ed0677,
+    #ff85b8
+  );
+  border-radius: 16px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: #ffffff;
+  box-shadow: 0 10px 25px rgba(237, 6, 119, 0.25);
+}
+
+/* ===== GRID CARD ===== */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+}
+
+.card {
+  height: 100px;
+  background: #ffffff;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  border: 1px solid #f3f4f6;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(237, 6, 119, 0.25);
+}
