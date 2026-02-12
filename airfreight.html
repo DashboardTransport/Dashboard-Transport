@@ -17,29 +17,34 @@
 body {
   margin: 0;
   font-family: 'Trueno', sans-serif;
-  display: flex;
-  background: linear-gradient(135deg, #ED0677, #ff4fa3);
+  background: linear-gradient(135deg, #c0055c, #ED0677, #ff4fa3);
   height: 100vh;
   overflow: hidden;
+  display: flex;
 }
 
 /* ===== SIDEBAR ===== */
 .sidebar {
+  position: fixed;
+  left: -260px;
+  top: 0;
   width: 240px;
-  background: linear-gradient(180deg, #FFCB05, #e6a800);
-  padding: 20px;
-  transition: 0.3s ease;
-  box-shadow: 4px 0 15px rgba(0,0,0,0.2);
-  position: relative;
+  height: 100%;
+  background: linear-gradient(180deg, #FFD84D, #FFCB05, #e6a800);
+  padding: 30px 20px;
+  box-shadow: 4px 0 25px rgba(0,0,0,0.3);
+  transition: 0.4s ease;
+  z-index: 1000;
 }
 
-.sidebar.collapsed {
-  width: 70px;
+.sidebar.active {
+  left: 0;
 }
 
 .sidebar h2 {
-  margin: 0 0 30px 0;
+  margin-bottom: 40px;
   font-size: 20px;
+  color: #4a2c35;
 }
 
 .sidebar ul {
@@ -48,27 +53,33 @@ body {
 }
 
 .sidebar ul li {
-  margin: 15px 0;
+  margin: 18px 0;
 }
 
 .sidebar ul li a {
   text-decoration: none;
   color: #4a2c35;
   font-size: 14px;
+  transition: 0.2s;
 }
 
-/* Collapse Button */
+.sidebar ul li a:hover {
+  letter-spacing: 1px;
+}
+
+/* ===== TOGGLE BUTTON ===== */
 .toggle-btn {
-  position: absolute;
-  top: 15px;
-  right: -15px;
-  background: #fff;
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background: white;
   border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
   cursor: pointer;
-  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.25);
+  z-index: 1100;
+  font-size: 16px;
 }
 
 /* ===== MAIN CONTENT ===== */
@@ -77,20 +88,22 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 100%;
 }
 
 /* ===== CIRCLE MENU ===== */
 .circle-container {
   position: relative;
-  width: 350px;
-  height: 350px;
+  width: 360px;
+  height: 360px;
 }
 
 .card {
   position: absolute;
-  width: 110px;
-  height: 110px;
-  background: #fff;
+  width: 115px;
+  height: 115px;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(6px);
   border-radius: 50%;
   display: flex;
   justify-content: center;
@@ -99,53 +112,64 @@ body {
   text-decoration: none;
   color: #4a2c35;
   font-size: 13px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
-  transition: 0.3s;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+  transition: 0.3s ease;
 }
 
 .card:hover {
-  transform: scale(1.1);
+  transform: scale(1.12);
 }
 
-/* PERFECT 360° POSITION */
+/* 360 positioning */
 .card:nth-child(1){ top:0%; left:50%; transform:translate(-50%,0);}
-.card:nth-child(2){ top:25%; left:85%; transform:translate(-50%,-50%);}
-.card:nth-child(3){ top:75%; left:85%; transform:translate(-50%,-50%);}
+.card:nth-child(2){ top:25%; left:88%; transform:translate(-50%,-50%);}
+.card:nth-child(3){ top:75%; left:88%; transform:translate(-50%,-50%);}
 .card:nth-child(4){ top:100%; left:50%; transform:translate(-50%,-100%);}
-.card:nth-child(5){ top:75%; left:15%; transform:translate(-50%,-50%);}
-.card:nth-child(6){ top:25%; left:15%; transform:translate(-50%,-50%);}
+.card:nth-child(5){ top:75%; left:12%; transform:translate(-50%,-50%);}
+.card:nth-child(6){ top:25%; left:12%; transform:translate(-50%,-50%);}
 
 </style>
 </head>
 <body>
 
+<button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+
 <div class="sidebar" id="sidebar">
-  <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
-  <h2>Menu</h2>
+  <h2>MENU</h2>
   <ul>
-    <li><a href="#">Air Freight</a></li>
-    <li><a href="#">Sea Freight</a></li>
-    <li><a href="#">Land Transport</a></li>
-    <li><a href="#">Warehouse</a></li>
-    <li><a href="#">Tracking</a></li>
+    <li><a href="#">HOME</a></li>
+    <li><a href="#">SEAFREIGHT</a></li>
+    <li><a href="#">LANDFREIGHT</a></li>
+    <li><a href="#">KPI</a></li>
+    <li><a href="#">ADMINISTRATIVE</a></li>
+    <li><a href="#">OTHERS</a></li>
   </ul>
 </div>
 
 <div class="main">
   <div class="circle-container">
-    <a href="#" class="card">Air</a>
-    <a href="#" class="card">Sea</a>
-    <a href="#" class="card">Land</a>
-    <a href="#" class="card">Warehouse</a>
-    <a href="#" class="card">Tracking</a>
-    <a href="#" class="card">Report</a>
+    <a href="#" class="card">SEA</a>
+    <a href="#" class="card">LAND</a>
+    <a href="#" class="card">KPI</a>
+    <a href="#" class="card">ADMIN</a>
+    <a href="#" class="card">OTHERS</a>
+    <a href="#" class="card">HOME</a>
   </div>
 </div>
 
 <script>
 function toggleSidebar() {
-  document.getElementById("sidebar").classList.toggle("collapsed");
+  document.getElementById("sidebar").classList.toggle("active");
 }
+
+// auto close kalau klik luar sidebar
+document.addEventListener("click", function(event) {
+  const sidebar = document.getElementById("sidebar");
+  const toggle = document.querySelector(".toggle-btn");
+  if (!sidebar.contains(event.target) && !toggle.contains(event.target)) {
+    sidebar.classList.remove("active");
+  }
+});
 </script>
 
 </body>
