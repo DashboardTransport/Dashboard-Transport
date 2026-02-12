@@ -3,173 +3,169 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>✈️ Airfreight Dashboard</title>
+<title>Airfreight Monitoring</title>
 
 <style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', sans-serif;
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI', sans-serif;
 }
 
 /* =========================
-   MAGENTA BACKGROUND (SAMA MOOD HOME)
+   MAIN BACKGROUND
 ========================= */
-body {
-    min-height: 100vh;
-    overflow-x: hidden;
+body{
+    min-height:100vh;
+    overflow-x:hidden;
     background:
-        linear-gradient(135deg, #ED0677 0%, #ff3ca6 40%, #ff8bd1 100%);
-    position: relative;
+        linear-gradient(135deg, #FF84A1 0%, #ff9fb6 40%, #ffc2d1 100%);
+    position:relative;
 }
 
 /* Subtle futuristic grid */
-body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
     background-image:
-        linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
+        linear-gradient(rgba(0,0,0,0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,0.06) 1px, transparent 1px);
+    background-size:40px 40px;
+    pointer-events:none;
+    z-index:0;
 }
 
 /* =========================
    SIDEBAR
 ========================= */
-.sidebar {
-    position: fixed;
-    left: -260px;
-    top: 0;
-    width: 260px;
-    height: 100%;
-    padding: 40px 30px;
-    transition: 0.4s ease;
-    z-index: 1000;
+.sidebar{
+    position:fixed;
+    left:-260px;
+    top:0;
+    width:260px;
+    height:100%;
+    padding:50px 30px;
+    transition:0.4s ease;
+    z-index:1000;
 
-    /* KUNING GRADASI FUTURISTIC */
     background:
-        linear-gradient(180deg, #FFCB06 0%, #ffb300 100%);
+        linear-gradient(180deg, #FFEFA3 0%, #ffe27a 100%);
 }
 
-.sidebar::before {
-    content: "";
-    position: absolute;
-    inset: 0;
+.sidebar::before{
+    content:"";
+    position:absolute;
+    inset:0;
     background-image:
-        linear-gradient(rgba(255,255,255,0.15) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.15) 1px, transparent 1px);
-    background-size: 30px 30px;
-    opacity: 0.25;
-    pointer-events: none;
+        linear-gradient(rgba(0,0,0,0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,0.07) 1px, transparent 1px);
+    background-size:30px 30px;
+    opacity:0.4;
+    pointer-events:none;
 }
 
-.sidebar.active {
-    left: 0;
+.sidebar.active{
+    left:0;
 }
 
-.sidebar h2 {
-    color: white;
-    margin-bottom: 40px;
-    font-size: 20px;
-    letter-spacing: 1px;
+.sidebar h2{
+    color:black;
+    margin-bottom:40px;
+    font-size:20px;
+    letter-spacing:1px;
 }
 
-/* Menu spacing lebih smooth */
-.sidebar ul {
-    list-style: none;
+.sidebar ul{
+    list-style:none;
 }
 
-.sidebar ul li {
-    margin: 22px 0;
+.sidebar ul li{
+    margin:20px 0;
 }
 
-.sidebar ul li a {
-    text-decoration: none;
-    color: white;
-    font-size: 15px;
-    font-weight: 500;
-    transition: 0.3s;
+.sidebar ul li a{
+    text-decoration:none;
+    color:black;
+    font-size:15px;
+    font-weight:500;
+    transition:0.3s;
 }
 
-.sidebar ul li a:hover {
-    letter-spacing: 1px;
-    opacity: 0.8;
+.sidebar ul li a:hover{
+    letter-spacing:1px;
 }
 
 /* =========================
    MAIN CONTENT
 ========================= */
-.main {
-    position: relative;
-    padding: 80px 80px;
-    transition: margin-left 0.4s ease;
-    z-index: 1;
+.main{
+    position:relative;
+    padding:80px;
+    transition:margin-left 0.4s ease;
+    z-index:1;
 }
 
-.main.shift {
-    margin-left: 260px;
+.main.shift{
+    margin-left:260px;
 }
 
-.main h1 {
-    color: white;
-    font-size: 40px;
-    margin-bottom: 50px;
+.main h1{
+    color:black;
+    font-size:38px;
+    margin-bottom:50px;
+    letter-spacing:1px;
 }
 
-/* FRAME CHART AREA */
-.chart-frame {
-    width: 100%;
-    height: 450px;
-    border-radius: 25px;
-    backdrop-filter: blur(10px);
-    background: rgba(255,255,255,0.12);
-    border: 1px solid rgba(255,255,255,0.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 18px;
-    letter-spacing: 1px;
+/* Frame for future chart */
+.chart-frame{
+    width:100%;
+    height:450px;
+    border-radius:25px;
+    backdrop-filter:blur(8px);
+    background:rgba(255,255,255,0.35);
+    border:1px solid rgba(0,0,0,0.1);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:black;
+    font-size:18px;
 }
 
 /* =========================
-   TOGGLE BUTTON (KANAN)
+   TOGGLE BUTTON
 ========================= */
-.toggle-btn {
-    position: fixed;
-    top: 25px;
-    right: 25px;
-    width: 28px;
-    height: 20px;
-    cursor: pointer;
-    z-index: 1100;
+.toggle-btn{
+    position:fixed;
+    top:25px;
+    right:25px;
+    width:26px;
+    height:20px;
+    cursor:pointer;
+    z-index:1100;
 }
 
-.toggle-btn span {
-    display: block;
-    height: 3px;
-    width: 100%;
-    background: white;
-    margin: 5px 0;
-    transition: 0.4s;
-    border-radius: 2px;
+.toggle-btn span{
+    display:block;
+    height:3px;
+    width:100%;
+    background:black;
+    margin:5px 0;
+    transition:0.4s;
+    border-radius:2px;
 }
 
-/* Animate to X */
-.toggle-btn.active span:nth-child(1) {
-    transform: rotate(45deg) translate(5px, 5px);
+.toggle-btn.active span:nth-child(1){
+    transform:rotate(45deg) translate(5px,5px);
 }
 
-.toggle-btn.active span:nth-child(2) {
-    opacity: 0;
+.toggle-btn.active span:nth-child(2){
+    opacity:0;
 }
 
-.toggle-btn.active span:nth-child(3) {
-    transform: rotate(-45deg) translate(6px, -6px);
+.toggle-btn.active span:nth-child(3){
+    transform:rotate(-45deg) translate(6px,-6px);
 }
 
 </style>
@@ -198,7 +194,7 @@ body::before {
 
 <!-- MAIN -->
 <div class="main" id="mainContent">
-    <h1>✈️ Dashboard Monitoring</h1>
+    <h1>AIRFREIGHT MONITORING</h1>
 
     <div class="chart-frame">
         Frame untuk isi graphic / chart nanti
