@@ -10,7 +10,7 @@
 body{
   margin:0;
   font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(135deg, #ED0677 0%, #ff4fa3 100%);
+  background: linear-gradient(135deg, #ED0677 0%, #ff2f92 40%, #ff6aa8 100%);
   color:white;
   overflow-x:hidden;
 }
@@ -20,52 +20,71 @@ body{
   position:fixed;
   top:0;
   left:0;
-  width:240px;
+  width:250px;
   height:100vh;
-  background: linear-gradient(180deg, #FFCB05 0%, #f5a700 100%);
-  padding:30px 20px;
+  background: linear-gradient(180deg, #FFCB06 0%, #f4b000 60%, #e09c00 100%);
+  padding:30px 25px;
   box-sizing:border-box;
   transform: translateX(-100%);
   transition: transform 0.35s ease;
   z-index:1000;
 }
 
+/* active */
 #sidebar.active{
   transform: translateX(0);
 }
 
-#sidebar h2{
-  margin-top:0;
-  font-size:20px;
+/* Close button */
+#closeBtn{
+  position:absolute;
+  top:18px;
+  right:20px;
+  font-size:22px;
+  cursor:pointer;
+  font-weight:600;
 }
 
+/* Sidebar title */
+#sidebar h2{
+  margin-top:0;
+  margin-bottom:35px;
+  font-size:20px;
+  font-weight:600;
+}
+
+/* Menu list */
 #sidebar ul{
   list-style:none;
   padding:0;
+  margin:0;
 }
 
 #sidebar ul li{
-  margin:18px 0;
+  margin:14px 0;
 }
 
 #sidebar ul li a{
   text-decoration:none;
   color:white;
   font-weight:500;
-  transition: opacity 0.2s;
+  padding:8px 0;
+  display:block;
+  transition: all 0.2s ease;
 }
 
 #sidebar ul li a:hover{
-  opacity:0.7;
+  padding-left:6px;
+  opacity:0.8;
 }
 
 /* ================= TOGGLE ================= */
 #toggle{
   position:fixed;
-  top:18px;
-  left:18px;
-  width:22px;
-  height:18px;
+  top:22px;
+  left:22px;
+  width:20px;
+  height:16px;
   cursor:pointer;
   z-index:1100;
   display:flex;
@@ -80,41 +99,29 @@ body{
   transition:0.3s ease;
 }
 
-#toggle.open span:nth-child(1){
-  transform:rotate(45deg) translate(5px,5px);
-}
-
-#toggle.open span:nth-child(2){
-  opacity:0;
-}
-
-#toggle.open span:nth-child(3){
-  transform:rotate(-45deg) translate(5px,-5px);
-}
-
-/* ================= MAIN CONTENT ================= */
+/* ================= MAIN ================= */
 #main{
-  padding:80px 40px;
+  padding:90px 60px;
   transition: margin-left 0.35s ease;
 }
 
 #main.shift{
-  margin-left:240px;
+  margin-left:250px;
 }
 
 /* ================= FRAME ================= */
 .frame{
-  max-width:1000px;
-  height:500px;
+  max-width:1100px;
+  height:520px;
   margin:40px auto;
   background: rgba(255,255,255,0.08);
-  border: 2px solid rgba(255,255,255,0.15);
-  border-radius:18px;
+  border: 1.5px solid rgba(255,255,255,0.25);
+  border-radius:22px;
   display:flex;
   align-items:center;
   justify-content:center;
   font-size:18px;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(10px);
 }
 </style>
 </head>
@@ -130,6 +137,7 @@ body{
 
 <!-- Sidebar -->
 <div id="sidebar">
+  <div id="closeBtn">×</div>
   <h2>Menu</h2>
   <ul>
     <li><a href="index.html">Home</a></li>
@@ -154,11 +162,16 @@ body{
 const toggle = document.getElementById("toggle");
 const sidebar = document.getElementById("sidebar");
 const main = document.getElementById("main");
+const closeBtn = document.getElementById("closeBtn");
 
 toggle.addEventListener("click",()=>{
-  toggle.classList.toggle("open");
-  sidebar.classList.toggle("active");
-  main.classList.toggle("shift");
+  sidebar.classList.add("active");
+  main.classList.add("shift");
+});
+
+closeBtn.addEventListener("click",()=>{
+  sidebar.classList.remove("active");
+  main.classList.remove("shift");
 });
 </script>
 
