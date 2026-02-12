@@ -1,175 +1,212 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Transport</title>
+<title>Airfreight Dashboard</title>
 
 <style>
 
-/* ===== FONT ===== */
+/* ================= FONT ================= */
 @font-face {
   font-family: 'Trueno';
-  src: url('font/TruenoBold.woff2') format('woff2');
-  font-weight: bold;
+  src: url('fonts/TruenoRG.woff2') format('woff2');
+  font-weight: 400;
+}
+@font-face {
+  font-family: 'Trueno';
+  src: url('fonts/TruenoBold.woff2') format('woff2');
+  font-weight: 700;
 }
 
-body {
-  margin: 0;
-  font-family: 'Trueno', sans-serif;
-  background: linear-gradient(135deg, #c0055c, #ED0677, #ff4fa3);
-  height: 100vh;
-  overflow: hidden;
-  display: flex;
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Trueno', sans-serif;
 }
 
-/* ===== SIDEBAR ===== */
-.sidebar {
-  position: fixed;
-  left: -260px;
-  top: 0;
-  width: 240px;
-  height: 100%;
-  background: linear-gradient(180deg, #FFD84D, #FFCB05, #e6a800);
-  padding: 30px 20px;
-  box-shadow: 4px 0 25px rgba(0,0,0,0.3);
-  transition: 0.4s ease;
-  z-index: 1000;
+/* ================= BODY BACKGROUND (MAGENTA HOME STYLE) ================= */
+body{
+  min-height:100vh;
+  display:flex;
+  overflow-x:hidden;
+  background:
+    radial-gradient(circle at 20% 30%, #FF84A1 0%, transparent 55%),
+    radial-gradient(circle at 80% 70%, #FFEFA3 0%, transparent 60%),
+    linear-gradient(135deg, #FFECF0, #FFEFA3);
 }
 
-.sidebar.active {
-  left: 0;
+/* ================= SIDEBAR ================= */
+.sidebar{
+  position:fixed;
+  left:-260px;
+  top:0;
+  width:260px;
+  height:100vh;
+  padding:30px 20px;
+  display:flex;
+  flex-direction:column;
+  transition:0.4s ease;
+
+  background:linear-gradient(180deg,#FFCB05 0%, #f7b500 60%, #e09e00 100%);
+  box-shadow:4px 0 25px rgba(0,0,0,0.15);
 }
 
-.sidebar h2 {
-  margin-bottom: 40px;
-  font-size: 20px;
-  color: #4a2c35;
+.sidebar.active{
+  left:0;
 }
 
-.sidebar ul {
-  list-style: none;
-  padding: 0;
+.sidebar h2{
+  font-size:22px;
+  margin-bottom:40px;
+  font-weight:700;
+  color:#333;
 }
 
-.sidebar ul li {
-  margin: 18px 0;
+.sidebar nav{
+  display:flex;
+  flex-direction:column;
+  gap:18px;
 }
 
-.sidebar ul li a {
-  text-decoration: none;
-  color: #4a2c35;
-  font-size: 14px;
-  transition: 0.2s;
+.sidebar nav a{
+  text-decoration:none;
+  color:#333;
+  font-weight:600;
+  padding:12px 18px;
+  border-radius:14px;
+  transition:0.3s;
 }
 
-.sidebar ul li a:hover {
-  letter-spacing: 1px;
+.sidebar nav a:hover{
+  background:rgba(255,255,255,0.6);
+  backdrop-filter:blur(6px);
 }
 
-/* ===== TOGGLE BUTTON ===== */
-.toggle-btn {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  background: white;
-  border: none;
-  border-radius: 8px;
-  padding: 8px 12px;
-  cursor: pointer;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.25);
-  z-index: 1100;
-  font-size: 16px;
+/* ================= TOGGLE BUTTON ================= */
+.toggle-btn{
+  position:fixed;
+  top:20px;
+  left:20px;
+  background:#ED0677;
+  color:white;
+  border:none;
+  padding:10px 14px;
+  border-radius:12px;
+  cursor:pointer;
+  font-size:18px;
+  box-shadow:0 6px 20px rgba(237,6,119,0.4);
+  z-index:1000;
 }
 
-/* ===== MAIN CONTENT ===== */
-.main {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
+/* ================= CONTENT ================= */
+.content{
+  flex:1;
+  padding:80px 60px;
+  width:100%;
 }
 
-/* ===== CIRCLE MENU ===== */
-.circle-container {
-  position: relative;
-  width: 360px;
-  height: 360px;
+.content h1{
+  font-size:42px;
+  font-weight:700;
+  color:#222;
 }
 
-.card {
-  position: absolute;
-  width: 115px;
-  height: 115px;
-  background: rgba(255,255,255,0.95);
-  backdrop-filter: blur(6px);
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  text-decoration: none;
-  color: #4a2c35;
-  font-size: 13px;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.25);
-  transition: 0.3s ease;
+.content p{
+  margin-top:10px;
+  font-size:18px;
+  color:#444;
 }
 
-.card:hover {
-  transform: scale(1.12);
+/* ================= GLASS SUMMARY CARD ================= */
+.glass-card{
+  margin-top:40px;
+  padding:30px;
+  border-radius:24px;
+  background:rgba(255,255,255,0.35);
+  backdrop-filter:blur(14px);
+  box-shadow:0 20px 40px rgba(0,0,0,0.1);
 }
 
-/* 360 positioning */
-.card:nth-child(1){ top:0%; left:50%; transform:translate(-50%,0);}
-.card:nth-child(2){ top:25%; left:88%; transform:translate(-50%,-50%);}
-.card:nth-child(3){ top:75%; left:88%; transform:translate(-50%,-50%);}
-.card:nth-child(4){ top:100%; left:50%; transform:translate(-50%,-100%);}
-.card:nth-child(5){ top:75%; left:12%; transform:translate(-50%,-50%);}
-.card:nth-child(6){ top:25%; left:12%; transform:translate(-50%,-50%);}
+/* ================= REGION BUBBLES ================= */
+.region-wrapper{
+  margin-top:60px;
+  display:flex;
+  gap:30px;
+  flex-wrap:wrap;
+}
+
+.region{
+  width:140px;
+  height:140px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  font-weight:700;
+  font-size:14px;
+  cursor:pointer;
+  transition:0.3s;
+
+  background:linear-gradient(145deg,#FF84A1,#FFEFA3);
+  color:#4a2c35;
+
+  box-shadow:
+    inset 0 0 25px rgba(255,255,255,0.8),
+    0 15px 30px rgba(255,132,161,0.4);
+}
+
+.region:hover{
+  transform:scale(1.1);
+  box-shadow:
+    inset 0 0 35px rgba(255,255,255,1),
+    0 20px 40px rgba(255,132,161,0.6);
+}
 
 </style>
 </head>
+
 <body>
 
 <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
 
 <div class="sidebar" id="sidebar">
-  <h2>MENU</h2>
-  <ul>
-    <li><a href="#">HOME</a></li>
-    <li><a href="#">SEAFREIGHT</a></li>
-    <li><a href="#">LANDFREIGHT</a></li>
-    <li><a href="#">KPI</a></li>
-    <li><a href="#">ADMINISTRATIVE</a></li>
-    <li><a href="#">OTHERS</a></li>
-  </ul>
+  <h2>AIRFREIGHT</h2>
+  <nav>
+    <a href="index.html">HOME</a>
+    <a href="seafreight.html">SEAFREIGHT</a>
+    <a href="landfreight.html">LANDFREIGHT</a>
+    <a href="#">KPI</a>
+    <a href="#">ADMINISTRATIVE</a>
+    <a href="#">OTHERS</a>
+  </nav>
 </div>
 
-<div class="main">
-  <div class="circle-container">
-    <a href="#" class="card">SEA</a>
-    <a href="#" class="card">LAND</a>
-    <a href="#" class="card">KPI</a>
-    <a href="#" class="card">ADMIN</a>
-    <a href="#" class="card">OTHERS</a>
-    <a href="#" class="card">HOME</a>
+<div class="content">
+  <h1>Airfreight Dashboard</h1>
+  <p>Welcome to Airfreight module.</p>
+
+  <div class="glass-card">
+    <h2>Summary</h2>
+    <p>Coming soon...</p>
   </div>
+
+  <div class="region-wrapper">
+    <div class="region">All Region</div>
+    <div class="region">Jabodetabek</div>
+    <div class="region">Jatimbalinusra</div>
+    <div class="region">Kalsulam</div>
+    <div class="region">Sumatera</div>
+  </div>
+
 </div>
 
 <script>
-function toggleSidebar() {
+function toggleSidebar(){
   document.getElementById("sidebar").classList.toggle("active");
 }
-
-// auto close kalau klik luar sidebar
-document.addEventListener("click", function(event) {
-  const sidebar = document.getElementById("sidebar");
-  const toggle = document.querySelector(".toggle-btn");
-  if (!sidebar.contains(event.target) && !toggle.contains(event.target)) {
-    sidebar.classList.remove("active");
-  }
-});
 </script>
 
 </body>
