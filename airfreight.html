@@ -4,158 +4,162 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>✈️ Dashboard Monitoring</title>
+
 <style>
-  /* BODY */
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #ED0677, #FF6EC7); /* gradasi magenta */
-    color: #fff;
-    overflow-x: hidden;
-  }
+/* ================= BODY ================= */
+body{
+  margin:0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #ED0677 0%, #ff4fa3 100%);
+  color:white;
+  overflow-x:hidden;
+}
 
-  /* SIDEBAR */
-  #sidebar {
-    position: fixed;
-    top: 0;
-    left: -250px; /* hidden default */
-    width: 250px;
-    height: 100vh;
-    background: linear-gradient(180deg, #FFD700, #FFA500); /* mood kuning */
-    box-shadow: 2px 0 10px rgba(0,0,0,0.3);
-    padding: 20px;
-    box-sizing: border-box;
-    transition: left 0.3s ease;
-    z-index: 1000;
-  }
+/* ================= SIDEBAR ================= */
+#sidebar{
+  position:fixed;
+  top:0;
+  left:0;
+  width:240px;
+  height:100vh;
+  background: linear-gradient(180deg, #FFCB05 0%, #f5a700 100%);
+  padding:30px 20px;
+  box-sizing:border-box;
+  transform: translateX(-100%);
+  transition: transform 0.35s ease;
+  z-index:1000;
+}
 
-  #sidebar.active {
-    left: 0;
-  }
+#sidebar.active{
+  transform: translateX(0);
+}
 
-  #sidebar h2 {
-    color: #fff;
-    margin-bottom: 20px;
-    font-size: 1.5em;
-  }
+#sidebar h2{
+  margin-top:0;
+  font-size:20px;
+}
 
-  #sidebar ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
+#sidebar ul{
+  list-style:none;
+  padding:0;
+}
 
-  #sidebar ul li {
-    margin: 15px 0;
-  }
+#sidebar ul li{
+  margin:18px 0;
+}
 
-  #sidebar ul li a {
-    color: #fff;
-    text-decoration: none;
-    font-size: 1em;
-    display: block;
-    padding: 5px 0;
-    transition: background 0.2s ease;
-  }
+#sidebar ul li a{
+  text-decoration:none;
+  color:white;
+  font-weight:500;
+  transition: opacity 0.2s;
+}
 
-  #sidebar ul li a:hover {
-    background: rgba(255,255,255,0.2);
-    border-radius: 5px;
-  }
+#sidebar ul li a:hover{
+  opacity:0.7;
+}
 
-  /* TOGGLE GARIS TIGA */
-  #sidebar-toggle {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    width: 35px;
-    height: 30px;
-    cursor: pointer;
-    z-index: 1100;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
+/* ================= TOGGLE ================= */
+#toggle{
+  position:fixed;
+  top:18px;
+  left:18px;
+  width:22px;
+  height:18px;
+  cursor:pointer;
+  z-index:1100;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
 
-  #sidebar-toggle div {
-    height: 4px;
-    background-color: #fff;
-    border-radius: 2px;
-    transition: all 0.3s ease;
-  }
+#toggle span{
+  height:3px;
+  background:white;
+  border-radius:3px;
+  transition:0.3s ease;
+}
 
-  #sidebar-toggle.open div:nth-child(1) {
-    transform: rotate(45deg) translate(5px,5px);
-  }
+#toggle.open span:nth-child(1){
+  transform:rotate(45deg) translate(5px,5px);
+}
 
-  #sidebar-toggle.open div:nth-child(2) {
-    opacity: 0;
-  }
+#toggle.open span:nth-child(2){
+  opacity:0;
+}
 
-  #sidebar-toggle.open div:nth-child(3) {
-    transform: rotate(-45deg) translate(5px,-5px);
-  }
+#toggle.open span:nth-child(3){
+  transform:rotate(-45deg) translate(5px,-5px);
+}
 
-  /* KONTEN UTAMA */
-  #main-content {
-    padding: 60px 40px 40px 40px;
-  }
+/* ================= MAIN CONTENT ================= */
+#main{
+  padding:80px 40px;
+  transition: margin-left 0.35s ease;
+}
 
-  .frame {
-    width: 100%;
-    max-width: 1000px;
-    height: 500px;
-    margin: 0 auto;
-    background: rgba(255,255,255,0.1); /* semi transparent frame */
-    border-radius: 15px;
-    border: 2px dashed rgba(255,255,255,0.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    font-size: 1.2em;
-  }
+#main.shift{
+  margin-left:240px;
+}
 
+/* ================= FRAME ================= */
+.frame{
+  max-width:1000px;
+  height:500px;
+  margin:40px auto;
+  background: rgba(255,255,255,0.08);
+  border: 2px solid rgba(255,255,255,0.15);
+  border-radius:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
+  backdrop-filter: blur(8px);
+}
 </style>
 </head>
+
 <body>
 
-  <!-- SIDEBAR -->
-  <div id="sidebar">
-    <h2>Menu</h2>
-    <ul>
-      <li><a href="home.html">Home</a></li>
-      <li><a href="seafreight.html">Seafreight</a></li>
-      <li><a href="landfreight.html">Landfreight</a></li>
-      <li><a href="kpi.html">KPI</a></li>
-      <li><a href="administrative.html">Administrative</a></li>
-      <li><a href="others.html">Others</a></li>
-    </ul>
-  </div>
+<!-- Toggle -->
+<div id="toggle">
+  <span></span>
+  <span></span>
+  <span></span>
+</div>
 
-  <!-- TOGGLE -->
-  <div id="sidebar-toggle">
-    <div></div>
-    <div></div>
-    <div></div>
-  </div>
+<!-- Sidebar -->
+<div id="sidebar">
+  <h2>Menu</h2>
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="seafreight.html">Seafreight</a></li>
+    <li><a href="landfreight.html">Landfreight</a></li>
+    <li><a href="kpi.html">KPI</a></li>
+    <li><a href="administrative.html">Administrative</a></li>
+    <li><a href="others.html">Others</a></li>
+  </ul>
+</div>
 
-  <!-- MAIN CONTENT -->
-  <div id="main-content">
-    <h1>Dashboard Monitoring</h1>
-    <div class="frame">
-      Frame untuk nanti isi chart / graphic
-    </div>
+<!-- Main -->
+<div id="main">
+  <h1>Dashboard Monitoring</h1>
+
+  <div class="frame">
+    Frame untuk isi graphic / chart nanti
   </div>
+</div>
 
 <script>
-  const sidebar = document.getElementById('sidebar');
-  const toggle = document.getElementById('sidebar-toggle');
+const toggle = document.getElementById("toggle");
+const sidebar = document.getElementById("sidebar");
+const main = document.getElementById("main");
 
-  toggle.addEventListener('click', () => {
-    sidebar.classList.toggle('active');
-    toggle.classList.toggle('open');
-  });
+toggle.addEventListener("click",()=>{
+  toggle.classList.toggle("open");
+  sidebar.classList.toggle("active");
+  main.classList.toggle("shift");
+});
 </script>
 
 </body>
