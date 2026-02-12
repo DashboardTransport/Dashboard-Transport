@@ -3,110 +3,150 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Airfreight - Dashboard</title>
-
-<link rel="stylesheet" href="style.css">
+<title>Dashboard Transport</title>
 
 <style>
 
-/* ===== AIRFREIGHT PAGE ===== */
-
-body{
-  margin:0;
-  font-family:'Trueno', sans-serif;
-  min-height:100vh;
-  display:flex;
-  background:
-    radial-gradient(circle at 20% 30%, #FF84A1 0%, transparent 55%),
-    radial-gradient(circle at 80% 70%, #FFEFA3 0%, transparent 60%),
-    linear-gradient(135deg, #FFECF0, #FFEFA3);
+/* ===== FONT ===== */
+@font-face {
+  font-family: 'Trueno';
+  src: url('font/TruenoBold.woff2') format('woff2');
+  font-weight: bold;
 }
 
-/* layout */
-.layout{
-  display:flex;
-  width:100%;
+body {
+  margin: 0;
+  font-family: 'Trueno', sans-serif;
+  display: flex;
+  background: linear-gradient(135deg, #ED0677, #ff4fa3);
+  height: 100vh;
+  overflow: hidden;
 }
 
-/* sidebar */
-.sidebar{
-  width:260px;
-  padding:40px 25px;
-  background:linear-gradient(180deg,#FFCB05,#f5b800);
-  box-shadow:5px 0 25px rgba(0,0,0,0.15);
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: 240px;
+  background: linear-gradient(180deg, #FFCB05, #e6a800);
+  padding: 20px;
+  transition: 0.3s ease;
+  box-shadow: 4px 0 15px rgba(0,0,0,0.2);
+  position: relative;
 }
 
-.sidebar h2{
-  margin-bottom:35px;
-  font-weight:700;
-  color:#333;
+.sidebar.collapsed {
+  width: 70px;
 }
 
-.sidebar a{
-  display:block;
-  margin-bottom:18px;
-  text-decoration:none;
-  color:#333;
-  font-weight:600;
-  padding:10px 14px;
-  border-radius:12px;
-  transition:0.3s;
+.sidebar h2 {
+  margin: 0 0 30px 0;
+  font-size: 20px;
 }
 
-.sidebar a:hover{
-  background:rgba(255,255,255,0.6);
-  backdrop-filter:blur(8px);
+.sidebar ul {
+  list-style: none;
+  padding: 0;
 }
 
-/* content */
-.content{
-  flex:1;
-  padding:60px;
-  color:#222;
+.sidebar ul li {
+  margin: 15px 0;
 }
 
-.content h1{
-  font-size:36px;
-  margin-bottom:15px;
+.sidebar ul li a {
+  text-decoration: none;
+  color: #4a2c35;
+  font-size: 14px;
 }
 
-.glass-card{
-  margin-top:30px;
-  padding:35px;
-  border-radius:22px;
-  background:rgba(255,255,255,0.3);
-  backdrop-filter:blur(14px);
-  box-shadow:0 15px 40px rgba(0,0,0,0.15);
+/* Collapse Button */
+.toggle-btn {
+  position: absolute;
+  top: 15px;
+  right: -15px;
+  background: #fff;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
 }
+
+/* ===== MAIN CONTENT ===== */
+.main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ===== CIRCLE MENU ===== */
+.circle-container {
+  position: relative;
+  width: 350px;
+  height: 350px;
+}
+
+.card {
+  position: absolute;
+  width: 110px;
+  height: 110px;
+  background: #fff;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  text-decoration: none;
+  color: #4a2c35;
+  font-size: 13px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: scale(1.1);
+}
+
+/* PERFECT 360° POSITION */
+.card:nth-child(1){ top:0%; left:50%; transform:translate(-50%,0);}
+.card:nth-child(2){ top:25%; left:85%; transform:translate(-50%,-50%);}
+.card:nth-child(3){ top:75%; left:85%; transform:translate(-50%,-50%);}
+.card:nth-child(4){ top:100%; left:50%; transform:translate(-50%,-100%);}
+.card:nth-child(5){ top:75%; left:15%; transform:translate(-50%,-50%);}
+.card:nth-child(6){ top:25%; left:15%; transform:translate(-50%,-50%);}
 
 </style>
 </head>
-
 <body>
 
-<div class="layout">
-
-  <div class="sidebar">
-    <h2>AIRFREIGHT</h2>
-    <a href="index.html">Home</a>
-    <a href="#">Seafreight</a>
-    <a href="#">Landfreight</a>
-    <a href="#">KPI</a>
-    <a href="#">Administrative</a>
-    <a href="#">Others</a>
-  </div>
-
-  <div class="content">
-    <h1>Airfreight Dashboard</h1>
-    <p>Welcome to Airfreight module.</p>
-
-    <div class="glass-card">
-      <h3>Summary</h3>
-      <p>Coming soon...</p>
-    </div>
-  </div>
-
+<div class="sidebar" id="sidebar">
+  <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+  <h2>Menu</h2>
+  <ul>
+    <li><a href="#">Air Freight</a></li>
+    <li><a href="#">Sea Freight</a></li>
+    <li><a href="#">Land Transport</a></li>
+    <li><a href="#">Warehouse</a></li>
+    <li><a href="#">Tracking</a></li>
+  </ul>
 </div>
+
+<div class="main">
+  <div class="circle-container">
+    <a href="#" class="card">Air</a>
+    <a href="#" class="card">Sea</a>
+    <a href="#" class="card">Land</a>
+    <a href="#" class="card">Warehouse</a>
+    <a href="#" class="card">Tracking</a>
+    <a href="#" class="card">Report</a>
+  </div>
+</div>
+
+<script>
+function toggleSidebar() {
+  document.getElementById("sidebar").classList.toggle("collapsed");
+}
+</script>
 
 </body>
 </html>
