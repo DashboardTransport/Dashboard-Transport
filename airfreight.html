@@ -7,7 +7,7 @@
 
 <style>
 
-/* ================= FONT ================= */
+/* ===== FONT ===== */
 @font-face {
   font-family: 'Trueno';
   src: url('fonts/TruenoRG.woff2') format('woff2');
@@ -26,7 +26,7 @@
   font-family:'Trueno', sans-serif;
 }
 
-/* ================= BODY BACKGROUND (MAGENTA HOME STYLE) ================= */
+/* ===== BODY BACKGROUND ===== */
 body{
   min-height:100vh;
   display:flex;
@@ -37,20 +37,18 @@ body{
     linear-gradient(135deg, #FFECF0, #FFEFA3);
 }
 
-/* ================= SIDEBAR ================= */
+/* ===== SIDEBAR ===== */
 .sidebar{
+  width:260px;
+  min-height:100vh;
+  padding:40px 20px;
+  background:linear-gradient(180deg,#FFCB05 0%, #f7b500 60%, #e09e00 100%);
+  box-shadow:4px 0 25px rgba(0,0,0,0.15);
   position:fixed;
   left:-260px;
   top:0;
-  width:260px;
-  height:100vh;
-  padding:30px 20px;
-  display:flex;
-  flex-direction:column;
   transition:0.4s ease;
-
-  background:linear-gradient(180deg,#FFCB05 0%, #f7b500 60%, #e09e00 100%);
-  box-shadow:4px 0 25px rgba(0,0,0,0.15);
+  z-index:1000;
 }
 
 .sidebar.active{
@@ -61,7 +59,7 @@ body{
   font-size:22px;
   margin-bottom:40px;
   font-weight:700;
-  color:#333;
+  color:#222;
 }
 
 .sidebar nav{
@@ -72,7 +70,7 @@ body{
 
 .sidebar nav a{
   text-decoration:none;
-  color:#333;
+  color:#222;
   font-weight:600;
   padding:12px 18px;
   border-radius:14px;
@@ -81,15 +79,27 @@ body{
 
 .sidebar nav a:hover{
   background:rgba(255,255,255,0.6);
-  backdrop-filter:blur(6px);
 }
 
-/* ================= TOGGLE BUTTON ================= */
+/* ===== MAIN WRAPPER ===== */
+.main{
+  flex:1;
+  width:100%;
+  padding:60px;
+  transition:0.4s ease;
+}
+
+/* shift content kalau sidebar aktif */
+.main.shift{
+  margin-left:260px;
+}
+
+/* ===== TOGGLE BUTTON ===== */
 .toggle-btn{
   position:fixed;
   top:20px;
-  left:20px;
-  background:#ED0677;
+  right:30px;   /* pindah ke kanan */
+  background:linear-gradient(135deg,#c0055c,#ED0677,#ff4fa3);
   color:white;
   border:none;
   padding:10px 14px;
@@ -97,39 +107,27 @@ body{
   cursor:pointer;
   font-size:18px;
   box-shadow:0 6px 20px rgba(237,6,119,0.4);
-  z-index:1000;
+  z-index:1100;
 }
 
-/* ================= CONTENT ================= */
-.content{
-  flex:1;
-  padding:80px 60px;
-  width:100%;
-}
-
-.content h1{
+/* ===== TITLE ===== */
+h1{
   font-size:42px;
   font-weight:700;
   color:#222;
 }
 
-.content p{
-  margin-top:10px;
-  font-size:18px;
-  color:#444;
-}
-
-/* ================= GLASS SUMMARY CARD ================= */
+/* ===== SUMMARY CARD ===== */
 .glass-card{
   margin-top:40px;
   padding:30px;
   border-radius:24px;
-  background:rgba(255,255,255,0.35);
+  background:rgba(255,255,255,0.4);
   backdrop-filter:blur(14px);
   box-shadow:0 20px 40px rgba(0,0,0,0.1);
 }
 
-/* ================= REGION BUBBLES ================= */
+/* ===== REGION BUBBLE ===== */
 .region-wrapper{
   margin-top:60px;
   display:flex;
@@ -149,10 +147,7 @@ body{
   font-size:14px;
   cursor:pointer;
   transition:0.3s;
-
   background:linear-gradient(145deg,#FF84A1,#FFEFA3);
-  color:#4a2c35;
-
   box-shadow:
     inset 0 0 25px rgba(255,255,255,0.8),
     0 15px 30px rgba(255,132,161,0.4);
@@ -160,9 +155,6 @@ body{
 
 .region:hover{
   transform:scale(1.1);
-  box-shadow:
-    inset 0 0 35px rgba(255,255,255,1),
-    0 20px 40px rgba(255,132,161,0.6);
 }
 
 </style>
@@ -184,8 +176,8 @@ body{
   </nav>
 </div>
 
-<div class="content">
-  <h1>Airfreight Dashboard</h1>
+<div class="main" id="mainContent">
+  <h1>Dashboard</h1>
   <p>Welcome to Airfreight module.</p>
 
   <div class="glass-card">
@@ -200,12 +192,12 @@ body{
     <div class="region">Kalsulam</div>
     <div class="region">Sumatera</div>
   </div>
-
 </div>
 
 <script>
 function toggleSidebar(){
   document.getElementById("sidebar").classList.toggle("active");
+  document.getElementById("mainContent").classList.toggle("shift");
 }
 </script>
 
