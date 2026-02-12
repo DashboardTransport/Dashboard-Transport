@@ -7,30 +7,16 @@
 
 <style>
 
-/* ===== FONT ===== */
-@font-face {
-  font-family: 'Trueno';
-  src: url('fonts/TruenoRG.woff2') format('woff2');
-  font-weight: 400;
-}
-@font-face {
-  font-family: 'Trueno';
-  src: url('fonts/TruenoBold.woff2') format('woff2');
-  font-weight: 700;
-}
-
 *{
   margin:0;
   padding:0;
   box-sizing:border-box;
-  font-family:'Trueno', sans-serif;
+  font-family:Arial, sans-serif;
 }
 
-/* ===== BODY BACKGROUND ===== */
 body{
   min-height:100vh;
   display:flex;
-  overflow-x:hidden;
   background:
     radial-gradient(circle at 20% 30%, #FF84A1 0%, transparent 55%),
     radial-gradient(circle at 80% 70%, #FFEFA3 0%, transparent 60%),
@@ -44,22 +30,10 @@ body{
   padding:40px 20px;
   background:linear-gradient(180deg,#FFCB05 0%, #f7b500 60%, #e09e00 100%);
   box-shadow:4px 0 25px rgba(0,0,0,0.15);
-  position:fixed;
-  left:-260px;
-  top:0;
-  transition:0.4s ease;
-  z-index:1000;
-}
-
-.sidebar.active{
-  left:0;
 }
 
 .sidebar h2{
-  font-size:22px;
   margin-bottom:40px;
-  font-weight:700;
-  color:#222;
 }
 
 .sidebar nav{
@@ -71,53 +45,19 @@ body{
 .sidebar nav a{
   text-decoration:none;
   color:#222;
-  font-weight:600;
-  padding:12px 18px;
-  border-radius:14px;
-  transition:0.3s;
+  font-weight:bold;
 }
 
-.sidebar nav a:hover{
-  background:rgba(255,255,255,0.6);
-}
-
-/* ===== MAIN WRAPPER ===== */
+/* ===== MAIN ===== */
 .main{
   flex:1;
-  width:100%;
   padding:60px;
-  transition:0.4s ease;
 }
 
-/* shift content kalau sidebar aktif */
-.main.shift{
-  margin-left:260px;
-}
-
-/* ===== TOGGLE BUTTON ===== */
-.toggle-btn{
-  position:fixed;
-  top:20px;
-  right:30px;   /* pindah ke kanan */
-  background:linear-gradient(135deg,#c0055c,#ED0677,#ff4fa3);
-  color:white;
-  border:none;
-  padding:10px 14px;
-  border-radius:12px;
-  cursor:pointer;
-  font-size:18px;
-  box-shadow:0 6px 20px rgba(237,6,119,0.4);
-  z-index:1100;
-}
-
-/* ===== TITLE ===== */
 h1{
-  font-size:42px;
-  font-weight:700;
-  color:#222;
+  font-size:38px;
 }
 
-/* ===== SUMMARY CARD ===== */
 .glass-card{
   margin-top:40px;
   padding:30px;
@@ -127,7 +67,7 @@ h1{
   box-shadow:0 20px 40px rgba(0,0,0,0.1);
 }
 
-/* ===== REGION BUBBLE ===== */
+/* ===== REGION ===== */
 .region-wrapper{
   margin-top:60px;
   display:flex;
@@ -143,18 +83,44 @@ h1{
   align-items:center;
   justify-content:center;
   text-align:center;
-  font-weight:700;
-  font-size:14px;
-  cursor:pointer;
-  transition:0.3s;
+  font-weight:bold;
   background:linear-gradient(145deg,#FF84A1,#FFEFA3);
-  box-shadow:
-    inset 0 0 25px rgba(255,255,255,0.8),
-    0 15px 30px rgba(255,132,161,0.4);
 }
 
-.region:hover{
-  transform:scale(1.1);
+/* ===== DATA TABLE ===== */
+.data-section{
+  margin-top:80px;
+}
+
+.data-section h2{
+  text-align:center;
+  margin-bottom:25px;
+}
+
+.table-wrapper{
+  background:rgba(255,255,255,0.45);
+  padding:25px;
+  border-radius:20px;
+  backdrop-filter:blur(12px);
+  box-shadow:0 20px 40px rgba(0,0,0,0.1);
+  overflow-x:auto;
+}
+
+#sheetTable{
+  width:100%;
+  border-collapse:collapse;
+  font-size:14px;
+}
+
+#sheetTable th{
+  background:linear-gradient(135deg,#FF84A1,#FFEFA3);
+  padding:12px;
+}
+
+#sheetTable td{
+  padding:10px;
+  border-bottom:1px solid rgba(0,0,0,0.08);
+  text-align:center;
 }
 
 </style>
@@ -162,21 +128,19 @@ h1{
 
 <body>
 
-<button class="toggle-btn" onclick="toggleSidebar()">☰</button>
-
-<div class="sidebar" id="sidebar">
+<div class="sidebar">
   <h2>AIRFREIGHT</h2>
   <nav>
     <a href="index.html">HOME</a>
-    <a href="seafreight.html">SEAFREIGHT</a>
-    <a href="landfreight.html">LANDFREIGHT</a>
+    <a href="#">SEAFREIGHT</a>
+    <a href="#">LANDFREIGHT</a>
     <a href="#">KPI</a>
     <a href="#">ADMINISTRATIVE</a>
     <a href="#">OTHERS</a>
   </nav>
 </div>
 
-<div class="main" id="mainContent">
+<div class="main">
   <h1>Dashboard</h1>
   <p>Welcome to Airfreight module.</p>
 
@@ -192,13 +156,36 @@ h1{
     <div class="region">Kalsulam</div>
     <div class="region">Sumatera</div>
   </div>
+
+  <!-- GOOGLE SHEET TABLE -->
+  <div class="data-section">
+    <h2>Airfreight Outgoing Cost Based on Region</h2>
+    <div class="table-wrapper">
+      <table id="sheetTable"></table>
+    </div>
+  </div>
+
 </div>
 
 <script>
-function toggleSidebar(){
-  document.getElementById("sidebar").classList.toggle("active");
-  document.getElementById("mainContent").classList.toggle("shift");
-}
+fetch("https://docs.google.com/spreadsheets/d/e/2PACX-1vQwTBUhnX5_I0RkKD13l1MSQ42cI9FF-lkOFhaq-4jQmNGnBn6QEsDl3LWjXBKEYBHCwCUdFeVIvILt/pub?gid=1246994800&single=true&output=csv")
+.then(response => response.text())
+.then(data => {
+  const rows = data.split("\n").map(row => row.split(","));
+  let table = document.getElementById("sheetTable");
+
+  rows.forEach((row, index) => {
+    let tr = document.createElement("tr");
+
+    row.forEach(cell => {
+      let td = document.createElement(index === 0 ? "th" : "td");
+      td.textContent = cell;
+      tr.appendChild(td);
+    });
+
+    table.appendChild(tr);
+  });
+});
 </script>
 
 </body>
