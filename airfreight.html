@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Airfreight - Dashboard Transport</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="airfreight-page">
+
+  <div class="layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <h2 class="logo">AIRFREIGHT</h2>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="#">Seafreight</a>
+        <a href="#">Landfreight</a>
+        <a href="#">KPI</a>
+        <a href="#">Administrative</a>
+        <a href="#">Others</a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content">
+      <h1>Airfreight Dashboard</h1>
+      <p>Welcome to Airfreight module.</p>
+
+      <div class="glass-card">
+        <h3>Summary</h3>
+        <p>Coming soon...</p>
+      </div>
+
+    </main>
+
+  </div>
+
+</body>
+</html>
+/* ================= AIRFREIGHT PAGE ================= */
+
+.airfreight-page {
+  margin: 0;
+  font-family: 'TruenoBold', sans-serif;
+  background: linear-gradient(90deg, #ED0677 0%, #FFCB05 100%);
+  min-height: 100vh;
+}
+
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 250px;
+  padding: 30px 20px;
+  background: linear-gradient(180deg, #FFCB05 0%, #f7b500 100%);
+  box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+}
+
+.sidebar .logo {
+  margin-bottom: 40px;
+  font-size: 20px;
+  color: #333;
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.sidebar nav a {
+  text-decoration: none;
+  color: #333;
+  font-size: 16px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  transition: 0.3s ease;
+}
+
+.sidebar nav a:hover {
+  background: rgba(255,255,255,0.6);
+  backdrop-filter: blur(8px);
+}
+
+/* Content */
+.content {
+  flex: 1;
+  padding: 60px;
+  color: #222;
+}
+
+.content h1 {
+  font-size: 32px;
+  margin-bottom: 20px;
+}
+
+/* Glass Card */
+.glass-card {
+  margin-top: 30px;
+  padding: 30px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.25);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+}
