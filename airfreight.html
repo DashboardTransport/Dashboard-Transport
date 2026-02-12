@@ -12,35 +12,36 @@
       left: 0;
       width: 250px;
       height: 100vh;
-      background: linear-gradient(180deg, #FFD700, #FFA500);
+      background: linear-gradient(180deg, #FFD700, #FFA500); /* gradasi kuning */
       padding: 20px;
+      box-sizing: border-box;
       box-shadow: 2px 0 10px rgba(0,0,0,0.2);
-      transition: transform 0.3s ease;
-      transform: translateX(0);
       z-index: 1000;
-    }
-
-    #sidebar.collapsed {
-      transform: translateX(-100%);
+      display: flex;
+      flex-direction: column;
     }
 
     #sidebar h2 {
       color: #fff;
       margin-bottom: 20px;
+      font-size: 1.5em;
     }
 
     #sidebar ul {
       list-style: none;
       padding: 0;
+      margin: 0;
+      flex-grow: 1;
     }
 
     #sidebar ul li {
       margin: 15px 0;
       color: #fff;
       cursor: pointer;
+      font-size: 1em;
     }
 
-    /* Garis tiga / toggle kanan */
+    /* Toggle garis tiga di kanan */
     #sidebar-toggle {
       position: fixed;
       top: 50%;
@@ -65,26 +66,34 @@
       transition: all 0.3s ease;
     }
 
-    /* Transform garis tiga jadi silang */
+    /* Garis tiga → silang saat toggle open */
     #sidebar-toggle.open div:nth-child(1) {
-      transform: rotate(45deg) translate(5px, 5px);
+      transform: rotate(45deg) translate(4px, 4px);
     }
     #sidebar-toggle.open div:nth-child(2) {
       opacity: 0;
     }
     #sidebar-toggle.open div:nth-child(3) {
-      transform: rotate(-45deg) translate(5px, -5px);
+      transform: rotate(-45deg) translate(4px, -4px);
     }
 
     /* Konten utama */
     #main-content {
-      margin-left: 270px;
+      margin-left: 260px; /* tetap di sisi kanan sidebar */
       padding: 20px;
+      box-sizing: border-box;
       transition: margin-left 0.3s ease;
     }
 
+    /* Jangan geser terlalu jauh saat collapse */
     #sidebar.collapsed ~ #main-content {
       margin-left: 20px;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
     }
   </style>
 </head>
@@ -100,7 +109,7 @@
     </ul>
   </div>
 
-  <!-- Garis tiga toggle -->
+  <!-- Toggle garis tiga -->
   <div id="sidebar-toggle">
     <div></div>
     <div></div>
@@ -110,7 +119,7 @@
   <!-- Konten utama -->
   <div id="main-content">
     <h1>Dashboard Monitoring</h1>
-    <p>Isi konten utama di sini.</p>
+    <p>Konten utama tetap di sini. Layout dan warna stabil, siap diisi chart atau data nanti.</p>
   </div>
 
   <script>
@@ -122,10 +131,11 @@
       sidebar.classList.toggle('collapsed');
       toggle.classList.toggle('open');
 
+      // margin konten tetap aman
       if(sidebar.classList.contains('collapsed')) {
         mainContent.style.marginLeft = '20px';
       } else {
-        mainContent.style.marginLeft = '270px';
+        mainContent.style.marginLeft = '260px';
       }
     });
   </script>
