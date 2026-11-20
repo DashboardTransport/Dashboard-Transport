@@ -169,7 +169,7 @@
       <nav>
         <button id="nav-dashboard" class="active" onclick="switchTab('dashboard', this)"><i class="fa-solid fa-chart-pie"></i> Dashboard</button>
         <button id="nav-weekly" onclick="switchTab('weekly', this)"><i class="fa-solid fa-calendar-week"></i> Weekly Analysis</button>
-        <button id="nav-issues" onclick="switchTab('issues', this)"><i class="fa-solid fa-bullhorn"></i> Update & Issue</button>
+        <button id="nav-issues" onclick="switchTab('issues', this)"><i class="fa-solid fa-bullhorn"></i> Update &amp; Issue</button>
         <button id="nav-sla" onclick="switchTab('sla', this)"><i class="fa-solid fa-stopwatch"></i> SLA Performance</button>
         <button onclick="window.location.href='index.html'" class="btn-home"><i class="fa-solid fa-house"></i> Back to Home</button>
         <button onclick="handleLogout()" class="btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
@@ -268,11 +268,12 @@
               <button id="btn-view-vendor" class="btn-toggle active" onclick="switchWeeklyView('vendor')"><i class="fa-solid fa-truck"></i> Breakdown By Vendor</button>
               <button id="btn-view-route" class="btn-toggle" onclick="switchWeeklyView('route')"><i class="fa-solid fa-map-location-dot"></i> Breakdown By Route</button>
             </div>
-            <div style="display:flex; gap:6px;">
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
               <button id="btn-metric-all" class="btn-sub-toggle active" onclick="switchMetricView('all')">All Metrics</button>
               <button id="btn-metric-weight" class="btn-sub-toggle" onclick="switchMetricView('weight')">By Weight</button>
               <button id="btn-metric-parcel" class="btn-sub-toggle" onclick="switchMetricView('parcel')">By Parcel</button>
               <button id="btn-metric-stt" class="btn-sub-toggle" onclick="switchMetricView('stt')">By STT</button>
+              <button id="btn-metric-cost" class="btn-sub-toggle" onclick="switchMetricView('cost')">By Est. Cost</button>
             </div>
           </div>
           <div class="action-btns">
@@ -286,7 +287,7 @@
           <div class="table-container">
             <table id="weekly-table-elem">
               <thead id="weekly-table-head"></thead>
-              <tbody id="weekly-table-body"><tr><td colspan="16" class="loading-text">Loading data...</td></tr></tbody>
+              <tbody id="weekly-table-body"><tr><td colspan="21" class="loading-text">Loading data...</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -756,7 +757,7 @@
       }
     }
 
-    /* 2. WEEKLY ANALYSIS */
+    /* 2. WEEKLY ANALYSIS (WITH EST. COST) */
     function switchWeeklyView(viewType) {
       activeWeeklyView = viewType;
       document.getElementById("btn-view-vendor").classList.toggle("active", viewType === "vendor");
@@ -766,11 +767,15 @@
 
     function switchMetricView(metricType) {
       activeMetricView = metricType;
-      var btns = ["all", "weight", "parcel", "stt"];
+      var btns = ["all", "weight", "parcel", "stt", "cost"];
       for (var i = 0; i < btns.length; i++) {
         document.getElementById("btn-metric-" + btns[i]).classList.toggle("active", btns[i] === metricType);
       }
       renderWeeklyTable();
+    }
+
+    function fmtRp(val) {
+      return "Rp " + Math.round(val || 0).toLocaleString("id-ID");
     }
 
     function renderWeeklyTable() {
@@ -781,17 +786,19 @@
       var headHtml = "";
       if (activeMetricView === "all") {
         headHtml = "<tr><th style='background:#FFECF0; color:#ED0677; font-weight:800;'>" + firstColName + "</th>" +
-          "<th colspan='3' style='background:#FFEFA3; color:#524245;'>WEEK 1 (Day 1–7)</th>" +
-          "<th colspan='3' style='background:#7ECCEE; color:#fff;'>WEEK 2 (Day 8–14)</th>" +
-          "<th colspan='3' style='background:#FF84A1; color:#fff;'>WEEK 3 (Day 15–21)</th>" +
-          "<th colspan='3' style='background:#ED0677; color:#fff;'>WEEK 4+ (Day 22–End)</th>" +
-          "<th colspan='3' style='background:#524245; color:#fff;'>TOTAL FULL MONTH</th></tr>" +
+          "<th colspan='4' style='background:#FFEFA3; color:#524245;'>WEEK 1 (Day 1–7)</th>" +
+          "<th colspan='4' style='background:#7ECCEE; color:#fff;'>WEEK 2 (Day 8–14)</th>" +
+          "<th colspan='4' style='background:#FF84A1; color:#fff;'>WEEK 3 (Day 15–21)</th>" +
+          "<th colspan='4' style='background:#ED0677; color:#fff;'>WEEK 4+ (Day 22–End)</th>" +
+          "<th colspan='4' style='background:#524245; color:#fff;'>TOTAL FULL MONTH</th></tr>" +
           "<tr><th style='background:#FFECF0;'></th>" +
-          "<th>STT</th><th>WEIGHT</th><th>PARCEL</th><th>STT</th><th>WEIGHT</th><th>PARCEL</th>" +
-          "<th>STT</th><th>WEIGHT</th><th>PARCEL</th><th>STT</th><th>WEIGHT</th><th>PARCEL</th>" +
-          "<th>STT</th><th>WEIGHT</th><th>PARCEL</th></tr>";
+          "<th>STT</th><th>WEIGHT</th><th>PARCEL</th><th>EST. COST</th>" +
+          "<th>STT</th><th>WEIGHT</th><th>PARCEL</th><th>EST. COST</th>" +
+          "<th>STT</th><th>WEIGHT</th><th>PARCEL</th><th>EST. COST</th>" +
+          "<th>STT</th><th>WEIGHT</th><th>PARCEL</th><th>EST. COST</th>" +
+          "<th>STT</th><th>WEIGHT</th><th>PARCEL</th><th>EST. COST</th></tr>";
       } else {
-        var mLabel = activeMetricView === "weight" ? "WEIGHT (KG)" : (activeMetricView === "parcel" ? "PARCEL" : "STT");
+        var mLabel = activeMetricView === "weight" ? "WEIGHT (KG)" : (activeMetricView === "parcel" ? "PARCEL" : (activeMetricView === "cost" ? "EST. COST" : "STT"));
         headHtml = "<tr><th style='background:#FFECF0; color:#ED0677; font-weight:800;'>" + firstColName + "</th>" +
           "<th style='background:#FFEFA3; color:#524245;'>WEEK 1 (Day 1–7)</th>" +
           "<th style='background:#7ECCEE; color:#fff;'>WEEK 2 (Day 8–14)</th>" +
@@ -808,49 +815,80 @@
         if (r[3] !== m || r[2] !== y) continue;
         var key = activeWeeklyView === "vendor" ? r[12] : (r[8] + " - " + r[9]);
         if (!dataset[key]) {
-          dataset[key] = { w1:{stt:0,gw:0,parcel:0}, w2:{stt:0,gw:0,parcel:0}, w3:{stt:0,gw:0,parcel:0}, w4:{stt:0,gw:0,parcel:0}, total:{stt:0,gw:0,parcel:0} };
+          dataset[key] = {
+            w1: { stt:0, gw:0, parcel:0, cost:0 },
+            w2: { stt:0, gw:0, parcel:0, cost:0 },
+            w3: { stt:0, gw:0, parcel:0, cost:0 },
+            w4: { stt:0, gw:0, parcel:0, cost:0 },
+            total: { stt:0, gw:0, parcel:0, cost:0 }
+          };
         }
         var wk = r[4] <= 7 ? "w1" : (r[4] <= 14 ? "w2" : (r[4] <= 21 ? "w3" : "w4"));
         var sttVal = r[7] !== "" ? 1 : 0;
-        dataset[key][wk].stt += sttVal; dataset[key][wk].gw += r[10]; dataset[key][wk].parcel += r[11];
-        dataset[key].total.stt += sttVal; dataset[key].total.gw += r[10]; dataset[key].total.parcel += r[11];
+        var rowCost = r[13] || 0;
+        dataset[key][wk].stt += sttVal; dataset[key][wk].gw += r[10]; dataset[key][wk].parcel += r[11]; dataset[key][wk].cost += rowCost;
+        dataset[key].total.stt += sttVal; dataset[key].total.gw += r[10]; dataset[key].total.parcel += r[11]; dataset[key].total.cost += rowCost;
       }
 
       var keys = Object.keys(dataset);
       if (keys.length === 0) {
-        document.getElementById("weekly-table-body").innerHTML = "<tr><td colspan='16' style='text-align:center; padding:20px; color:#888;'>No records found for selected month &amp; year.</td></tr>";
+        document.getElementById("weekly-table-body").innerHTML = "<tr><td colspan='21' style='text-align:center; padding:20px; color:#888;'>No records found for selected month &amp; year.</td></tr>";
         return;
       }
 
       var html = "";
-      var totals = { w1:{stt:0,gw:0,parcel:0}, w2:{stt:0,gw:0,parcel:0}, w3:{stt:0,gw:0,parcel:0}, w4:{stt:0,gw:0,parcel:0}, total:{stt:0,gw:0,parcel:0} };
+      var totals = {
+        w1: { stt:0, gw:0, parcel:0, cost:0 },
+        w2: { stt:0, gw:0, parcel:0, cost:0 },
+        w3: { stt:0, gw:0, parcel:0, cost:0 },
+        w4: { stt:0, gw:0, parcel:0, cost:0 },
+        total: { stt:0, gw:0, parcel:0, cost:0 }
+      };
+
       for (var name in dataset) {
         var w = dataset[name];
-        totals.w1.stt += w.w1.stt; totals.w1.gw += w.w1.gw; totals.w1.parcel += w.w1.parcel;
-        totals.w2.stt += w.w2.stt; totals.w2.gw += w.w2.gw; totals.w2.parcel += w.w2.parcel;
-        totals.w3.stt += w.w3.stt; totals.w3.gw += w.w3.gw; totals.w3.parcel += w.w3.parcel;
-        totals.w4.stt += w.w4.stt; totals.w4.gw += w.w4.gw; totals.w4.parcel += w.w4.parcel;
-        totals.total.stt += w.total.stt; totals.total.gw += w.total.gw; totals.total.parcel += w.total.parcel;
+        totals.w1.stt += w.w1.stt; totals.w1.gw += w.w1.gw; totals.w1.parcel += w.w1.parcel; totals.w1.cost += w.w1.cost;
+        totals.w2.stt += w.w2.stt; totals.w2.gw += w.w2.gw; totals.w2.parcel += w.w2.parcel; totals.w2.cost += w.w2.cost;
+        totals.w3.stt += w.w3.stt; totals.w3.gw += w.w3.gw; totals.w3.parcel += w.w3.parcel; totals.w3.cost += w.w3.cost;
+        totals.w4.stt += w.w4.stt; totals.w4.gw += w.w4.gw; totals.w4.parcel += w.w4.parcel; totals.w4.cost += w.w4.cost;
+        totals.total.stt += w.total.stt; totals.total.gw += w.total.gw; totals.total.parcel += w.total.parcel; totals.total.cost += w.total.cost;
 
         if (activeMetricView === "all") {
-          html += "<tr><td class='align-left'><b>" + name + "</b></td><td>" + w.w1.stt + "</td><td>" + w.w1.gw.toLocaleString("id-ID") + "</td><td>" + w.w1.parcel.toLocaleString("id-ID") + "</td><td>" + w.w2.stt + "</td><td>" + w.w2.gw.toLocaleString("id-ID") + "</td><td>" + w.w2.parcel.toLocaleString("id-ID") + "</td><td>" + w.w3.stt + "</td><td>" + w.w3.gw.toLocaleString("id-ID") + "</td><td>" + w.w3.parcel.toLocaleString("id-ID") + "</td><td>" + w.w4.stt + "</td><td>" + w.w4.gw.toLocaleString("id-ID") + "</td><td>" + w.w4.parcel.toLocaleString("id-ID") + "</td><td style='color:var(--primary); font-weight:800;'>" + w.total.stt + "</td><td style='color:var(--primary); font-weight:800;'>" + w.total.gw.toLocaleString("id-ID") + " KG</td><td style='color:var(--primary); font-weight:800;'>" + w.total.parcel.toLocaleString("id-ID") + "</td></tr>";
+          html += "<tr><td class='align-left'><b>" + name + "</b></td>" +
+            "<td>" + w.w1.stt + "</td><td>" + w.w1.gw.toLocaleString("id-ID") + "</td><td>" + w.w1.parcel.toLocaleString("id-ID") + "</td><td>" + fmtRp(w.w1.cost) + "</td>" +
+            "<td>" + w.w2.stt + "</td><td>" + w.w2.gw.toLocaleString("id-ID") + "</td><td>" + w.w2.parcel.toLocaleString("id-ID") + "</td><td>" + fmtRp(w.w2.cost) + "</td>" +
+            "<td>" + w.w3.stt + "</td><td>" + w.w3.gw.toLocaleString("id-ID") + "</td><td>" + w.w3.parcel.toLocaleString("id-ID") + "</td><td>" + fmtRp(w.w3.cost) + "</td>" +
+            "<td>" + w.w4.stt + "</td><td>" + w.w4.gw.toLocaleString("id-ID") + "</td><td>" + w.w4.parcel.toLocaleString("id-ID") + "</td><td>" + fmtRp(w.w4.cost) + "</td>" +
+            "<td style='color:var(--primary); font-weight:800;'>" + w.total.stt + "</td>" +
+            "<td style='color:var(--primary); font-weight:800;'>" + w.total.gw.toLocaleString("id-ID") + " KG</td>" +
+            "<td style='color:var(--primary); font-weight:800;'>" + w.total.parcel.toLocaleString("id-ID") + "</td>" +
+            "<td style='color:var(--primary); font-weight:800;'>" + fmtRp(w.total.cost) + "</td></tr>";
         } else if (activeMetricView === "weight") {
           html += "<tr><td class='align-left'><b>" + name + "</b></td><td>" + w.w1.gw.toLocaleString("id-ID") + "</td><td>" + w.w2.gw.toLocaleString("id-ID") + "</td><td>" + w.w3.gw.toLocaleString("id-ID") + "</td><td>" + w.w4.gw.toLocaleString("id-ID") + "</td><td style='color:var(--primary); font-weight:800;'>" + w.total.gw.toLocaleString("id-ID") + " KG</td></tr>";
         } else if (activeMetricView === "parcel") {
           html += "<tr><td class='align-left'><b>" + name + "</b></td><td>" + w.w1.parcel.toLocaleString("id-ID") + "</td><td>" + w.w2.parcel.toLocaleString("id-ID") + "</td><td>" + w.w3.parcel.toLocaleString("id-ID") + "</td><td>" + w.w4.parcel.toLocaleString("id-ID") + "</td><td style='color:var(--primary); font-weight:800;'>" + w.total.parcel.toLocaleString("id-ID") + "</td></tr>";
         } else if (activeMetricView === "stt") {
           html += "<tr><td class='align-left'><b>" + name + "</b></td><td>" + w.w1.stt + "</td><td>" + w.w2.stt + "</td><td>" + w.w3.stt + "</td><td>" + w.w4.stt + "</td><td style='color:var(--primary); font-weight:800;'>" + w.total.stt + "</td></tr>";
+        } else if (activeMetricView === "cost") {
+          html += "<tr><td class='align-left'><b>" + name + "</b></td><td>" + fmtRp(w.w1.cost) + "</td><td>" + fmtRp(w.w2.cost) + "</td><td>" + fmtRp(w.w3.cost) + "</td><td>" + fmtRp(w.w4.cost) + "</td><td style='color:var(--primary); font-weight:800;'>" + fmtRp(w.total.cost) + "</td></tr>";
         }
       }
 
       if (activeMetricView === "all") {
-        html += "<tr class='grand-total'><td class='align-left'><b>GRAND TOTAL</b></td><td>" + totals.w1.stt + "</td><td>" + totals.w1.gw.toLocaleString("id-ID") + " KG</td><td>" + totals.w1.parcel.toLocaleString("id-ID") + "</td><td>" + totals.w2.stt + "</td><td>" + totals.w2.gw.toLocaleString("id-ID") + " KG</td><td>" + totals.w2.parcel.toLocaleString("id-ID") + "</td><td>" + totals.w3.stt + "</td><td>" + totals.w3.gw.toLocaleString("id-ID") + " KG</td><td>" + totals.w3.parcel.toLocaleString("id-ID") + "</td><td>" + totals.w4.stt + "</td><td>" + totals.w4.gw.toLocaleString("id-ID") + " KG</td><td>" + totals.w4.parcel.toLocaleString("id-ID") + "</td><td>" + totals.total.stt + "</td><td>" + totals.total.gw.toLocaleString("id-ID") + " KG</td><td>" + totals.total.parcel.toLocaleString("id-ID") + "</td></tr>";
+        html += "<tr class='grand-total'><td class='align-left'><b>GRAND TOTAL</b></td>" +
+          "<td>" + totals.w1.stt + "</td><td>" + totals.w1.gw.toLocaleString("id-ID") + " KG</td><td>" + totals.w1.parcel.toLocaleString("id-ID") + "</td><td>" + fmtRp(totals.w1.cost) + "</td>" +
+          "<td>" + totals.w2.stt + "</td><td>" + totals.w2.gw.toLocaleString("id-ID") + " KG</td><td>" + totals.w2.parcel.toLocaleString("id-ID") + "</td><td>" + fmtRp(totals.w2.cost) + "</td>" +
+          "<td>" + totals.w3.stt + "</td><td>" + totals.w3.gw.toLocaleString("id-ID") + " KG</td><td>" + totals.w3.parcel.toLocaleString("id-ID") + "</td><td>" + fmtRp(totals.w3.cost) + "</td>" +
+          "<td>" + totals.w4.stt + "</td><td>" + totals.w4.gw.toLocaleString("id-ID") + " KG</td><td>" + totals.w4.parcel.toLocaleString("id-ID") + "</td><td>" + fmtRp(totals.w4.cost) + "</td>" +
+          "<td>" + totals.total.stt + "</td><td>" + totals.total.gw.toLocaleString("id-ID") + " KG</td><td>" + totals.total.parcel.toLocaleString("id-ID") + "</td><td>" + fmtRp(totals.total.cost) + "</td></tr>";
       } else if (activeMetricView === "weight") {
         html += "<tr class='grand-total'><td class='align-left'><b>GRAND TOTAL</b></td><td>" + totals.w1.gw.toLocaleString("id-ID") + " KG</td><td>" + totals.w2.gw.toLocaleString("id-ID") + " KG</td><td>" + totals.w3.gw.toLocaleString("id-ID") + " KG</td><td>" + totals.w4.gw.toLocaleString("id-ID") + " KG</td><td>" + totals.total.gw.toLocaleString("id-ID") + " KG</td></tr>";
       } else if (activeMetricView === "parcel") {
         html += "<tr class='grand-total'><td class='align-left'><b>GRAND TOTAL</b></td><td>" + totals.w1.parcel.toLocaleString("id-ID") + "</td><td>" + totals.w2.parcel.toLocaleString("id-ID") + "</td><td>" + totals.w3.parcel.toLocaleString("id-ID") + "</td><td>" + totals.w4.parcel.toLocaleString("id-ID") + "</td><td>" + totals.total.parcel.toLocaleString("id-ID") + "</td></tr>";
       } else if (activeMetricView === "stt") {
         html += "<tr class='grand-total'><td class='align-left'><b>GRAND TOTAL</b></td><td>" + totals.w1.stt + "</td><td>" + totals.w2.stt + "</td><td>" + totals.w3.stt + "</td><td>" + totals.w4.stt + "</td><td>" + totals.total.stt + "</td></tr>";
+      } else if (activeMetricView === "cost") {
+        html += "<tr class='grand-total'><td class='align-left'><b>GRAND TOTAL</b></td><td>" + fmtRp(totals.w1.cost) + "</td><td>" + fmtRp(totals.w2.cost) + "</td><td>" + fmtRp(totals.w3.cost) + "</td><td>" + fmtRp(totals.w4.cost) + "</td><td>" + fmtRp(totals.total.cost) + "</td></tr>";
       }
       document.getElementById("weekly-table-body").innerHTML = html;
     }
