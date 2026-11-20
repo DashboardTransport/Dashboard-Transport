@@ -6,6 +6,7 @@
   <title>Transport Dashboard | Operations Portal</title>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
       --primary: #ED0677;
@@ -25,19 +26,84 @@
       flex-direction: column;
     }
 
+    /* LOGIN OVERLAY */
+    #login-screen {
+      position: fixed; inset: 0;
+      background: linear-gradient(135deg, #FFF4F7 0%, #FFEFA3 100%);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 9999; padding: 20px;
+    }
+    .login-box {
+      background: #fff; padding: 36px 32px; border-radius: 16px;
+      width: 100%; max-width: 400px;
+      box-shadow: 0 12px 32px rgba(237, 6, 119, 0.12);
+      border: 1px solid #FFD0DC; text-align: center;
+    }
+    .login-icon {
+      width: 48px; height: 48px; background: var(--sec-bg-pink); border-radius: 12px;
+      display: inline-grid; place-items: center; color: var(--primary);
+      font-size: 1.35rem; margin-bottom: 12px;
+    }
+    .login-box h2 { color: var(--primary); font-weight: 800; font-size: 1.35rem; margin-bottom: 4px; }
+    .login-box p { color: #777; font-size: 0.85rem; margin-bottom: 24px; }
+    .login-field { text-align: left; margin-bottom: 16px; }
+    .login-field label { display: block; font-size: 0.78rem; font-weight: 700; margin-bottom: 6px; color: var(--sec-dark); }
+    .login-field input {
+      width: 100%; padding: 11px 14px; border: 1.5px solid #DDD;
+      border-radius: 8px; font-size: 0.9rem; font-weight: 600;
+    }
+    .login-field input:focus { outline: none; border-color: var(--primary); }
+    .btn-login {
+      width: 100%; padding: 12px; background: var(--primary); color: #fff; border: none;
+      border-radius: 8px; font-weight: 800; font-size: 0.95rem; cursor: pointer; transition: 0.2s;
+    }
+    .btn-login:hover { opacity: 0.9; }
+    #login-error { color: var(--primary); font-size: 0.8rem; font-weight: 700; margin-top: 12px; min-height: 18px; }
+
+    /* APP WRAPPER */
+    #app-wrapper {
+      display: none;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* TOP BAR */
+    header {
+      background: #fff;
+      border-bottom: 1px solid #EFEFEF;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .header-title {
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-logout {
+      background: #524245; color: #fff; border: none;
+      padding: 8px 14px; border-radius: 6px; font-size: 0.8rem;
+      font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn-logout:hover { opacity: 0.9; }
+
     /* MAIN CONTENT */
     main {
       flex: 1;
       max-width: 1040px;
       width: 100%;
       margin: 0 auto;
-      padding: 48px 24px;
+      padding: 40px 24px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
     }
-    .hero-text { text-align: center; margin-bottom: 40px; }
+    .hero-text { text-align: center; margin-bottom: 36px; }
     .hero-badge {
       display: inline-block;
       background: var(--sec-yellow-light);
@@ -71,7 +137,6 @@
     @media (max-width: 820px) { .menu-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 520px) { .menu-grid { grid-template-columns: 1fr; } }
 
-    /* ACTIVE CARD (SEAFREIGHT) */
     .menu-card {
       background: #fff;
       border: 2px solid #EFEFEF;
@@ -141,7 +206,6 @@
     .locked-module h2 { color: #64748B; }
     .locked-module .card-footer { color: #94A3B8; font-weight: 700; }
 
-    /* FOOTER */
     footer {
       text-align: center;
       padding: 18px;
@@ -154,73 +218,144 @@
 </head>
 <body>
 
-  <main>
-    <div class="hero-text">
-      <div class="hero-badge">Operations Portal</div>
-      <h1>Transport <span>Dashboard</span></h1>
-      <p>Select an active operational module to monitor shipment volume, costs, and SLA performance.</p>
+  <!-- LOGIN SCREEN -->
+  <div id="login-screen">
+    <div class="login-box">
+      <div class="login-icon"><i class="fa-solid fa-truck-fast"></i></div>
+      <h2>Transport Dashboard</h2>
+      <p>Operations Portal — Sign In Required</p>
+      <form onsubmit="handleLogin(event)">
+        <div class="login-field">
+          <label>EMAIL (ID)</label>
+          <input type="email" id="login-email" placeholder="ops@company.com" required>
+        </div>
+        <div class="login-field">
+          <label>PASSWORD</label>
+          <input type="password" id="login-password" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn-login" id="btn-login-submit">Sign In</button>
+        <div id="login-error"></div>
+      </form>
     </div>
+  </div>
 
-    <div class="menu-grid">
-      <!-- 1. SEAFREIGHT (ACTIVE) -->
-      <a href="seafreight.html" class="menu-card active-module">
-        <span class="card-badge badge-live"><i class="fa-solid fa-circle-check"></i> Active</span>
-        <div class="icon-box"><i class="fa-solid fa-ship"></i></div>
-        <h2>SEAFREIGHT</h2>
-        <p>Monitor sea shipment volume, CPKG/CPP, weekly breakdowns, data anomalies, and SLA performance.</p>
-        <div class="card-footer">Open Seafreight Portal <i class="fa-solid fa-arrow-right"></i></div>
-      </a>
+  <!-- MAIN LANDING PAGE -->
+  <div id="app-wrapper">
+    <header>
+      <div class="header-title"><i class="fa-solid fa-compass"></i> OPERATIONS PORTAL</div>
+      <button onclick="handleLogout()" class="btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+    </header>
 
-      <!-- 2. AIRFREIGHT (LOCKED) -->
-      <div class="menu-card locked-module" aria-disabled="true">
-        <span class="card-badge badge-locked"><i class="fa-solid fa-lock"></i> Locked</span>
-        <div class="icon-box"><i class="fa-solid fa-plane-departure"></i></div>
-        <h2>AIRFREIGHT</h2>
-        <p>Monitor air cargo shipments, flight transit SLAs, and airline/vendor performance evaluations.</p>
-        <div class="card-footer"><i class="fa-solid fa-clock"></i> Module Locked</div>
+    <main>
+      <div class="hero-text">
+        <div class="hero-badge">Operations Portal</div>
+        <h1>Transport <span>Dashboard</span></h1>
+        <p>Select an active operational module to monitor shipment volume, costs, and SLA performance.</p>
       </div>
 
-      <!-- 3. LANDFREIGHT (LOCKED) -->
-      <div class="menu-card locked-module" aria-disabled="true">
-        <span class="card-badge badge-locked"><i class="fa-solid fa-lock"></i> Locked</span>
-        <div class="icon-box"><i class="fa-solid fa-truck-fast"></i></div>
-        <h2>LANDFREIGHT</h2>
-        <p>Monitor ground fleet operations, intercity trucking, load utilization, and on-time arrival rates.</p>
-        <div class="card-footer"><i class="fa-solid fa-clock"></i> Module Locked</div>
-      </div>
+      <div class="menu-grid">
+        <!-- 1. SEAFREIGHT (ACTIVE) -->
+        <a href="seafreight.html" class="menu-card active-module">
+          <span class="card-badge badge-live"><i class="fa-solid fa-circle-check"></i> Active</span>
+          <div class="icon-box"><i class="fa-solid fa-ship"></i></div>
+          <h2>SEAFREIGHT</h2>
+          <p>Monitor sea shipment volume, CPKG/CPP, weekly breakdowns, data anomalies, and SLA performance.</p>
+          <div class="card-footer">Open Seafreight Portal <i class="fa-solid fa-arrow-right"></i></div>
+        </a>
 
-      <!-- 4. KPI (LOCKED) -->
-      <div class="menu-card locked-module" aria-disabled="true">
-        <span class="card-badge badge-locked"><i class="fa-solid fa-lock"></i> Locked</span>
-        <div class="icon-box"><i class="fa-solid fa-chart-line"></i></div>
-        <h2>KPI</h2>
-        <p>Consolidated Key Performance Indicator summary across all transportation modes.</p>
-        <div class="card-footer"><i class="fa-solid fa-clock"></i> Module Locked</div>
-      </div>
+        <!-- 2. AIRFREIGHT (LOCKED) -->
+        <div class="menu-card locked-module" aria-disabled="true">
+          <span class="card-badge badge-locked"><i class="fa-solid fa-lock"></i> Locked</span>
+          <div class="icon-box"><i class="fa-solid fa-plane-departure"></i></div>
+          <h2>AIRFREIGHT</h2>
+          <p>Monitor air cargo shipments, flight transit SLAs, and airline/vendor performance evaluations.</p>
+          <div class="card-footer"><i class="fa-solid fa-clock"></i> Module Locked</div>
+        </div>
 
-      <!-- 5. ADMINISTRATIVE (LOCKED) -->
-      <div class="menu-card locked-module" aria-disabled="true">
-        <span class="card-badge badge-locked"><i class="fa-solid fa-lock"></i> Locked</span>
-        <div class="icon-box"><i class="fa-solid fa-folder-open"></i></div>
-        <h2>ADMINISTRATIVE</h2>
-        <p>Document completeness tracking, vendor billing reconciliation, and operational administration.</p>
-        <div class="card-footer"><i class="fa-solid fa-clock"></i> Module Locked</div>
-      </div>
+        <!-- 3. LANDFREIGHT (LOCKED) -->
+        <div class="menu-card locked-module" aria-disabled="true">
+          <span class="card-badge badge-locked"><i class="fa-solid fa-lock"></i> Locked</span>
+          <div class="icon-box"><i class="fa-solid fa-truck-fast"></i></div>
+          <h2>LANDFREIGHT</h2>
+          <p>Monitor ground fleet operations, intercity trucking, load utilization, and on-time arrival rates.</p>
+          <div class="card-footer"><i class="fa-solid fa-clock"></i> Module Locked</div>
+        </div>
 
-      <!-- 6. OTHERS (LOCKED) -->
-      <div class="menu-card locked-module" aria-disabled="true">
-        <span class="card-badge badge-locked"><i class="fa-solid fa-lock"></i> Locked</span>
-        <div class="icon-box"><i class="fa-solid fa-layer-group"></i></div>
-        <h2>OTHERS</h2>
-        <p>Supplementary reports, route master data, and supporting transport operational utilities.</p>
-        <div class="card-footer"><i class="fa-solid fa-clock"></i> Module Locked</div>
-      </div>
-    </div>
-  </main>
+        <!-- 4. KPI (LOCKED) -->
+        <div class="menu-card locked-module" aria-disabled="true">
+          <span class="card-badge badge-locked"><i class="fa-solid fa-lock"></i> Locked</span>
+          <div class="icon-box"><i class="fa-solid fa-chart-line"></i></div>
+          <h2>KPI</h2>
+          <p>Consolidated Key Performance Indicator summary across all transportation modes.</p>
+          <div class="card-footer"><i class="fa-solid fa-clock"></i> Module Locked</div>
+        </div>
 
-  <footer>
-    Transport &amp; Logistics Monitoring System
-  </footer>
+        <!-- 5. ADMINISTRATIVE (LOCKED) -->
+        <div class="menu-card locked-module" aria-disabled="true">
+          <span class="card-badge badge-locked"><i class="fa-solid fa-lock"></i> Locked</span>
+          <div class="icon-box"><i class="fa-solid fa-folder-open"></i></div>
+          <h2>ADMINISTRATIVE</h2>
+          <p>Document completeness tracking, vendor billing reconciliation, and operational administration.</p>
+          <div class="card-footer"><i class="fa-solid fa-clock"></i> Module Locked</div>
+        </div>
+
+        <!-- 6. OTHERS (LOCKED) -->
+        <div class="menu-card locked-module" aria-disabled="true">
+          <span class="card-badge badge-locked"><i class="fa-solid fa-lock"></i> Locked</span>
+          <div class="icon-box"><i class="fa-solid fa-layer-group"></i></div>
+          <h2>OTHERS</h2>
+          <p>Supplementary reports, route master data, and supporting transport operational utilities.</p>
+          <div class="card-footer"><i class="fa-solid fa-clock"></i> Module Locked</div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      Transport &amp; Logistics Monitoring System
+    </footer>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://jskezklvpaxgkyuynmqe.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_HFq9qTmT2ccAehYXVeUNWw_tPeFBmO1';
+    const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    window.onload = async function() {
+      const { data: { session } } = await sbClient.auth.getSession();
+      if (session) {
+        document.getElementById("login-screen").style.display = "none";
+        document.getElementById("app-wrapper").style.display = "flex";
+      }
+    };
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      var email = document.getElementById("login-email").value.trim();
+      var password = document.getElementById("login-password").value;
+      var btn = document.getElementById("btn-login-submit");
+      var errEl = document.getElementById("login-error");
+      btn.disabled = true;
+      btn.innerText = "Signing in...";
+      errEl.innerText = "";
+
+      const { data, error } = await sbClient.auth.signInWithPassword({ email: email, password: password });
+      btn.disabled = false;
+      btn.innerText = "Sign In";
+
+      if (error) {
+        errEl.innerText = "Login failed: " + error.message;
+      } else {
+        document.getElementById("login-screen").style.display = "none";
+        document.getElementById("app-wrapper").style.display = "flex";
+      }
+    }
+
+    async function handleLogout() {
+      await sbClient.auth.signOut();
+      document.getElementById("app-wrapper").style.display = "none";
+      document.getElementById("login-screen").style.display = "flex";
+    }
+  </script>
 
 </body>
 </html>
