@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Transport Web | Transport Portal</title>
+  <title>Transport Dashboard | Operations Portal</title>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -23,29 +23,6 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-    }
-
-    /* HEADER */
-    header {
-      background: #fff;
-      border-bottom: 1px solid #EFEFEF;
-      padding: 14px 32px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .brand { display: flex; align-items: center; gap: 12px; }
-    .brand-logo {
-      width: 36px; height: 36px; background: var(--primary); border-radius: 50%;
-      display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 1.15rem;
-    }
-    .brand-title { font-weight: 800; font-size: 1.15rem; color: var(--primary); letter-spacing: -0.3px; }
-    .brand-sub { font-size: 0.8rem; color: #888; border-left: 2px solid #E2E8F0; padding-left: 12px; }
-    .status-pill {
-      font-size: 0.75rem; font-weight: 700; padding: 5px 12px; border-radius: 20px;
-      background: var(--sec-bg-pink); color: var(--primary); border: 1px solid #FFD0DC;
     }
 
     /* MAIN CONTENT */
@@ -75,7 +52,7 @@
       letter-spacing: 0.5px;
     }
     .hero-text h1 {
-      font-size: 2rem;
+      font-size: 2.1rem;
       font-weight: 800;
       color: var(--sec-dark);
       margin-bottom: 8px;
@@ -94,7 +71,7 @@
     @media (max-width: 820px) { .menu-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 520px) { .menu-grid { grid-template-columns: 1fr; } }
 
-    /* CARD AKTIF (SEAFREIGHT) */
+    /* ACTIVE CARD (SEAFREIGHT) */
     .menu-card {
       background: #fff;
       border: 2px solid #EFEFEF;
@@ -145,7 +122,7 @@
       color: var(--primary); display: flex; align-items: center; gap: 6px;
     }
 
-    /* CARD TERKUNCI (COMING SOON) */
+    /* LOCKED CARD */
     .menu-card.locked-module {
       background: #F4F5F7;
       border-color: #E2E8F0;
@@ -177,30 +154,21 @@
 </head>
 <body>
 
-  <header>
-    <div class="brand">
-      <div class="brand-logo">A</div>
-      <div class="brand-title">Trasnport Web</div>
-      <div class="brand-sub">Turning Data Into Awareness</div>
-    </div>
-    <div class="status-pill"><i class="fa-solid fa-shield-halved"></i> Transport Control Tower</div>
-  </header>
-
   <main>
     <div class="hero-text">
       <div class="hero-badge">Operations Portal</div>
-      <h1>Dashboard <span>Transport</span></h1>
-      <p>Pilih modul operasional yang aktif untuk memantau volume, biaya, dan performa SLA.</p>
+      <h1>Transport <span>Dashboard</span></h1>
+      <p>Select an active operational module to monitor shipment volume, costs, and SLA performance.</p>
     </div>
 
     <div class="menu-grid">
-      <!-- 1. SEAFREIGHT (AKTIF) -->
+      <!-- 1. SEAFREIGHT (ACTIVE) -->
       <a href="seafreight.html" class="menu-card active-module">
         <span class="card-badge badge-live"><i class="fa-solid fa-circle-check"></i> Active</span>
         <div class="icon-box"><i class="fa-solid fa-ship"></i></div>
         <h2>SEAFREIGHT</h2>
-        <p>Monitoring volume, CPKG/CPP, weekly breakdown, anomali data, dan SLA pengiriman jalur laut.</p>
-        <div class="card-footer">Buka Portal Seafreight <i class="fa-solid fa-arrow-right"></i></div>
+        <p>Monitor sea shipment volume, CPKG/CPP, weekly breakdowns, data anomalies, and SLA performance.</p>
+        <div class="card-footer">Open Seafreight Portal <i class="fa-solid fa-arrow-right"></i></div>
       </a>
 
       <!-- 2. AIRFREIGHT (LOCKED) -->
@@ -208,8 +176,8 @@
         <span class="card-badge badge-locked"><i class="fa-solid fa-lock"></i> Locked</span>
         <div class="icon-box"><i class="fa-solid fa-plane-departure"></i></div>
         <h2>AIRFREIGHT</h2>
-        <p>Monitoring pengiriman udara, SLA penerbangan, dan evaluasi kinerja vendor kargo udara.</p>
-        <div class="card-footer"><i class="fa-solid fa-clock"></i> Modul Belum Dibuka</div>
+        <p>Monitor air cargo shipments, flight transit SLAs, and airline/vendor performance evaluations.</p>
+        <div class="card-footer"><i class="fa-solid fa-clock"></i> Module Locked</div>
       </div>
 
       <!-- 3. LANDFREIGHT (LOCKED) -->
@@ -217,8 +185,8 @@
         <span class="card-badge badge-locked"><i class="fa-solid fa-lock"></i> Locked</span>
         <div class="icon-box"><i class="fa-solid fa-truck-fast"></i></div>
         <h2>LANDFREIGHT</h2>
-        <p>Monitoring armada darat, trucking antarkota, utilisasi muatan, dan ketepatan waktu tiba.</p>
-        <div class="card-footer"><i class="fa-solid fa-clock"></i> Modul Belum Dibuka</div>
+        <p>Monitor ground fleet operations, intercity trucking, load utilization, and on-time arrival rates.</p>
+        <div class="card-footer"><i class="fa-solid fa-clock"></i> Module Locked</div>
       </div>
 
       <!-- 4. KPI (LOCKED) -->
@@ -226,8 +194,8 @@
         <span class="card-badge badge-locked"><i class="fa-solid fa-lock"></i> Locked</span>
         <div class="icon-box"><i class="fa-solid fa-chart-line"></i></div>
         <h2>KPI</h2>
-        <p>Ringkasan pencapaian Key Performance Indicator gabungan seluruh moda transportasi.</p>
-        <div class="card-footer"><i class="fa-solid fa-clock"></i> Modul Belum Dibuka</div>
+        <p>Consolidated Key Performance Indicator summary across all transportation modes.</p>
+        <div class="card-footer"><i class="fa-solid fa-clock"></i> Module Locked</div>
       </div>
 
       <!-- 5. ADMINISTRATIVE (LOCKED) -->
@@ -235,8 +203,8 @@
         <span class="card-badge badge-locked"><i class="fa-solid fa-lock"></i> Locked</span>
         <div class="icon-box"><i class="fa-solid fa-folder-open"></i></div>
         <h2>ADMINISTRATIVE</h2>
-        <p>Kelengkapan dokumen, rekonsiliasi penagihan vendor, dan administrasi operasional.</p>
-        <div class="card-footer"><i class="fa-solid fa-clock"></i> Modul Belum Dibuka</div>
+        <p>Document completeness tracking, vendor billing reconciliation, and operational administration.</p>
+        <div class="card-footer"><i class="fa-solid fa-clock"></i> Module Locked</div>
       </div>
 
       <!-- 6. OTHERS (LOCKED) -->
@@ -244,14 +212,14 @@
         <span class="card-badge badge-locked"><i class="fa-solid fa-lock"></i> Locked</span>
         <div class="icon-box"><i class="fa-solid fa-layer-group"></i></div>
         <h2>OTHERS</h2>
-        <p>Laporan tambahan, master data rute, dan utilitas pendukung operasional transport.</p>
-        <div class="card-footer"><i class="fa-solid fa-clock"></i> Modul Belum Dibuka</div>
+        <p>Supplementary reports, route master data, and supporting transport operational utilities.</p>
+        <div class="card-footer"><i class="fa-solid fa-clock"></i> Module Locked</div>
       </div>
     </div>
   </main>
 
   <footer>
-    Transport Web &bull; Transport &amp; Logistics Monitoring System
+    Transport &amp; Logistics Monitoring System
   </footer>
 
 </body>
