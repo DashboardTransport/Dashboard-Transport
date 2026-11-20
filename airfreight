@@ -5,4 +5,160 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Airfreight Portal | Regional Selection</title>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --primary: #ED0677;
+      --primary-yellow: #FFCB05;
+      --sec-pink-light: #FF84A1;
+      --sec-yellow-light: #FFEFA3;
+      --sec-bg-pink: #FFECF0;
+      --sec-dark: #524245;
+      --bg-body: #F9FAFC;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Plus Jakarta Sans", sans-serif; }
+    body {
+      background: linear-gradient(135deg, #FFF4F7 0%, #F9FAFC 50%, #FFFBEB 100%);
+      color: var(--sec-dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background: #fff; border-bottom: 1px solid #EFEFEF; padding: 12px 24px;
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+    }
+    .header-title { font-weight: 800; font-size: 0.95rem; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+    .header-actions { display: flex; align-items: center; gap: 8px; }
+    .btn-home {
+      background: #FFF4F7; color: var(--primary); border: 1px solid #FFD0DC; padding: 8px 14px;
+      border-radius: 6px; font-size: 0.8rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: 0.2s;
+    }
+    .btn-home:hover { background: var(--primary); color: #fff; }
+    .btn-logout {
+      background: #524245; color: #fff; border: none; padding: 8px 14px; border-radius: 6px;
+      font-size: 0.8rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn-logout:hover { opacity: 0.9; }
+    main {
+      flex: 1; max-width: 1040px; width: 100%; margin: 0 auto; padding: 40px 24px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .hero-text { text-align: center; margin-bottom: 36px; }
+    .hero-badge {
+      display: inline-block; background: var(--sec-yellow-light); color: var(--sec-dark); border: 1px solid var(--primary-yellow);
+      font-size: 0.75rem; font-weight: 800; padding: 4px 12px; border-radius: 20px; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px;
+    }
+    .hero-text h1 { font-size: 2.05rem; font-weight: 800; color: var(--sec-dark); margin-bottom: 8px; letter-spacing: -0.5px; }
+    .hero-text h1 span { color: var(--primary); }
+    .hero-text p { font-size: 0.92rem; color: #777; font-weight: 500; }
+    .menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; width: 100%; }
+    @media (max-width: 820px) { .menu-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 520px) {
+      header { padding: 10px 14px; }
+      main { padding: 28px 14px; }
+      .hero-text h1 { font-size: 1.65rem; }
+      .menu-grid { grid-template-columns: 1fr; gap: 14px; }
+    }
+    .menu-card {
+      background: #fff; border: 2px solid #EFEFEF; border-radius: 16px; padding: 28px 24px;
+      text-decoration: none; color: var(--sec-dark); display: flex; flex-direction: column;
+      align-items: flex-start; position: relative; transition: all 0.22s ease; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+    }
+    .menu-card.active-module { border-color: var(--primary); cursor: pointer; }
+    .menu-card.active-module:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(237, 6, 119, 0.14); background: #FFF9FB; }
+    .icon-box { width: 48px; height: 48px; border-radius: 12px; display: grid; place-items: center; font-size: 1.25rem; margin-bottom: 18px; }
+    .active-module .icon-box { background: var(--sec-bg-pink); color: var(--primary); }
+    .card-badge { position: absolute; top: 20px; right: 20px; font-size: 0.7rem; font-weight: 800; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; }
+    .badge-live { background: #D8EAD8; color: #1E561E; border: 1px solid #A3D9A3; }
+    .menu-card h2 { font-size: 1.05rem; font-weight: 800; margin-bottom: 6px; letter-spacing: 0.2px; }
+    .active-module h2 { color: var(--primary); }
+    .menu-card p { font-size: 0.82rem; color: #777; line-height: 1.45; font-weight: 500; }
+    .card-footer { margin-top: 20px; font-size: 0.78rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 6px; }
+    .menu-card.locked-module { background: #F4F5F7; border-color: #E2E8F0; opacity: 0.72; cursor: not-allowed; user-select: none; }
+    .locked-module .icon-box { background: #E2E8F0; color: #8A8F98; }
+    .badge-locked { background: #E2E8F0; color: #64748B; display: inline-flex; align-items: center; gap: 4px; }
+    .locked-module h2 { color: #64748B; }
+    .locked-module .card-footer { color: #94A3B8; font-weight: 700; }
+    footer { text-align: center; padding: 18px; font-size: 0.78rem; color: #888; border-top: 1px solid #EFEFEF; background: #fff; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-title"><i class="fa-solid fa-plane-departure"></i> AIRFREIGHT PORTAL</div>
+    <div class="header-actions">
+      <a href="index.html" class="btn-home"><i class="fa-solid fa-house"></i> Back to Home</a>
+      <button onclick="handleLogout()" class="btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="hero-text">
+      <div class="hero-badge">Airfreight Regional Hubs</div>
+      <h1>Select <span>Airfreight</span> Region</h1>
+      <p>Choose an active regional hub below to open its dedicated shipment monitoring dashboard.</p>
+    </div>
+
+    <div class="menu-grid">
+      <a href="airfreight-jakarta.html" class="menu-card active-module">
+        <span class="card-badge badge-live"><i class="fa-solid fa-circle-check"></i> Active</span>
+        <div class="icon-box"><i class="fa-solid fa-plane-up"></i></div>
+        <h2>JAKARTA</h2>
+        <p>Air cargo monitoring, vendor breakdown, route coverage, weekly volume &amp; cost, and SLA tracking for Jakarta.</p>
+        <div class="card-footer">Open Jakarta Dashboard <i class="fa-solid fa-arrow-right"></i></div>
+      </a>
+
+      <div class="menu-card locked-module" aria-disabled="true">
+        <span class="card-badge badge-locked"><i class="fa-solid fa-lock"></i> Locked</span>
+        <div class="icon-box"><i class="fa-solid fa-plane-departure"></i></div>
+        <h2>KALBAR</h2>
+        <p>Regional airfreight operations and SLA monitoring for Kalimantan Barat.</p>
+        <div class="card-footer"><i class="fa-solid fa-clock"></i> Region Locked</div>
+      </div>
+
+      <div class="menu-card locked-module" aria-disabled="true">
+        <span class="card-badge badge-locked"><i class="fa-solid fa-lock"></i> Locked</span>
+        <div class="icon-box"><i class="fa-solid fa-plane-departure"></i></div>
+        <h2>JATIMBALINUSRA</h2>
+        <p>Regional airfreight operations and SLA monitoring for Jawa Timur, Bali &amp; Nusa Tenggara.</p>
+        <div class="card-footer"><i class="fa-solid fa-clock"></i> Region Locked</div>
+      </div>
+
+      <div class="menu-card locked-module" aria-disabled="true">
+        <span class="card-badge badge-locked"><i class="fa-solid fa-lock"></i> Locked</span>
+        <div class="icon-box"><i class="fa-solid fa-plane-departure"></i></div>
+        <h2>KALSULAMPAP</h2>
+        <p>Regional airfreight operations and SLA monitoring for Kalimantan, Sulawesi, Maluku &amp; Papua.</p>
+        <div class="card-footer"><i class="fa-solid fa-clock"></i> Region Locked</div>
+      </div>
+
+      <div class="menu-card locked-module" aria-disabled="true">
+        <span class="card-badge badge-locked"><i class="fa-solid fa-lock"></i> Locked</span>
+        <div class="icon-box"><i class="fa-solid fa-plane-departure"></i></div>
+        <h2>SUMATERA</h2>
+        <p>Regional airfreight operations and SLA monitoring for Sumatera region.</p>
+        <div class="card-footer"><i class="fa-solid fa-clock"></i> Region Locked</div>
+      </div>
+    </div>
+  </main>
+
+  <footer>Transport &amp; Logistics Monitoring System — Airfreight Division</footer>
+
+  <script>
+    const SUPABASE_URL = 'https://jskezklvpaxgkyuynmqe.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_HFq9qTmT2ccAehYXVeUNWw_tPeFBmO1';
+    const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    window.onload = async function() {
+      const { data: { session } } = await sbClient.auth.getSession();
+      if (!session) window.location.href = "index.html";
+    };
+
+    async function handleLogout() {
+      await sbClient.auth.signOut();
+      window.location.href = "index.html";
+    }
+  </script>
+</body>
+</html>
