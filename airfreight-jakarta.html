@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Monitoring Airfreight — Jabodetabek</title>
+  <title>Monitoring Airfreight — Jakarta</title>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -82,16 +82,22 @@
     .container { max-width: 1280px; margin: 24px auto; padding: 0 20px; }
     .tab-page { display: none; }
     .tab-page.active-page { display: block; }
+
+    /* FILTER CARD SEJAJAR */
     .filter-card {
       background: #D8EAD8; border: 2px solid #2D5B2D; border-radius: 8px;
-      padding: 12px 20px; margin-bottom: 20px; display: inline-flex; align-items: center; gap: 14px; flex-wrap: wrap;
+      padding: 10px 14px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; width: 100%;
     }
-    .filter-group { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 0.82rem; }
-    .filter-group input, .filter-group select { border: 1px solid #777; padding: 6px 10px; border-radius: 4px; font-weight: 600; background: #fff; }
-    .day-badge { background: #A3D9A3; border: 1px solid #2D5B2D; padding: 6px 14px; border-radius: 6px; font-weight: 800; font-size: 0.85rem; }
-    .btn-action { padding: 8px 18px; font-weight:700; cursor:pointer; background:var(--primary); color:#fff; border:none; border-radius:6px; transition:0.2s; }
+    .filter-card-inline {
+      background: #D8EAD8; border: 2px solid #2D5B2D; border-radius: 8px;
+      padding: 10px 16px; margin-bottom: 20px; display: inline-flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    }
+    .filter-group { display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 0.76rem; white-space: nowrap; }
+    .filter-group input, .filter-group select { border: 1px solid #777; padding: 5px 8px; border-radius: 4px; font-weight: 600; font-size: 0.78rem; background: #fff; }
+    .day-badge { background: #A3D9A3; border: 1px solid #2D5B2D; padding: 5px 12px; border-radius: 6px; font-weight: 800; font-size: 0.78rem; white-space: nowrap; margin-left: auto; }
+    .btn-action { padding: 7px 14px; font-weight:700; font-size:0.78rem; cursor:pointer; background:var(--primary); color:#fff; border:none; border-radius:6px; transition:0.2s; white-space: nowrap; }
     .btn-action:hover { opacity: 0.9; }
-    .btn-secondary { padding: 8px 14px; font-weight:700; cursor:pointer; background:#524245; color:#fff; border:none; border-radius:6px; font-size:0.8rem; }
+    .btn-secondary { padding: 7px 12px; font-weight:700; cursor:pointer; background:#524245; color:#fff; border:none; border-radius:6px; font-size:0.78rem; white-space: nowrap; }
     .btn-export-img { padding: 6px 12px; font-weight:700; cursor:pointer; background:var(--primary); color:#fff; border:none; border-radius:6px; font-size:0.78rem; display:inline-flex; align-items:center; gap:6px; }
     .btn-export-csv { padding: 6px 12px; font-weight:700; cursor:pointer; background:#217346; color:#fff; border:none; border-radius:6px; font-size:0.78rem; display:inline-flex; align-items:center; gap:6px; }
     .view-toggle { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -118,6 +124,14 @@
     th { background: var(--sec-bg-pink); color: var(--primary); padding: 12px 16px; font-size: 0.78rem; text-transform: uppercase; font-weight: 800; border-bottom: 2px solid #FFD0DC; text-align: center; vertical-align: middle; }
     td { padding: 12px 16px; font-size: 0.86rem; border-bottom: 1px solid #F0F0F0; font-weight: 600; text-align: center; }
     td.align-left, th.align-left { text-align: left; }
+    td.route-tags-cell { white-space: normal; text-align: left; line-height: 1.7; min-width: 320px; }
+    .route-pill {
+      display: inline-block; background: #FFF4F7; color: var(--sec-dark); border: 1px solid #FFD0DC;
+      padding: 2px 9px; border-radius: 14px; font-size: 0.74rem; font-weight: 700; margin: 2px 4px 2px 0;
+    }
+    .route-count-badge {
+      background: var(--primary); color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 0.78rem; font-weight: 800;
+    }
     tr:nth-child(even) { background-color: #FAFAFA; }
     tr.grand-total { background: #FFF4F7; font-weight: 800; color: var(--primary); border-top: 2px solid var(--primary); }
     tr.vendor-parent-row { background: #FFF5F8 !important; border-top: 2px solid #FFD0DC; font-weight: 800; }
@@ -139,6 +153,11 @@
     .export-wrapper { background: #F9FAFC; padding: 8px; border-radius: 10px; margin-bottom: 22px; }
 
     /* ================= RESPONSIVE WEB / TABLET / MOBILE ================= */
+    @media (max-width: 1180px) {
+      .filter-card { flex-wrap: wrap; }
+      .day-badge { margin-left: 0; }
+    }
+
     @media (max-width: 1024px) {
       .kpi-grid { grid-template-columns: repeat(3, 1fr); }
       .kpi-grid-5 { grid-template-columns: repeat(3, 1fr); }
@@ -153,8 +172,8 @@
       .container { margin: 14px auto; padding: 0 12px; }
       .section-banner { font-size: 0.88rem; padding: 8px 6px; }
 
-      .filter-card {
-        display: flex; width: 100%; padding: 12px; gap: 10px;
+      .filter-card, .filter-card-inline {
+        display: flex; width: 100%; padding: 12px; gap: 10px; flex-wrap: wrap;
       }
       .filter-group {
         width: 100%; justify-content: space-between; font-size: 0.78rem;
@@ -163,10 +182,12 @@
         width: 60% !important; padding: 8px; font-size: 0.85rem;
       }
       .filter-card .btn-action,
-      .filter-card .btn-secondary {
+      .filter-card .btn-secondary,
+      .filter-card-inline .btn-action,
+      .filter-card-inline .btn-secondary {
         flex: 1 1 45%; text-align: center; padding: 9px 10px;
       }
-      .day-badge { width: 100%; text-align: center; }
+      .day-badge { width: 100%; text-align: center; margin-left: 0; }
 
       .kpi-grid, .kpi-grid-5 { grid-template-columns: repeat(2, 1fr); gap: 8px; }
       .kpi-card { padding: 12px 8px; }
@@ -193,7 +214,7 @@
   <div id="login-screen">
     <div class="login-box">
       <div class="login-icon"><i class="fa-solid fa-plane-up"></i></div>
-      <h2>Airfreight Jabodetabek</h2>
+      <h2>Airfreight Jakarta</h2>
       <p>Monitoring Dashboard — Sign In Required</p>
       <form onsubmit="handleLogin(event)">
         <div class="login-field">
@@ -207,7 +228,7 @@
         <button type="submit" class="btn-login" id="btn-login-submit">Sign In</button>
         <div id="login-error"></div>
       </form>
-      <a href="airfreight.html" class="login-back-link"><i class="fa-solid fa-arrow-left"></i> Back to Regions</a>
+      <a href="index.html" class="login-back-link"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
     </div>
   </div>
 
@@ -216,7 +237,7 @@
     <header>
       <div class="brand">
         <div class="module-title"><i class="fa-solid fa-plane-up"></i> AIRFREIGHT MONITORING</div>
-        <span class="region-pill">JABODETABEK</span>
+        <span class="region-pill">JAKARTA</span>
         <span id="sync-badge" class="sync-status"><i class="fa-solid fa-spinner fa-spin"></i> Loading DB...</span>
       </div>
       <nav>
@@ -224,7 +245,6 @@
         <button id="nav-weekly" onclick="switchTab('weekly', this)"><i class="fa-solid fa-calendar-week"></i> Weekly Analysis</button>
         <button id="nav-issues" onclick="switchTab('issues', this)"><i class="fa-solid fa-bullhorn"></i> Update &amp; Issue</button>
         <button id="nav-sla" onclick="switchTab('sla', this)"><i class="fa-solid fa-stopwatch"></i> SLA Performance</button>
-        <button onclick="window.location.href='airfreight.html'" class="btn-home"><i class="fa-solid fa-map"></i> Regions</button>
         <button onclick="window.location.href='index.html'" class="btn-home"><i class="fa-solid fa-house"></i> Home</button>
         <button onclick="handleLogout()" class="btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
       </nav>
@@ -251,7 +271,7 @@
           <div class="day-badge" id="day-count">-</div>
         </div>
 
-        <div class="section-banner">AIRFREIGHT JABODETABEK — OVERALL STATISTICS</div>
+        <div class="section-banner">AIRFREIGHT JAKARTA — OVERALL STATISTICS</div>
         <div class="kpi-grid">
           <div class="kpi-card"><div class="label">Total SMU</div><div class="value" id="kpi-smu">0</div><div class="sub-val" id="kpi-cat-split">SD: 0 | ND: 0</div></div>
           <div class="kpi-card"><div class="label">Gross Weight (KG)</div><div class="value" id="kpi-gw">0 KG</div><div class="sub-val" id="kpi-avg-gw">Avg: 0 KG/SMU</div></div>
@@ -266,11 +286,63 @@
           <span class="anomaly-badge" id="anomaly-count-badge">0 Errors</span>
         </div>
 
+        <!-- 1. BREAKDOWN BY VENDOR (SORT BY HIGHEST EST. TOTAL COST) -->
         <div class="section-header-bar">
-          <h3 class="sub-heading"><i class="fa-solid fa-route"></i> Breakdown By Route</h3>
+          <h3 class="sub-heading"><i class="fa-solid fa-truck-ramp-box"></i> Breakdown By Vendor <span class="sub-note">(Sorted by Highest Est. Total Cost)</span></h3>
           <div class="action-btns">
-            <button onclick="downloadTableCsv('dash-route-table', 'AF_Jabodetabek_Breakdown_Route.csv')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
-            <button onclick="exportElementToPng('wrap-dash-route', 'AF_Jabodetabek_Breakdown_Route.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
+            <button onclick="downloadTableCsv('dash-vendor-table', 'AF_Jakarta_Breakdown_Vendor.csv')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
+            <button onclick="exportElementToPng('wrap-dash-vendor', 'AF_Jakarta_Breakdown_Vendor.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
+          </div>
+        </div>
+        <div id="wrap-dash-vendor" class="export-wrapper">
+          <div class="table-container" style="margin-bottom:0;">
+            <table id="dash-vendor-table">
+              <thead>
+                <tr>
+                  <th class="align-left">Vendor Name</th>
+                  <th>Total SMU</th>
+                  <th>Gross Weight (KG)</th>
+                  <th>Parcel</th>
+                  <th>Est. Total Cost</th>
+                  <th>CPKG</th>
+                  <th>CPP</th>
+                </tr>
+              </thead>
+              <tbody id="vendor-table-body"><tr><td colspan="7" class="loading-text">Loading data...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 2. VENDOR COVERED ROUTE -->
+        <div class="section-header-bar">
+          <h3 class="sub-heading"><i class="fa-solid fa-map-signs"></i> Vendor Covered Route <span class="sub-note">(Route Quantity &amp; Destination Coverage)</span></h3>
+          <div class="action-btns">
+            <button onclick="downloadTableCsv('dash-vendor-routes-table', 'AF_Jakarta_Vendor_Covered_Routes.csv')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
+            <button onclick="exportElementToPng('wrap-dash-vendor-routes', 'AF_Jakarta_Vendor_Covered_Routes.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
+          </div>
+        </div>
+        <div id="wrap-dash-vendor-routes" class="export-wrapper">
+          <div class="table-container" style="margin-bottom:0;">
+            <table id="dash-vendor-routes-table">
+              <thead>
+                <tr>
+                  <th class="align-left">Vendor Name</th>
+                  <th>Total Covered Routes</th>
+                  <th>Total SMU</th>
+                  <th class="align-left">Covered Route List (Origin - Destination)</th>
+                </tr>
+              </thead>
+              <tbody id="vendor-routes-table-body"><tr><td colspan="4" class="loading-text">Loading data...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 3. BREAKDOWN BY ROUTE (SORT BY HIGHEST CPP, DI ATAS TOP 10 HEAVIEST SMU) -->
+        <div class="section-header-bar">
+          <h3 class="sub-heading"><i class="fa-solid fa-route"></i> Breakdown By Route <span class="sub-note">(Sorted by Highest CPP)</span></h3>
+          <div class="action-btns">
+            <button onclick="downloadTableCsv('dash-route-table', 'AF_Jakarta_Breakdown_Route.csv')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
+            <button onclick="exportElementToPng('wrap-dash-route', 'AF_Jakarta_Breakdown_Route.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
           </div>
         </div>
         <div id="wrap-dash-route" class="export-wrapper">
@@ -294,39 +366,12 @@
           </div>
         </div>
 
-        <div class="section-header-bar">
-          <h3 class="sub-heading"><i class="fa-solid fa-truck-ramp-box"></i> Breakdown By Vendor</h3>
-          <div class="action-btns">
-            <button onclick="downloadTableCsv('dash-vendor-table', 'AF_Jabodetabek_Breakdown_Vendor.csv')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
-            <button onclick="exportElementToPng('wrap-dash-vendor', 'AF_Jabodetabek_Breakdown_Vendor.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
-          </div>
-        </div>
-        <div id="wrap-dash-vendor" class="export-wrapper">
-          <div class="table-container" style="margin-bottom:0;">
-            <table id="dash-vendor-table">
-              <thead>
-                <tr>
-                  <th class="align-left">Vendor Name</th>
-                  <th>Total SMU</th>
-                  <th>Gross Weight (KG)</th>
-                  <th>Parcel</th>
-                  <th>Est. Outgoing</th>
-                  <th>Est. Incoming</th>
-                  <th>Est. Total Cost</th>
-                  <th>CPKG</th>
-                  <th>CPP</th>
-                </tr>
-              </thead>
-              <tbody id="vendor-table-body"><tr><td colspan="9" class="loading-text">Loading data...</td></tr></tbody>
-            </table>
-          </div>
-        </div>
-
+        <!-- 4. TOP 10 HEAVIEST SMUS -->
         <div class="section-header-bar">
           <h3 class="sub-heading"><i class="fa-solid fa-trophy"></i> Top 10 Heaviest SMUs</h3>
           <div class="action-btns">
-            <button onclick="downloadTableCsv('dash-top10-table', 'AF_Jabodetabek_Top10_Heaviest_SMU.csv')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
-            <button onclick="exportElementToPng('wrap-dash-top10', 'AF_Jabodetabek_Top10_Heaviest_SMU.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
+            <button onclick="downloadTableCsv('dash-top10-table', 'AF_Jakarta_Top10_Heaviest_SMU.csv')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
+            <button onclick="exportElementToPng('wrap-dash-top10', 'AF_Jakarta_Top10_Heaviest_SMU.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
           </div>
         </div>
         <div id="wrap-dash-top10" class="export-wrapper">
@@ -354,7 +399,7 @@
 
       <!-- TAB 2: WEEKLY ANALYSIS -->
       <div id="page-weekly" class="tab-page">
-        <div class="filter-card">
+        <div class="filter-card-inline">
           <div class="filter-group"><span>SELECT MONTH</span>
             <select id="weekly-month">
               <option value="1">January</option><option value="2">February</option><option value="3">March</option>
@@ -382,13 +427,13 @@
             </div>
           </div>
           <div class="action-btns">
-            <button onclick="downloadTableCsv('weekly-table-elem', 'AF_Jabodetabek_Weekly_Analysis.csv')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
+            <button onclick="downloadTableCsv('weekly-table-elem', 'AF_Jakarta_Weekly_Analysis.csv')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
             <button onclick="exportWeeklyImage()" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
           </div>
         </div>
 
         <div id="weekly-export-area" style="background:#F9FAFC; padding:10px; border-radius:8px;">
-          <div class="section-banner" id="weekly-banner-title">JABODETABEK — FULL MONTH WEEKLY BREAKDOWN</div>
+          <div class="section-banner" id="weekly-banner-title">JAKARTA — FULL MONTH WEEKLY BREAKDOWN</div>
           <div class="table-container">
             <table id="weekly-table-elem">
               <thead id="weekly-table-head"></thead>
@@ -400,7 +445,7 @@
 
       <!-- TAB 3: UPDATE & ISSUE -->
       <div id="page-issues" class="tab-page">
-        <div class="filter-card">
+        <div class="filter-card-inline">
           <div class="filter-group"><span>START DATE</span><input type="date" id="issue-start-date"></div>
           <div class="filter-group"><span>END DATE</span><input type="date" id="issue-end-date"></div>
           <button onclick="renderIssueLogs(true)" class="btn-action"><i class="fa-solid fa-magnifying-glass"></i> Check Anomaly Logs</button>
@@ -417,8 +462,8 @@
         <div class="section-header-bar">
           <h3 class="sub-heading" style="color: var(--primary);"><i class="fa-solid fa-list-check"></i> Incomplete / Problematic Data Details</h3>
           <div class="action-btns">
-            <button onclick="downloadTableCsv('issue-table-elem', 'AF_Jabodetabek_Anomalies.csv')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
-            <button onclick="exportElementToPng('wrap-issue-table', 'AF_Jabodetabek_Anomalies.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
+            <button onclick="downloadTableCsv('issue-table-elem', 'AF_Jakarta_Anomalies.csv')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
+            <button onclick="exportElementToPng('wrap-issue-table', 'AF_Jakarta_Anomalies.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
           </div>
         </div>
         <div id="wrap-issue-table" class="export-wrapper">
@@ -447,7 +492,7 @@
       <!-- TAB 4: SLA PERFORMANCE -->
       <div id="page-sla" class="tab-page">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:20px;">
-          <div class="filter-card" style="margin-bottom:0;">
+          <div class="filter-card-inline" style="margin-bottom:0;">
             <div class="filter-group"><span>START DATE</span><input type="date" id="sla-start-date"></div>
             <div class="filter-group"><span>END DATE</span><input type="date" id="sla-end-date"></div>
             <div class="filter-group"><span>CATEGORY</span>
@@ -463,12 +508,12 @@
           </div>
           <div class="action-btns">
             <button onclick="downloadSlaRawCsv('ALL')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download All SLA Raw (.CSV)</button>
-            <button onclick="exportElementToPng('sla-export-area', 'AF_Jabodetabek_SLA_Summary.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download All Summary PNG</button>
+            <button onclick="exportElementToPng('sla-export-area', 'AF_Jakarta_SLA_Summary.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download All Summary PNG</button>
           </div>
         </div>
 
         <div id="sla-export-area" style="background:#F9FAFC; padding:10px; border-radius:8px;">
-          <div class="section-banner">AIRFREIGHT SLA PERFORMANCE (PRE-ALERT TO ATD: SD = H+0 | ND = H+1)</div>
+          <div class="section-banner">AIRFREIGHT JAKARTA SLA PERFORMANCE (PRE-ALERT TO ATD: SD = H+0 | ND = H+1)</div>
           <div class="kpi-grid-5">
             <div class="kpi-card"><div class="label">Evaluated SMU</div><div class="value" id="sla-kpi-total">0</div></div>
             <div class="kpi-card"><div class="label">Hit SLA (On-Time)</div><div class="value" style="color:#1E561E;" id="sla-kpi-hit">0</div></div>
@@ -480,8 +525,8 @@
           <div class="section-header-bar">
             <h3 class="sub-heading"><i class="fa-solid fa-tags"></i> 1. SLA Performance By Service Category (SD vs ND)</h3>
             <div class="action-btns">
-              <button onclick="downloadTableCsv('sla-cat-table', 'AF_Jabodetabek_SLA_By_Category.csv')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
-              <button onclick="exportElementToPng('wrap-sla-cat', 'AF_Jabodetabek_SLA_By_Category.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
+              <button onclick="downloadTableCsv('sla-cat-table', 'AF_Jakarta_SLA_By_Category.csv')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
+              <button onclick="exportElementToPng('wrap-sla-cat', 'AF_Jakarta_SLA_By_Category.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
             </div>
           </div>
           <div id="wrap-sla-cat" class="export-wrapper">
@@ -502,7 +547,7 @@
             <h3 class="sub-heading"><i class="fa-solid fa-route"></i> 2. SLA Performance By Route</h3>
             <div class="action-btns">
               <button onclick="downloadSlaRawCsv('ROUTE')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download Raw (.CSV)</button>
-              <button onclick="exportElementToPng('wrap-sla-route', 'AF_Jabodetabek_SLA_By_Route.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
+              <button onclick="exportElementToPng('wrap-sla-route', 'AF_Jakarta_SLA_By_Route.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
             </div>
           </div>
           <div id="wrap-sla-route" class="export-wrapper">
@@ -523,7 +568,7 @@
             <h3 class="sub-heading"><i class="fa-solid fa-truck"></i> 3. SLA Performance By Vendor (Detail Per Route)</h3>
             <div class="action-btns">
               <button onclick="downloadSlaRawCsv('VENDOR')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download Raw (.CSV)</button>
-              <button onclick="exportElementToPng('wrap-sla-vendor', 'AF_Jabodetabek_SLA_By_Vendor.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
+              <button onclick="exportElementToPng('wrap-sla-vendor', 'AF_Jakarta_SLA_By_Vendor.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
             </div>
           </div>
           <div id="wrap-sla-vendor" class="export-wrapper">
@@ -544,7 +589,7 @@
             <h3 class="sub-heading"><i class="fa-solid fa-calendar-week"></i> 4. SLA Performance By Week</h3>
             <div class="action-btns">
               <button onclick="downloadSlaRawCsv('WEEK')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download Raw (.CSV)</button>
-              <button onclick="exportElementToPng('wrap-sla-week', 'AF_Jabodetabek_SLA_By_Week.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
+              <button onclick="exportElementToPng('wrap-sla-week', 'AF_Jakarta_SLA_By_Week.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
             </div>
           </div>
           <div id="wrap-sla-week" class="export-wrapper">
@@ -564,8 +609,8 @@
           <div class="section-header-bar">
             <h3 class="sub-heading" style="color: var(--primary);"><i class="fa-solid fa-arrow-trend-down"></i> 5. Top 5 Lowest Vendor Performance (By Route)</h3>
             <div class="action-btns">
-              <button onclick="downloadTableCsv('sla-lowest-vendor-table', 'AF_Jabodetabek_Top5_Lowest_Vendor.csv')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
-              <button onclick="exportElementToPng('wrap-sla-lowest', 'AF_Jabodetabek_Top5_Lowest_Vendor.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
+              <button onclick="downloadTableCsv('sla-lowest-vendor-table', 'AF_Jakarta_Top5_Lowest_Vendor.csv')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
+              <button onclick="exportElementToPng('wrap-sla-lowest', 'AF_Jakarta_Top5_Lowest_Vendor.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
             </div>
           </div>
           <div id="wrap-sla-lowest" class="export-wrapper">
@@ -587,7 +632,7 @@
           <h3 class="sub-heading" style="color: var(--primary);"><i class="fa-solid fa-clock-rotate-left"></i> 6. Detail SMU Not Hit SLA (Delay List) <span class="sub-note" id="delay-list-counter"></span></h3>
           <div class="action-btns">
             <button onclick="downloadSlaRawCsv('NOT_HIT')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download Raw (.CSV)</button>
-            <button onclick="exportElementToPng('wrap-sla-delay', 'AF_Jabodetabek_SLA_Delay_List.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
+            <button onclick="exportElementToPng('wrap-sla-delay', 'AF_Jakarta_SLA_Delay_List.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
           </div>
         </div>
         <div id="wrap-sla-delay" class="export-wrapper">
@@ -881,13 +926,16 @@
         grandIn += r.costIn;
         grandTotal += r.costTotal;
 
-        if (!vendorMap[r.vendor]) vendorMap[r.vendor] = { smu: 0, gw: 0, parcel: 0, out: 0, inc: 0, tot: 0 };
+        if (!vendorMap[r.vendor]) vendorMap[r.vendor] = { smu: 0, gw: 0, parcel: 0, out: 0, inc: 0, tot: 0, routes: {} };
         vendorMap[r.vendor].smu += smuCount;
         vendorMap[r.vendor].gw += r.gw;
         vendorMap[r.vendor].parcel += r.parcel;
         vendorMap[r.vendor].out += r.costOut;
         vendorMap[r.vendor].inc += r.costIn;
         vendorMap[r.vendor].tot += r.costTotal;
+        if (r.origin !== "UNKNOWN" && r.dest !== "UNKNOWN") {
+          vendorMap[r.vendor].routes[routeName] = (vendorMap[r.vendor].routes[routeName] || 0) + smuCount;
+        }
 
         if (!routeMap[routeName]) routeMap[routeName] = { smu: 0, gw: 0, parcel: 0, out: 0, inc: 0, tot: 0 };
         routeMap[routeName].smu += smuCount;
@@ -914,25 +962,9 @@
       document.getElementById("kpi-cost-total").innerText = fmtRp(grandTotal);
       document.getElementById("kpi-cpkg").innerText = "CPKG: " + fmtRp(grandGw > 0 ? grandTotal / grandGw : 0);
 
-      var rHtml = "";
-      var routeKeys = Object.keys(routeMap).sort(function(a, b) { return routeMap[b].gw - routeMap[a].gw; });
-      for (var rk = 0; rk < routeKeys.length; rk++) {
-        var rName = routeKeys[rk];
-        var rd = routeMap[rName];
-        rHtml += "<tr><td class='align-left'><b>" + rName + "</b></td>" +
-          "<td>" + rd.smu.toLocaleString("id-ID") + "</td>" +
-          "<td>" + Math.round(rd.gw).toLocaleString("id-ID") + " KG</td>" +
-          "<td>" + rd.parcel.toLocaleString("id-ID") + "</td>" +
-          "<td>" + fmtRp(rd.out) + "</td>" +
-          "<td>" + fmtRp(rd.inc) + "</td>" +
-          "<td style='color:var(--primary); font-weight:800;'>" + fmtRp(rd.tot) + "</td>" +
-          "<td>" + fmtRp(rd.gw > 0 ? rd.tot / rd.gw : 0) + "</td>" +
-          "<td>" + fmtRp(rd.parcel > 0 ? rd.tot / rd.parcel : 0) + "</td></tr>";
-      }
-      document.getElementById("route-table-body").innerHTML = rHtml || "<tr><td colspan='9' class='loading-text'>No data found in selected period.</td></tr>";
-
+      // BREAKDOWN BY VENDOR (SORT BY HIGHEST EST. TOTAL COST)
       var vHtml = "";
-      var vendorKeys = Object.keys(vendorMap).sort(function(a, b) { return vendorMap[b].gw - vendorMap[a].gw; });
+      var vendorKeys = Object.keys(vendorMap).sort(function(a, b) { return vendorMap[b].tot - vendorMap[a].tot; });
       for (var vk = 0; vk < vendorKeys.length; vk++) {
         var vName = vendorKeys[vk];
         var vd = vendorMap[vName];
@@ -940,14 +972,56 @@
           "<td>" + vd.smu.toLocaleString("id-ID") + "</td>" +
           "<td>" + Math.round(vd.gw).toLocaleString("id-ID") + " KG</td>" +
           "<td>" + vd.parcel.toLocaleString("id-ID") + "</td>" +
-          "<td>" + fmtRp(vd.out) + "</td>" +
-          "<td>" + fmtRp(vd.inc) + "</td>" +
           "<td style='color:var(--primary); font-weight:800;'>" + fmtRp(vd.tot) + "</td>" +
           "<td>" + fmtRp(vd.gw > 0 ? vd.tot / vd.gw : 0) + "</td>" +
           "<td>" + fmtRp(vd.parcel > 0 ? vd.tot / vd.parcel : 0) + "</td></tr>";
       }
-      document.getElementById("vendor-table-body").innerHTML = vHtml || "<tr><td colspan='9' class='loading-text'>No data found in selected period.</td></tr>";
+      document.getElementById("vendor-table-body").innerHTML = vHtml || "<tr><td colspan='7' class='loading-text'>No data found in selected period.</td></tr>";
 
+      // VENDOR COVERED ROUTE (SORT BY MOST ROUTES COVERED)
+      var vrHtml = "";
+      var vendorRouteKeys = Object.keys(vendorMap).sort(function(a, b) {
+        var countDiff = Object.keys(vendorMap[b].routes).length - Object.keys(vendorMap[a].routes).length;
+        return countDiff !== 0 ? countDiff : (vendorMap[b].smu - vendorMap[a].smu);
+      });
+      for (var vrk = 0; vrk < vendorRouteKeys.length; vrk++) {
+        var vrName = vendorRouteKeys[vrk];
+        var vrd = vendorMap[vrName];
+        var coveredList = Object.keys(vrd.routes).sort();
+        var pillsHtml = coveredList.map(function(rt) {
+          return "<span class='route-pill'>" + rt + " (" + vrd.routes[rt] + ")</span>";
+        }).join(" ");
+        vrHtml += "<tr><td class='align-left'><b>" + vrName + "</b></td>" +
+          "<td><span class='route-count-badge'>" + coveredList.length + " Routes</span></td>" +
+          "<td>" + vrd.smu.toLocaleString("id-ID") + " SMU</td>" +
+          "<td class='route-tags-cell'>" + (pillsHtml || "-") + "</td></tr>";
+      }
+      document.getElementById("vendor-routes-table-body").innerHTML = vrHtml || "<tr><td colspan='4' class='loading-text'>No route coverage data found.</td></tr>";
+
+      // BREAKDOWN BY ROUTE (SORT BY HIGHEST CPP)
+      var rHtml = "";
+      var routeKeys = Object.keys(routeMap).sort(function(a, b) {
+        var cppA = routeMap[a].parcel > 0 ? (routeMap[a].tot / routeMap[a].parcel) : 0;
+        var cppB = routeMap[b].parcel > 0 ? (routeMap[b].tot / routeMap[b].parcel) : 0;
+        return cppB - cppA;
+      });
+      for (var rk = 0; rk < routeKeys.length; rk++) {
+        var rName = routeKeys[rk];
+        var rd = routeMap[rName];
+        var rCpp = rd.parcel > 0 ? (rd.tot / rd.parcel) : 0;
+        rHtml += "<tr><td class='align-left'><b>" + rName + "</b></td>" +
+          "<td>" + rd.smu.toLocaleString("id-ID") + "</td>" +
+          "<td>" + Math.round(rd.gw).toLocaleString("id-ID") + " KG</td>" +
+          "<td>" + rd.parcel.toLocaleString("id-ID") + "</td>" +
+          "<td>" + fmtRp(rd.out) + "</td>" +
+          "<td>" + fmtRp(rd.inc) + "</td>" +
+          "<td>" + fmtRp(rd.tot) + "</td>" +
+          "<td>" + fmtRp(rd.gw > 0 ? rd.tot / rd.gw : 0) + "</td>" +
+          "<td style='color:var(--primary); font-weight:800;'>" + fmtRp(rCpp) + "</td></tr>";
+      }
+      document.getElementById("route-table-body").innerHTML = rHtml || "<tr><td colspan='9' class='loading-text'>No data found in selected period.</td></tr>";
+
+      // TOP 10 HEAVIEST SMUS
       smuList.sort(function(a, b) { return b.gw - a.gw; });
       var top10 = smuList.slice(0, 10);
       var tHtml = "";
@@ -1108,7 +1182,7 @@
     }
 
     function exportWeeklyImage() {
-      exportElementToPng("weekly-export-area", "AF_Jabodetabek_Weekly_" + activeMetricView.toUpperCase() + ".png");
+      exportElementToPng("weekly-export-area", "AF_Jakarta_Weekly_" + activeMetricView.toUpperCase() + ".png");
     }
 
     /* 3. UPDATE & ISSUE */
@@ -1381,21 +1455,21 @@
         return;
       }
       var listToExport = currentSlaRawList.slice();
-      var fileName = "AF_Jabodetabek_Raw_SLA_All.csv";
+      var fileName = "AF_Jakarta_Raw_SLA_All.csv";
 
       if (mode === "ROUTE") {
         listToExport.sort(function(a, b) { return a.route.localeCompare(b.route) || a.vendor.localeCompare(b.vendor); });
-        fileName = "AF_Jabodetabek_Raw_SLA_By_Route.csv";
+        fileName = "AF_Jakarta_Raw_SLA_By_Route.csv";
       } else if (mode === "VENDOR") {
         listToExport.sort(function(a, b) { return a.vendor.localeCompare(b.vendor) || a.route.localeCompare(b.route); });
-        fileName = "AF_Jabodetabek_Raw_SLA_By_Vendor.csv";
+        fileName = "AF_Jakarta_Raw_SLA_By_Vendor.csv";
       } else if (mode === "WEEK") {
         listToExport.sort(function(a, b) { return a.weekPeriod.localeCompare(b.weekPeriod) || a.route.localeCompare(b.route); });
-        fileName = "AF_Jabodetabek_Raw_SLA_By_Week.csv";
+        fileName = "AF_Jakarta_Raw_SLA_By_Week.csv";
       } else if (mode === "NOT_HIT") {
         listToExport = listToExport.filter(function(item) { return !item.isHit; });
         listToExport.sort(function(a, b) { return b.delayDays - a.delayDays; });
-        fileName = "AF_Jabodetabek_Raw_SMU_Not_Hit.csv";
+        fileName = "AF_Jakarta_Raw_SMU_Not_Hit.csv";
         if (listToExport.length === 0) {
           alert("No Not-Hit SMU data available to download.");
           return;
