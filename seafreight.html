@@ -145,7 +145,7 @@
       <p>Monitoring Dashboard — Sign In Required</p>
       <form onsubmit="handleLogin(event)">
         <div class="login-field">
-          <label>EMAIL</label>
+          <label>EMAIL (ID)</label>
           <input type="email" id="login-email" placeholder="ops@company.com" required>
         </div>
         <div class="login-field">
@@ -497,8 +497,7 @@
 
     async function handleLogout() {
       await sbClient.auth.signOut();
-      document.getElementById("app-wrapper").style.display = "none";
-      document.getElementById("login-screen").style.display = "flex";
+      window.location.href = "index.html";
     }
 
     function parseIsoToLocal(isoStr) {
