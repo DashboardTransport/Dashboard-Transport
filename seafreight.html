@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AWAREWEB | Monitoring Seafreight</title>
+  <title>Monitoring Seafreight</title>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -31,9 +31,9 @@
       background: #fff; padding: 36px 32px; border-radius: 16px; width: 100%; max-width: 400px;
       box-shadow: 0 12px 32px rgba(237, 6, 119, 0.12); border: 1px solid #FFD0DC; text-align: center;
     }
-    .login-logo {
-      width: 48px; height: 48px; background: var(--primary); border-radius: 50%;
-      display: inline-grid; place-items: center; color: #fff; font-weight: 800; font-size: 1.4rem; margin-bottom: 12px;
+    .login-icon {
+      width: 48px; height: 48px; background: var(--sec-bg-pink); border-radius: 12px;
+      display: inline-grid; place-items: center; color: var(--primary); font-size: 1.35rem; margin-bottom: 12px;
     }
     .login-box h2 { color: var(--primary); font-weight: 800; font-size: 1.35rem; margin-bottom: 4px; }
     .login-box p { color: #777; font-size: 0.85rem; margin-bottom: 24px; }
@@ -48,6 +48,11 @@
       border-radius: 8px; font-weight: 800; font-size: 0.95rem; cursor: pointer; transition: 0.2s;
     }
     .btn-login:hover { opacity: 0.9; }
+    .login-back-link {
+      display: inline-flex; align-items: center; gap: 6px; margin-top: 16px;
+      font-size: 0.8rem; font-weight: 700; color: #777; text-decoration: none;
+    }
+    .login-back-link:hover { color: var(--primary); }
     #login-error { color: var(--primary); font-size: 0.8rem; font-weight: 700; margin-top: 12px; min-height: 18px; }
 
     /* HEADER & APP */
@@ -58,9 +63,7 @@
       position: sticky; top: 0; z-index: 100; flex-wrap: wrap; gap: 10px;
     }
     .brand { display: flex; align-items: center; gap: 10px; }
-    .brand-logo { width: 32px; height: 32px; background: var(--primary); border-radius: 50%; display: grid; place-items: center; color: #fff; font-weight: 800; }
-    .brand-title { font-weight: 800; font-size: 1.1rem; color: var(--primary); }
-    .brand-sub { font-size: 0.8rem; color: #888; border-left: 2px solid #ddd; padding-left: 10px; margin-left: 5px; }
+    .module-title { font-weight: 800; font-size: 1.05rem; color: var(--primary); display: flex; align-items: center; gap: 8px; }
     .sync-status { font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: 20px; background: #FFF4F7; color: var(--primary); border: 1px solid #FFD0DC; }
     nav { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
     nav button {
@@ -69,6 +72,11 @@
       border-radius: 6px; cursor: pointer; transition: 0.2s;
     }
     nav button:hover, nav button.active { background: var(--sec-bg-pink); color: var(--primary); }
+    .btn-home {
+      background: #FFF4F7 !important; color: var(--primary) !important;
+      border: 1px solid #FFD0DC !important;
+    }
+    .btn-home:hover { background: var(--primary) !important; color: #fff !important; }
     .btn-logout { background: #524245 !important; color: #fff !important; }
     .container { max-width: 1280px; margin: 24px auto; padding: 0 20px; }
     .tab-page { display: none; }
@@ -129,16 +137,16 @@
 </head>
 <body>
 
-  <!-- HALAMAN LOGIN -->
+  <!-- LOGIN SCREEN -->
   <div id="login-screen">
     <div class="login-box">
-      <div class="login-logo">A</div>
-      <h2>AWAREWEB</h2>
-      <p>Seafreight Monitoring Portal — Login Required</p>
+      <div class="login-icon"><i class="fa-solid fa-ship"></i></div>
+      <h2>Seafreight Portal</h2>
+      <p>Monitoring Dashboard — Sign In Required</p>
       <form onsubmit="handleLogin(event)">
         <div class="login-field">
           <label>EMAIL</label>
-          <input type="email" id="login-email" placeholder="ops@awareweb.com" required>
+          <input type="email" id="login-email" placeholder="ops@company.com" required>
         </div>
         <div class="login-field">
           <label>PASSWORD</label>
@@ -147,16 +155,15 @@
         <button type="submit" class="btn-login" id="btn-login-submit">Sign In</button>
         <div id="login-error"></div>
       </form>
+      <a href="index.html" class="login-back-link"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
     </div>
   </div>
 
-  <!-- DASHBOARD UTAMA -->
+  <!-- MAIN DASHBOARD -->
   <div id="app-wrapper">
     <header>
       <div class="brand">
-        <div class="brand-logo">A</div>
-        <div class="brand-title">AWAREWEB</div>
-        <div class="brand-sub">Turning Data Into Awareness</div>
+        <div class="module-title"><i class="fa-solid fa-ship"></i> SEAFREIGHT MONITORING</div>
         <span id="sync-badge" class="sync-status"><i class="fa-solid fa-spinner fa-spin"></i> Loading DB...</span>
       </div>
       <nav>
@@ -164,6 +171,7 @@
         <button id="nav-weekly" onclick="switchTab('weekly', this)"><i class="fa-solid fa-calendar-week"></i> Weekly Analysis</button>
         <button id="nav-issues" onclick="switchTab('issues', this)"><i class="fa-solid fa-bullhorn"></i> Update & Issue</button>
         <button id="nav-sla" onclick="switchTab('sla', this)"><i class="fa-solid fa-stopwatch"></i> SLA Performance</button>
+        <button onclick="window.location.href='index.html'" class="btn-home"><i class="fa-solid fa-house"></i> Back to Home</button>
         <button onclick="handleLogout()" class="btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
       </nav>
     </header>
@@ -294,7 +302,7 @@
           <div class="day-badge" id="issue-day-count">-</div>
         </div>
 
-        <div class="section-banner">LOG DATA & ANOMALY SYSTEM</div>
+        <div class="section-banner">DATA LOG &amp; ANOMALY SYSTEM</div>
         <div class="anomaly-banner" id="issue-summary-card">
           <div><strong><i class="fa-solid fa-shield-virus" style="color:var(--primary);"></i> Anomaly Summary (Selected Period):</strong> <span id="issue-summary-text">Loading log data...</span></div>
           <div style="display:flex; align-items:center; gap:8px;"><span class="anomaly-badge" id="issue-count-badge">0 Issues</span></div>
@@ -448,7 +456,7 @@
   </div>
 
   <script>
-    /* ================= KONFIGURASI SUPABASE ================= */
+    /* ================= SUPABASE CONFIGURATION ================= */
     const SUPABASE_URL = 'https://jskezklvpaxgkyuynmqe.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_HFq9qTmT2ccAehYXVeUNWw_tPeFBmO1';
     const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -480,7 +488,7 @@
       btn.innerText = "Sign In";
 
       if (error) {
-        errEl.innerText = "Login gagal: " + error.message;
+        errEl.innerText = "Login failed: " + error.message;
       } else {
         showAppAndFetchData();
       }
@@ -551,15 +559,15 @@
           }
 
           var issues = [];
-          if (sttVal === '') issues.push("STT Kosong");
-          if (originRaw === 'UNKNOWN') issues.push("Origin Kosong");
-          if (destRaw === 'UNKNOWN') issues.push("Destination Kosong");
-          if (vendorRaw === 'Unassigned Vendor') issues.push("Vendor Kosong");
-          if (gw <= 0) issues.push("Weight Kosong/0");
-          if (parcel <= 0) issues.push("Parcel Kosong/0");
-          if (!atdDate) issues.push("ATD Kosong");
-          if (!ataDate) issues.push("ATA Kosong");
-          if (!qDate) issues.push("Hub Destination Kosong");
+          if (sttVal === '') issues.push("Missing STT");
+          if (originRaw === 'UNKNOWN') issues.push("Missing Origin");
+          if (destRaw === 'UNKNOWN') issues.push("Missing Destination");
+          if (vendorRaw === 'Unassigned Vendor') issues.push("Missing Vendor");
+          if (gw <= 0) issues.push("Missing/0 Weight");
+          if (parcel <= 0) issues.push("Missing/0 Parcel");
+          if (!atdDate) issues.push("Missing ATD");
+          if (!ataDate) issues.push("Missing ATA");
+          if (!qDate) issues.push("Missing Hub Destination");
 
           allRows.push([
             cDate ? cDate.getTime() : null,
@@ -586,7 +594,7 @@
         badge.style.background = "#D8EAD8";
         badge.style.color = "#1E561E";
         badge.style.borderColor = "#2D5B2D";
-        badge.innerHTML = "<i class='fa-solid fa-circle-check'></i> " + allRows.length.toLocaleString("id-ID") + " Rows Loaded";
+        badge.innerHTML = "<i class='fa-solid fa-circle-check'></i> " + allRows.length.toLocaleString("en-US") + " Rows Loaded";
 
         if (maxDate) {
           var y = maxDate.getFullYear();
@@ -810,7 +818,7 @@
 
       var keys = Object.keys(dataset);
       if (keys.length === 0) {
-        document.getElementById("weekly-table-body").innerHTML = "<tr><td colspan='16' style='text-align:center; padding:20px; color:#888;'>No records found for selected month & year.</td></tr>";
+        document.getElementById("weekly-table-body").innerHTML = "<tr><td colspan='16' style='text-align:center; padding:20px; color:#888;'>No records found for selected month &amp; year.</td></tr>";
         return;
       }
 
