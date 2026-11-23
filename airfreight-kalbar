@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monitoring Airfreight — Kalbar</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --primary: #ED0677;
+      --primary-yellow: #FFCB05;
+      --sec-pink-light: #FF84A1;
+      --sec-blue: #7ECCEE;
+      --sec-yellow-light: #FFEFA3;
+      --sec-bg-pink: #FFECF0;
+      --sec-dark: #524245;
+      --bg-body: #F9FAFC;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Plus Jakarta Sans", sans-serif; }
+    body { background-color: var(--bg-body); color: var(--sec-dark); min-height: 100vh; }
+
+    /* LOGIN OVERLAY */
+    #login-screen {
+      position: fixed; inset: 0; background: linear-gradient(135deg, #FFF4F7 0%, #FFEFA3 100%);
+      display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px;
+    }
+    .login-box {
+      background: #fff; padding: 36px 32px; border-radius: 16px; width: 100%; max-width: 400px;
+      box-shadow: 0 12px 32px rgba(237, 6, 119, 0.12); border: 1px solid #FFD0DC; text-align: center;
+    }
+    .login-icon {
+      width: 48px; height: 48px; background: var(--sec-bg-pink); border-radius: 12px;
+      display: inline-grid; place-items: center; color: var(--primary); font-size: 1.35rem; margin-bottom: 12px;
+    }
+    .login-box h2 { color: var(--primary); font-weight: 800; font-size: 1.35rem; margin-bottom: 4px; }
+    .login-box p { color: #777; font-size: 0.85rem; margin-bottom: 24px; }
+    .login-field { text-align: left; margin-bottom: 16px; }
+    .login-field label { display: block; font-size: 0.78rem; font-weight: 700; margin-bottom: 6px; color: var(--sec-dark); }
+    .login-field input {
+      width: 100%; padding: 11px 14px; border: 1.5px solid #DDD; border-radius: 8px; font-size: 0.9rem; font-weight: 600;
+    }
+    .login-field input:focus { outline: none; border-color: var(--primary); }
+    .btn-login {
+      width: 100%; padding: 12px; background: var(--primary); color: #fff; border: none;
+      border-radius: 8px; font-weight: 800; font-size: 0.95rem; cursor: pointer; transition: 0.2s;
+    }
+    .btn-login:hover { opacity: 0.9; }
+    .login-back-link {
+      display: inline-flex; align-items: center; gap: 6px; margin-top: 16px;
+      font-size: 0.8rem; font-weight: 700; color: #777; text-decoration: none;
+    }
+    .login-back-link:hover { color: var(--primary); }
+    #login-error { color: var(--primary); font-size: 0.8rem; font-weight: 700; margin-top: 12px; min-height: 18px; }
+
+    /* HEADER & APP */
+    #app-wrapper { display: none; }
+    header {
+      background: #fff; border-bottom: 1px solid #EFEFEF; padding: 12px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100; flex-wrap: wrap; gap: 10px;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .module-title { font-weight: 800; font-size: 1.05rem; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+    .region-pill { background: var(--sec-yellow-light); color: var(--sec-dark); border: 1px solid var(--primary-yellow); font-size: 0.72rem; font-weight: 800; padding: 3px 10px; border-radius: 20px; }
+    .sync-status { font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: 20px; background: #FFF4F7; color: var(--primary); border: 1px solid #FFD0DC; }
+    nav { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    nav button {
+      background: none; border: none; color: var(--sec-dark); font-size: 0.8rem; font-weight: 700;
+      display: flex; align-items: center; gap: 6px; text-transform: uppercase; padding: 8px 12px;
+      border-radius: 6px; cursor: pointer; transition: 0.2s;
+    }
+    nav button:hover, nav button.active { background: var(--sec-bg-pink); color: var(--primary); }
+    .btn-home {
+      background: #FFF4F7 !important; color: var(--primary) !important;
+      border: 1px solid #FFD0DC !important;
+    }
+    .btn-home:hover { background: var(--primary) !important; color: #fff !important; }
+    .btn-logout { background: #524245 !important; color: #fff !important; }
+    .container { max-width: 1280px; margin: 24px auto; padding: 0 20px; }
+    .tab-page { display: none; }
+    .tab-page.active-page { display: block; }
+
+    /* FILTER CARD SEJAJAR */
+    .filter-card {
+      background: #D8EAD8; border: 2px solid #2D5B2D; border-radius: 8px;
+      padding: 10px 14px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; width: 100%;
+    }
+    .filter-card-inline {
+      background: #D8EAD8; border: 2px solid #2D5B2D; border-radius: 8px;
+      padding: 10px 16px; margin-bottom: 20px; display: inline-flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    }
+    .filter-group { display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 0.76rem; white-space: nowrap; }
+    .filter-group input, .filter-group select { border: 1px solid #777; padding: 5px 8px; border-radius: 4px; font-weight: 600; font-size: 0.78rem; background: #fff; }
+    .day-badge { background: #A3D9A3; border: 1px solid #2D5B2D; padding: 5px 12px; border-radius: 6px; font-weight: 800; font-size: 0.78rem; white-space: nowrap; margin-left: auto; }
+    .btn-action { padding: 7px 14px; font-weight:700; font-size:0.78rem; cursor:pointer; background:var(--primary); color:#fff; border:none; border-radius:6px; transition:0.2s; white-space: nowrap; }
+    .btn-action:hover { opacity: 0.9; }
+    .btn-secondary { padding: 7px 12px; font-weight:700; cursor:pointer; background:#524245; color:#fff; border:none; border-radius:6px; font-size:0.78rem; white-space: nowrap; }
+    .btn-export-img { padding: 6px 12px; font-weight:700; cursor:pointer; background:var(--primary); color:#fff; border:none; border-radius:6px; font-size:0.78rem; display:inline-flex; align-items:center; gap:6px; }
+    .btn-export-csv { padding: 6px 12px; font-weight:700; cursor:pointer; background:#217346; color:#fff; border:none; border-radius:6px; font-size:0.78rem; display:inline-flex; align-items:center; gap:6px; }
+    .view-toggle { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn-toggle { padding: 8px 14px; font-weight: 700; border: 1px solid var(--primary); background: #fff; color: var(--primary); border-radius: 6px; cursor: pointer; font-size: 0.8rem; }
+    .btn-toggle.active { background: var(--primary); color: #fff; }
+    .btn-sub-toggle { padding: 6px 12px; font-weight: 700; border: 1px solid #ccc; background: #fff; color: var(--sec-dark); border-radius: 6px; cursor: pointer; font-size: 0.78rem; }
+    .btn-sub-toggle.active { background: var(--sec-dark); color: #fff; border-color: var(--sec-dark); }
+    .section-banner { background: #FFC0CB; border: 2px solid #000; text-align: center; font-weight: 800; padding: 8px; font-size: 1.05rem; margin-bottom: 15px; border-radius: 6px; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 24px; }
+    .kpi-grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 24px; }
+    .kpi-card { background: #fff; border: 1px solid #E2E8F0; border-radius: 10px; padding: 14px 10px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
+    .kpi-card .label { font-size: 0.7rem; font-weight: 700; color: #666; text-transform: uppercase; margin-bottom: 6px; }
+    .kpi-card .value { font-size: 1.1rem; font-weight: 800; color: var(--primary); word-break: break-word; }
+    .kpi-card .sub-val { font-size: 0.72rem; font-weight: 700; color: #64748B; margin-top: 4px; }
+    .anomaly-banner {
+      background: #FFF0F2; border: 2px solid var(--primary); border-radius: 8px; padding: 12px 18px;
+      margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; color: var(--sec-dark); flex-wrap: wrap; gap: 10px;
+    }
+    .anomaly-badge { background: var(--primary); color: #fff; padding: 4px 10px; border-radius: 20px; font-weight: 800; font-size: 0.8rem; }
+    .table-container { background: #fff; border-radius: 12px; border: 1px solid #EFEFEF; overflow-x: auto; -webkit-overflow-scrolling: touch; box-shadow: 0 4px 12px rgba(0,0,0,0.03); margin-bottom: 28px; }
+    .delay-scroll-box { max-height: 295px; overflow-y: auto; }
+    .delay-scroll-box thead th { position: sticky; top: 0; z-index: 5; background: var(--sec-bg-pink); }
+    table { width: 100%; border-collapse: collapse; text-align: left; white-space: nowrap; }
+    th { background: var(--sec-bg-pink); color: var(--primary); padding: 12px 16px; font-size: 0.78rem; text-transform: uppercase; font-weight: 800; border-bottom: 2px solid #FFD0DC; text-align: center; vertical-align: middle; }
+    td { padding: 12px 16px; font-size: 0.86rem; border-bottom: 1px solid #F0F0F0; font-weight: 600; text-align: center; }
+    td.align-left, th.align-left { text-align: left; }
+    td.route-tags-cell { white-space: normal; text-align: left; line-height: 1.7; min-width: 320px; }
+    .route-pill {
+      display: inline-block; background: #FFF4F7; color: var(--sec-dark); border: 1px solid #FFD0DC;
+      padding: 2px 9px; border-radius: 14px; font-size: 0.74rem; font-weight: 700; margin: 2px 4px 2px 0;
+    }
+    .route-count-badge {
+      background: var(--primary); color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 0.78rem; font-weight: 800;
+    }
+    tr:nth-child(even) { background-color: #FAFAFA; }
+    tr.grand-total { background: #FFF4F7; font-weight: 800; color: var(--primary); border-top: 2px solid var(--primary); }
+    tr.vendor-parent-row { background: #FFF5F8 !important; border-top: 2px solid #FFD0DC; font-weight: 800; }
+    tr.vendor-child-row { background: #FFFFFF !important; font-size: 0.83rem; color: #555; }
+    tr.vendor-child-row td { padding: 9px 16px; border-bottom: 1px dashed #EAEAEA; }
+    .route-indent { padding-left: 26px !important; color: #444; font-weight: 600; }
+    .badge-error { background: #FFE0E6; color: var(--primary); padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; display: inline-block; margin: 2px; }
+    .badge-hit { background: #D8EAD8; color: #1E561E; padding: 4px 10px; border-radius: 4px; font-size: 0.78rem; font-weight: 800; }
+    .badge-nothit { background: #FFE0E6; color: #ED0677; padding: 4px 10px; border-radius: 4px; font-size: 0.78rem; font-weight: 800; }
+    .badge-cat-sd { background: #FFEFA3; color: #524245; border: 1px solid #FFCB05; padding: 3px 8px; border-radius: 4px; font-size: 0.74rem; font-weight: 800; }
+    .rank-badge { background: #524245; color: #fff; padding: 3px 9px; border-radius: 12px; font-size: 0.75rem; font-weight: 800; }
+    .rank-badge.top1 { background: var(--primary); }
+    .loading-text { padding: 20px; text-align: center; color: #888; font-weight: 600; }
+    .section-header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px; }
+    .sub-heading { color: var(--sec-dark); display: flex; align-items: center; gap: 8px; font-size: 1.05rem; flex-wrap: wrap; }
+    .sub-note { font-size: 0.78rem; font-weight: 600; color: #777; margin-left: 6px; }
+    .action-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+    .export-wrapper { background: #F9FAFC; padding: 8px; border-radius: 10px; margin-bottom: 22px; }
+
+    /* ================= RESPONSIVE WEB / TABLET / MOBILE ================= */
+    @media (max-width: 1180px) {
+      .filter-card { flex-wrap: wrap; }
+      .day-badge { margin-left: 0; }
+    }
+
+    @media (max-width: 1024px) {
+      .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+      .kpi-grid-5 { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (max-width: 640px) {
+      header { padding: 10px 14px; }
+      .module-title { font-size: 0.95rem; }
+      nav { width: 100%; gap: 6px; }
+      nav button { font-size: 0.72rem; padding: 7px 10px; flex: 1 1 auto; justify-content: center; }
+
+      .container { margin: 14px auto; padding: 0 12px; }
+      .section-banner { font-size: 0.88rem; padding: 8px 6px; }
+
+      .filter-card, .filter-card-inline {
+        display: flex; width: 100%; padding: 12px; gap: 10px; flex-wrap: wrap;
+      }
+      .filter-group {
+        width: 100%; justify-content: space-between; font-size: 0.78rem;
+      }
+      .filter-group input, .filter-group select {
+        width: 60% !important; padding: 8px; font-size: 0.85rem;
+      }
+      .filter-card .btn-action,
+      .filter-card .btn-secondary,
+      .filter-card-inline .btn-action,
+      .filter-card-inline .btn-secondary {
+        flex: 1 1 45%; text-align: center; padding: 9px 10px;
+      }
+      .day-badge { width: 100%; text-align: center; margin-left: 0; }
+
+      .kpi-grid, .kpi-grid-5 { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .kpi-card { padding: 12px 8px; }
+      .kpi-card .label { font-size: 0.65rem; }
+      .kpi-card .value { font-size: 0.95rem; }
+
+      .sub-heading { font-size: 0.95rem; }
+      .action-btns { width: 100%; }
+      .action-btns button { flex: 1 1 auto; justify-content: center; font-size: 0.74rem; padding: 8px 10px; }
+
+      .view-toggle { width: 100%; }
+      .btn-toggle { flex: 1 1 48%; text-align: center; font-size: 0.75rem; padding: 8px 8px; }
+      .btn-sub-toggle { flex: 1 1 auto; text-align: center; font-size: 0.72rem; padding: 6px 8px; }
+
+      th { padding: 10px 12px; font-size: 0.72rem; }
+      td { padding: 10px 12px; font-size: 0.8rem; }
+      .export-wrapper { padding: 4px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LOGIN SCREEN -->
+  <div id="login-screen">
+    <div class="login-box">
+      <div class="login-icon"><i class="fa-solid fa-plane-up"></i></div>
+      <h2>Airfreight Kalbar</h2>
+      <p>Monitoring Dashboard — Sign In Required</p>
+      <form onsubmit="handleLogin(event)">
+        <div class="login-field">
+          <label>EMAIL (ID)</label>
+          <input type="email" id="login-email" placeholder="ops@company.com" required>
+        </div>
+        <div class="login-field">
+          <label>PASSWORD</label>
+          <input type="password" id="login-password" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn-login" id="btn-login-submit">Sign In</button>
+        <div id="login-error"></div>
+      </form>
+      <a href="index.html" class="login-back-link"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
+    </div>
+  </div>
+
+  <!-- MAIN DASHBOARD -->
+  <div id="app-wrapper">
+    <header>
+      <div class="brand">
+        <div class="module-title"><i class="fa-solid fa-plane-up"></i> AIRFREIGHT MONITORING</div>
+        <span class="region-pill">KALBAR</span>
+        <span id="sync-badge" class="sync-status"><i class="fa-solid fa-spinner fa-spin"></i> Loading DB...</span>
+      </div>
+      <nav>
+        <button id="nav-dashboard" class="active" onclick="switchTab('dashboard', this)"><i class="fa-solid fa-chart-pie"></i> Dashboard</button>
+        <button id="nav-weekly" onclick="switchTab('weekly', this)"><i class="fa-solid fa-calendar-week"></i> Weekly Analysis</button>
+        <button id="nav-issues" onclick="switchTab('issues', this)"><i class="fa-solid fa-bullhorn"></i> Update &amp; Issue</button>
+        <button id="nav-sla" onclick="switchTab('sla', this)"><i class="fa-solid fa-stopwatch"></i> SLA Performance</button>
+        <button onclick="window.location.href='index.html'" class="btn-home"><i class="fa-solid fa-house"></i> Home</button>
+        <button onclick="handleLogout()" class="btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+      </nav>
+    </header>
+
+    <div class="container">
+      <!-- TAB 1: DASHBOARD -->
+      <div id="page-dashboard" class="tab-page active-page">
+        <div class="filter-card">
+          <div class="filter-group"><span>START DATE</span><input type="date" id="start-date"></div>
+          <div class="filter-group"><span>END DATE</span><input type="date" id="end-date"></div>
+          <button onclick="applyFilter(true)" class="btn-action"><i class="fa-solid fa-filter"></i> Apply Filter</button>
+          <button onclick="resetAllDates()" class="btn-secondary">Show All</button>
+          <div class="day-badge" id="day-count">-</div>
+        </div>
+
+        <div class="section-banner">AIRFREIGHT KALBAR — OVERALL STATISTICS (SD / SAME DAY)</div>
+        <div class="kpi-grid">
+          <div class="kpi-card"><div class="label">Total SMU</div><div class="value" id="kpi-smu">0</div><div class="sub-val" id="kpi-cat-split">Service: SD (H+0)</div></div>
+          <div class="kpi-card"><div class="label">Gross Weight (KG)</div><div class="value" id="kpi-gw">0 KG</div><div class="sub-val" id="kpi-avg-gw">Avg: 0 KG/SMU</div></div>
+          <div class="kpi-card"><div class="label">Quantity Parcel</div><div class="value" id="kpi-parcel">0</div><div class="sub-val" id="kpi-cpp">CPP: Rp 0</div></div>
+          <div class="kpi-card"><div class="label">Est. Cost Outgoing</div><div class="value" id="kpi-cost-out">Rp 0</div><div class="sub-val" id="kpi-out-share">0% of Total</div></div>
+          <div class="kpi-card"><div class="label">Est. Cost Incoming</div><div class="value" id="kpi-cost-in">Rp 0</div><div class="sub-val" id="kpi-in-share">0% of Total</div></div>
+          <div class="kpi-card"><div class="label">Est. Total Cost</div><div class="value" id="kpi-cost-total">Rp 0</div><div class="sub-val" id="kpi-cpkg">CPKG: Rp 0</div></div>
+        </div>
+
+        <div class="anomaly-banner" id="anomaly-alert-box">
+          <div><strong><i class="fa-solid fa-triangle-exclamation" style="color:var(--primary);"></i> Data Anomaly Detection:</strong> <span id="anomaly-summary-text">Loading data...</span></div>
+          <span class="anomaly-badge" id="anomaly-count-badge">0 Errors</span>
+        </div>
+
+        <!-- 1. BREAKDOWN BY VENDOR (SORT BY HIGHEST EST. TOTAL COST) -->
+        <div class="section-header-bar">
+          <h3 class="sub-heading"><i class="fa-solid fa-truck-ramp-box"></i> Breakdown By Vendor <span class="sub-note">(Sorted by Highest Est. Total Cost)</span></h3>
+          <div class="action-btns">
+            <button onclick="downloadTableCsv('dash-vendor-table', 'AF_Kalbar_Breakdown_Vendor.csv')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
+            <button onclick="exportElementToPng('wrap-dash-vendor', 'AF_Kalbar_Breakdown_Vendor.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
+          </div>
+        </div>
+        <div id="wrap-dash-vendor" class="export-wrapper">
+          <div class="table-container" style="margin-bottom:0;">
+            <table id="dash-vendor-table">
+              <thead>
+                <tr>
+                  <th class="align-left">Vendor Name</th>
+                  <th>Total SMU</th>
+                  <th>Gross Weight (KG)</th>
+                  <th>Parcel</th>
+                  <th>Est. Total Cost</th>
+                  <th>CPKG</th>
+                  <th>CPP</th>
+                </tr>
+              </thead>
+              <tbody id="vendor-table-body"><tr><td colspan="7" class="loading-text">Loading data...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 2. VENDOR COVERED ROUTE -->
+        <div class="section-header-bar">
+          <h3 class="sub-heading"><i class="fa-solid fa-map-signs"></i> Vendor Covered Route <span class="sub-note">(Route Quantity &amp; Destination Coverage)</span></h3>
+          <div class="action-btns">
+            <button onclick="downloadTableCsv('dash-vendor-routes-table', 'AF_Kalbar_Vendor_Covered_Routes.csv')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
+            <button onclick="exportElementToPng('wrap-dash-vendor-routes', 'AF_Kalbar_Vendor_Covered_Routes.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
+          </div>
+        </div>
+        <div id="wrap-dash-vendor-routes" class="export-wrapper">
+          <div class="table-container" style="margin-bottom:0;">
+            <table id="dash-vendor-routes-table">
+              <thead>
+                <tr>
+                  <th class="align-left">Vendor Name</th>
+                  <th>Total Covered Routes</th>
+                  <th>Total SMU</th>
+                  <th class="align-left">Covered Route List (Origin - Destination)</th>
+                </tr>
+              </thead>
+              <tbody id="vendor-routes-table-body"><tr><td colspan="4" class="loading-text">Loading data...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 3. BREAKDOWN BY ROUTE (SORT BY HIGHEST CPP, DI ATAS TOP 10 HEAVIEST SMU) -->
+        <div class="section-header-bar">
+          <h3 class="sub-heading"><i class="fa-solid fa-route"></i> Breakdown By Route <span class="sub-note">(Sorted by Highest CPP)</span></h3>
+          <div class="action-btns">
+            <button onclick="downloadTableCsv('dash-route-table', 'AF_Kalbar_Breakdown_Route.csv')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
+            <button onclick="exportElementToPng('wrap-dash-route', 'AF_Kalbar_Breakdown_Route.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
+          </div>
+        </div>
+        <div id="wrap-dash-route" class="export-wrapper">
+          <div class="table-container" style="margin-bottom:0;">
+            <table id="dash-route-table">
+              <thead>
+                <tr>
+                  <th class="align-left">Route (Origin - Destination)</th>
+                  <th>Total SMU</th>
+                  <th>Gross Weight (KG)</th>
+                  <th>Parcel</th>
+                  <th>Est. Outgoing</th>
+                  <th>Est. Incoming</th>
+                  <th>Est. Total Cost</th>
+                  <th>CPKG</th>
+                  <th>CPP</th>
+                </tr>
+              </thead>
+              <tbody id="route-table-body"><tr><td colspan="9" class="loading-text">Loading data...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 4. TOP 10 HEAVIEST SMUS -->
+        <div class="section-header-bar">
+          <h3 class="sub-heading"><i class="fa-solid fa-trophy"></i> Top 10 Heaviest SMUs</h3>
+          <div class="action-btns">
+            <button onclick="downloadTableCsv('dash-top10-table', 'AF_Kalbar_Top10_Heaviest_SMU.csv')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
+            <button onclick="exportElementToPng('wrap-dash-top10', 'AF_Kalbar_Top10_Heaviest_SMU.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
+          </div>
+        </div>
+        <div id="wrap-dash-top10" class="export-wrapper">
+          <div class="table-container" style="margin-bottom:0;">
+            <table id="dash-top10-table">
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th class="align-left">SMU No.</th>
+                  <th>Service</th>
+                  <th class="align-left">Vendor</th>
+                  <th>Flight</th>
+                  <th class="align-left">Route</th>
+                  <th>Gross Weight (KG)</th>
+                  <th>Parcel</th>
+                  <th>Est. Total Cost</th>
+                  <th>CPKG</th>
+                </tr>
+              </thead>
+              <tbody id="top10-table-body"><tr><td colspan="10" class="loading-text">Loading data...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: WEEKLY ANALYSIS -->
+      <div id="page-weekly" class="tab-page">
+        <div class="filter-card-inline">
+          <div class="filter-group"><span>SELECT MONTH</span>
+            <select id="weekly-month">
+              <option value="1">January</option><option value="2">February</option><option value="3">March</option>
+              <option value="4">April</option><option value="5">May</option><option value="6">June</option>
+              <option value="7">July</option><option value="8">August</option><option value="9">September</option>
+              <option value="10">October</option><option value="11">November</option><option value="12">December</option>
+            </select>
+          </div>
+          <div class="filter-group"><span>YEAR</span><input type="number" id="weekly-year" value="2026" style="width: 90px;"></div>
+          <button onclick="renderWeeklyTable()" class="btn-action"><i class="fa-solid fa-chart-line"></i> Generate Report</button>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px; flex-wrap:wrap; gap:10px;">
+          <div style="display:flex; flex-direction:column; gap:8px; width:100%;">
+            <div class="view-toggle">
+              <button id="btn-view-vendor" class="btn-toggle active" onclick="switchWeeklyView('vendor')"><i class="fa-solid fa-truck"></i> Breakdown By Vendor</button>
+              <button id="btn-view-route" class="btn-toggle" onclick="switchWeeklyView('route')"><i class="fa-solid fa-map-location-dot"></i> Breakdown By Route</button>
+            </div>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <button id="btn-metric-all" class="btn-sub-toggle active" onclick="switchMetricView('all')">All Metrics</button>
+              <button id="btn-metric-weight" class="btn-sub-toggle" onclick="switchMetricView('weight')">By Weight</button>
+              <button id="btn-metric-parcel" class="btn-sub-toggle" onclick="switchMetricView('parcel')">By Parcel</button>
+              <button id="btn-metric-smu" class="btn-sub-toggle" onclick="switchMetricView('smu')">By SMU</button>
+              <button id="btn-metric-cost" class="btn-sub-toggle" onclick="switchMetricView('cost')">By Est. Total Cost</button>
+            </div>
+          </div>
+          <div class="action-btns">
+            <button onclick="downloadTableCsv('weekly-table-elem', 'AF_Kalbar_Weekly_Analysis.csv')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
+            <button onclick="exportWeeklyImage()" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
+          </div>
+        </div>
+
+        <div id="weekly-export-area" style="background:#F9FAFC; padding:10px; border-radius:8px;">
+          <div class="section-banner" id="weekly-banner-title">KALBAR — FULL MONTH WEEKLY BREAKDOWN</div>
+          <div class="table-container">
+            <table id="weekly-table-elem">
+              <thead id="weekly-table-head"></thead>
+              <tbody id="weekly-table-body"><tr><td colspan="21" class="loading-text">Loading data...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: UPDATE & ISSUE -->
+      <div id="page-issues" class="tab-page">
+        <div class="filter-card-inline">
+          <div class="filter-group"><span>START DATE</span><input type="date" id="issue-start-date"></div>
+          <div class="filter-group"><span>END DATE</span><input type="date" id="issue-end-date"></div>
+          <button onclick="renderIssueLogs(true)" class="btn-action"><i class="fa-solid fa-magnifying-glass"></i> Check Anomaly Logs</button>
+          <button onclick="resetAllDates()" class="btn-secondary">Show All</button>
+          <div class="day-badge" id="issue-day-count">-</div>
+        </div>
+
+        <div class="section-banner">DATA LOG &amp; ANOMALY SYSTEM</div>
+        <div class="anomaly-banner" id="issue-summary-card">
+          <div><strong><i class="fa-solid fa-shield-virus" style="color:var(--primary);"></i> Anomaly Summary (Selected Period):</strong> <span id="issue-summary-text">Loading log data...</span></div>
+          <div style="display:flex; align-items:center; gap:8px;"><span class="anomaly-badge" id="issue-count-badge">0 Issues</span></div>
+        </div>
+
+        <div class="section-header-bar">
+          <h3 class="sub-heading" style="color: var(--primary);"><i class="fa-solid fa-list-check"></i> Incomplete / Problematic Data Details</h3>
+          <div class="action-btns">
+            <button onclick="downloadTableCsv('issue-table-elem', 'AF_Kalbar_Anomalies.csv')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
+            <button onclick="exportElementToPng('wrap-issue-table', 'AF_Kalbar_Anomalies.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
+          </div>
+        </div>
+        <div id="wrap-issue-table" class="export-wrapper">
+          <div class="table-container" style="margin-bottom:0;">
+            <table id="issue-table-elem">
+              <thead>
+                <tr>
+                  <th class="align-left">SMU No.</th>
+                  <th>Pre-Alert Date</th>
+                  <th>Service</th>
+                  <th class="align-left">Route</th>
+                  <th class="align-left">Vendor</th>
+                  <th>Flight</th>
+                  <th>Weight / Parcel</th>
+                  <th>ATD / ATA</th>
+                  <th>Anomaly Detail</th>
+                </tr>
+              </thead>
+              <tbody id="issue-table-body"><tr><td colspan="9" class="loading-text">Loading logs...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: SLA PERFORMANCE -->
+      <div id="page-sla" class="tab-page">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:20px;">
+          <div class="filter-card-inline" style="margin-bottom:0;">
+            <div class="filter-group"><span>START DATE</span><input type="date" id="sla-start-date"></div>
+            <div class="filter-group"><span>END DATE</span><input type="date" id="sla-end-date"></div>
+            <button onclick="renderAllSlaTables(true)" class="btn-action"><i class="fa-solid fa-stopwatch"></i> Calculate SLA</button>
+            <button onclick="resetAllDates()" class="btn-secondary">Show All</button>
+            <div class="day-badge" id="sla-day-count">-</div>
+          </div>
+          <div class="action-btns">
+            <button onclick="downloadSlaRawCsv('ALL')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download All SLA Raw (.CSV)</button>
+            <button onclick="exportElementToPng('sla-export-area', 'AF_Kalbar_SLA_Summary.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download All Summary PNG</button>
+          </div>
+        </div>
+
+        <div id="sla-export-area" style="background:#F9FAFC; padding:10px; border-radius:8px;">
+          <div class="section-banner">AIRFREIGHT KALBAR SLA PERFORMANCE (SAME DAY / H+0: PRE-ALERT DATE = ATD DATE)</div>
+          <div class="kpi-grid-5">
+            <div class="kpi-card"><div class="label">Evaluated SMU</div><div class="value" id="sla-kpi-total">0</div></div>
+            <div class="kpi-card"><div class="label">Hit SLA (Same Day)</div><div class="value" style="color:#1E561E;" id="sla-kpi-hit">0</div></div>
+            <div class="kpi-card"><div class="label">Not Hit (Delay)</div><div class="value" style="color:#ED0677;" id="sla-kpi-nothit">0</div></div>
+            <div class="kpi-card"><div class="label">SLA Achievement</div><div class="value" id="sla-kpi-pct">0%</div></div>
+            <div class="kpi-card"><div class="label">Avg PA → ATD</div><div class="value" id="sla-kpi-avg">0 Days</div></div>
+          </div>
+
+          <div class="section-header-bar">
+            <h3 class="sub-heading"><i class="fa-solid fa-route"></i> 1. SLA Performance By Route</h3>
+            <div class="action-btns">
+              <button onclick="downloadSlaRawCsv('ROUTE')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download Raw (.CSV)</button>
+              <button onclick="exportElementToPng('wrap-sla-route', 'AF_Kalbar_SLA_By_Route.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
+            </div>
+          </div>
+          <div id="wrap-sla-route" class="export-wrapper">
+            <div class="table-container" style="margin-bottom:0;">
+              <table id="sla-route-table">
+                <thead>
+                  <tr>
+                    <th class="align-left">Route</th><th>Evaluated SMU</th>
+                    <th>Hit SLA (H+0)</th><th>Not Hit (Delay)</th><th>Avg Actual Days</th><th>SLA Achievement (%)</th>
+                  </tr>
+                </thead>
+                <tbody id="sla-route-body"><tr><td colspan="6" class="loading-text">Loading data...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="section-header-bar">
+            <h3 class="sub-heading"><i class="fa-solid fa-truck"></i> 2. SLA Performance By Vendor (Detail Per Route)</h3>
+            <div class="action-btns">
+              <button onclick="downloadSlaRawCsv('VENDOR')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download Raw (.CSV)</button>
+              <button onclick="exportElementToPng('wrap-sla-vendor', 'AF_Kalbar_SLA_By_Vendor.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
+            </div>
+          </div>
+          <div id="wrap-sla-vendor" class="export-wrapper">
+            <div class="table-container" style="margin-bottom:0;">
+              <table id="sla-vendor-table">
+                <thead>
+                  <tr>
+                    <th class="align-left">Vendor / Route Detail</th><th>Evaluated SMU</th>
+                    <th>Hit SLA (H+0)</th><th>Not Hit (Delay)</th><th>Avg Actual Days</th><th>SLA Achievement (%)</th>
+                  </tr>
+                </thead>
+                <tbody id="sla-vendor-body"><tr><td colspan="6" class="loading-text">Loading data...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="section-header-bar">
+            <h3 class="sub-heading"><i class="fa-solid fa-calendar-week"></i> 3. SLA Performance By Week</h3>
+            <div class="action-btns">
+              <button onclick="downloadSlaRawCsv('WEEK')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download Raw (.CSV)</button>
+              <button onclick="exportElementToPng('wrap-sla-week', 'AF_Kalbar_SLA_By_Week.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
+            </div>
+          </div>
+          <div id="wrap-sla-week" class="export-wrapper">
+            <div class="table-container" style="margin-bottom:0;">
+              <table id="sla-week-table">
+                <thead>
+                  <tr>
+                    <th class="align-left">Week Period</th><th>Evaluated SMU</th><th>Hit SLA (H+0)</th>
+                    <th>Not Hit (Delay)</th><th>Avg Actual Days</th><th>SLA Achievement (%)</th>
+                  </tr>
+                </thead>
+                <tbody id="sla-week-body"><tr><td colspan="6" class="loading-text">Loading data...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="section-header-bar">
+            <h3 class="sub-heading" style="color: var(--primary);"><i class="fa-solid fa-arrow-trend-down"></i> 4. Top 5 Lowest Vendor Performance (By Route)</h3>
+            <div class="action-btns">
+              <button onclick="downloadTableCsv('sla-lowest-vendor-table', 'AF_Kalbar_Top5_Lowest_Vendor.csv')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
+              <button onclick="exportElementToPng('wrap-sla-lowest', 'AF_Kalbar_Top5_Lowest_Vendor.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
+            </div>
+          </div>
+          <div id="wrap-sla-lowest" class="export-wrapper">
+            <div class="table-container" style="margin-bottom:0;">
+              <table id="sla-lowest-vendor-table">
+                <thead>
+                  <tr>
+                    <th>Rank</th><th class="align-left">Vendor</th><th class="align-left">Route</th>
+                    <th>Evaluated SMU</th><th>Hit SLA</th><th>Not Hit</th><th>Avg Actual Days</th><th>SLA Achievement (%)</th>
+                  </tr>
+                </thead>
+                <tbody id="sla-lowest-vendor-body"><tr><td colspan="8" class="loading-text">Loading data...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-header-bar">
+          <h3 class="sub-heading" style="color: var(--primary);"><i class="fa-solid fa-clock-rotate-left"></i> 5. Detail SMU Not Hit SLA (Delay List) <span class="sub-note" id="delay-list-counter"></span></h3>
+          <div class="action-btns">
+            <button onclick="downloadSlaRawCsv('NOT_HIT')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download Raw (.CSV)</button>
+            <button onclick="exportElementToPng('wrap-sla-delay', 'AF_Kalbar_SLA_Delay_List.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
+          </div>
+        </div>
+        <div id="wrap-sla-delay" class="export-wrapper">
+          <div class="table-container delay-scroll-box" style="margin-bottom:0;">
+            <table id="sla-delay-table">
+              <thead>
+                <tr>
+                  <th class="align-left">SMU No.</th><th>Service</th><th class="align-left">Route</th><th class="align-left">Vendor</th>
+                  <th>Flight</th><th>Pre-Alert (C)</th><th>ATD (T)</th><th>Target</th><th>Actual</th><th>Delay</th><th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="sla-delay-table-body"><tr><td colspan="11" class="loading-text">No delay data.</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ================= SUPABASE CONFIGURATION ================= */
+    const SUPABASE_URL = 'https://jskezklvpaxgkyuynmqe.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_HFq9qTmT2ccAehYXVeUNWw_tPeFBmO1';
+    const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    var allRows = [];
+    var activeWeeklyView = "vendor";
+    var activeMetricView = "all";
+    var currentSlaRawList = [];
+
+    window.onload = async function() {
+      const { data: { session } } = await sbClient.auth.getSession();
+      if (session) {
+        showAppAndFetchData();
+      }
+    };
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      var email = document.getElementById("login-email").value.trim();
+      var password = document.getElementById("login-password").value;
+      var btn = document.getElementById("btn-login-submit");
+      var errEl = document.getElementById("login-error");
+      btn.disabled = true;
+      btn.innerText = "Signing in...";
+      errEl.innerText = "";
+
+      const { data, error } = await sbClient.auth.signInWithPassword({ email: email, password: password });
+      btn.disabled = false;
+      btn.innerText = "Sign In";
+
+      if (error) {
+        errEl.innerText = "Login failed: " + error.message;
+      } else {
+        showAppAndFetchData();
+      }
+    }
+
+    async function handleLogout() {
+      await sbClient.auth.signOut();
+      window.location.href = "index.html";
+    }
+
+    function parseIsoToLocal(isoStr) {
+      if (!isoStr) return null;
+      var p = isoStr.split("-");
+      if (p.length !== 3) return null;
+      return new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10), 0, 0, 0);
+    }
+
+    function fmtDisplayDate(d) {
+      if (!d) return "-";
+      var dd = String(d.getDate()).padStart(2, "0");
+      var mm = String(d.getMonth() + 1).padStart(2, "0");
+      return dd + "/" + mm + "/" + d.getFullYear();
+    }
+
+    async function showAppAndFetchData() {
+      document.getElementById("login-screen").style.display = "none";
+      document.getElementById("app-wrapper").style.display = "block";
+      var badge = document.getElementById("sync-badge");
+
+      try {
+        let fetched = [];
+        let from = 0;
+        const step = 1000;
+        while (true) {
+          const { data, error } = await sbClient
+            .from('airfreight_kalbar')
+            .select('*')
+            .order('row_num', { ascending: true })
+            .range(from, from + step - 1);
+          if (error) throw error;
+          if (!data || data.length === 0) break;
+          fetched = fetched.concat(data);
+          if (data.length < step) break;
+          from += step;
+        }
+
+        allRows = [];
+        var maxDate = null;
+
+        for (var i = 0; i < fetched.length; i++) {
+          var item = fetched[i];
+          var cDate = parseIsoToLocal(item.pre_alert_date);
+          var atdDate = parseIsoToLocal(item.atd_date);
+          var ataDate = parseIsoToLocal(item.ata_date);
+
+          var smuVal = item.smu_no || '';
+          var originRaw = item.origin || 'UNKNOWN';
+          var destRaw = item.destination || 'UNKNOWN';
+          var gw = parseFloat(item.gross_weight) || 0;
+          var parcel = parseFloat(item.parcel_qty) || 0;
+          var vendorRaw = item.vendor || 'Unassigned Vendor';
+          var flightVal = item.flight_number || '';
+          var afPerfVal = item.af_performance || '';
+          var rateOut = parseFloat(item.rate_outgoing) || 0;
+          var costOut = parseFloat(item.est_cost_outgoing) || 0;
+          var costIn = parseFloat(item.est_cost_incoming) || 0;
+          var costTotal = parseFloat(item.est_total_cost) || 0;
+
+          if (cDate && (!maxDate || cDate.getTime() > maxDate.getTime())) {
+            maxDate = cDate;
+          }
+
+          var issues = [];
+          if (smuVal === '') issues.push("Missing SMU");
+          if (originRaw === 'UNKNOWN') issues.push("Missing Origin");
+          if (destRaw === 'UNKNOWN') issues.push("Missing Destination");
+          if (vendorRaw === 'Unassigned Vendor') issues.push("Missing Vendor");
+          if (flightVal === '') issues.push("Missing Flight");
+          if (gw <= 0) issues.push("Missing/0 Weight");
+          if (parcel <= 0) issues.push("Missing/0 Parcel");
+          if (!atdDate) issues.push("Missing ATD");
+          if (costTotal <= 0) issues.push("Missing/0 Total Cost");
+
+          allRows.push({
+            cTime: cDate ? cDate.getTime() : null,
+            cDisp: fmtDisplayDate(cDate),
+            cYear: cDate ? cDate.getFullYear() : null,
+            cMonth: cDate ? (cDate.getMonth() + 1) : null,
+            cDay: cDate ? cDate.getDate() : null,
+            atdTime: atdDate ? atdDate.getTime() : null,
+            atdDisp: fmtDisplayDate(atdDate),
+            ataDisp: fmtDisplayDate(ataDate),
+            smu: smuVal,
+            origin: originRaw,
+            dest: destRaw,
+            gw: gw,
+            parcel: parcel,
+            vendor: vendorRaw,
+            flight: flightVal,
+            category: 'SD',
+            afPerf: afPerfVal,
+            rateOut: rateOut,
+            costOut: costOut,
+            costIn: costIn,
+            costTotal: costTotal,
+            issues: issues
+          });
+        }
+
+        badge.style.background = "#D8EAD8";
+        badge.style.color = "#1E561E";
+        badge.style.borderColor = "#2D5B2D";
+        badge.innerHTML = "<i class='fa-solid fa-circle-check'></i> " + allRows.length.toLocaleString("en-US") + " Rows Loaded";
+
+        if (maxDate) {
+          var y = maxDate.getFullYear();
+          var m = maxDate.getMonth();
+          var lastDay = new Date(y, m + 1, 0);
+          var sIso = y + "-" + String(m + 1).padStart(2, "0") + "-01";
+          var eIso = y + "-" + String(m + 1).padStart(2, "0") + "-" + String(lastDay.getDate()).padStart(2, "0");
+          syncDateInputs(sIso, eIso);
+          document.getElementById("weekly-month").value = String(m + 1);
+          document.getElementById("weekly-year").value = String(y);
+        }
+
+        applyFilter(false);
+        renderWeeklyTable();
+        renderIssueLogs(false);
+        renderAllSlaTables(false);
+      } catch (err) {
+        badge.innerHTML = "<i class='fa-solid fa-triangle-exclamation'></i> DB Error: " + err.message;
+      }
+    }
+
+    function syncDateInputs(sVal, eVal) {
+      document.getElementById("start-date").value = sVal;
+      document.getElementById("end-date").value = eVal;
+      document.getElementById("issue-start-date").value = sVal;
+      document.getElementById("issue-end-date").value = eVal;
+      document.getElementById("sla-start-date").value = sVal;
+      document.getElementById("sla-end-date").value = eVal;
+    }
+
+    function resetAllDates() {
+      syncDateInputs("", "");
+      applyFilter(false);
+      renderIssueLogs(false);
+      renderAllSlaTables(false);
+    }
+
+    function switchTab(tabName, btnElem) {
+      var btns = document.querySelectorAll("nav button");
+      for (var i = 0; i < btns.length; i++) { btns[i].classList.remove("active"); }
+      var pages = document.querySelectorAll(".tab-page");
+      for (var j = 0; j < pages.length; j++) { pages[j].classList.remove("active-page"); }
+      btnElem.classList.add("active");
+      document.getElementById("page-" + tabName).classList.add("active-page");
+    }
+
+    function calcDaysLabel(sStr, eStr) {
+      if (!sStr || !eStr) return "All Period";
+      var s = new Date(sStr + "T00:00:00");
+      var e = new Date(eStr + "T00:00:00");
+      var diff = Math.floor((e.getTime() - s.getTime()) / 86400000) + 1;
+      return diff + " Days";
+    }
+
+    function fmtRp(val) {
+      return "Rp " + Math.round(val || 0).toLocaleString("id-ID");
+    }
+
+    function sdBadgeHtml() {
+      return "<span class='badge-cat-sd'>SD (H+0)</span>";
+    }
+
+    /* 1. DASHBOARD */
+    function applyFilter(syncOthers) {
+      var sStr = document.getElementById("start-date").value;
+      var eStr = document.getElementById("end-date").value;
+
+      if (syncOthers) {
+        syncDateInputs(sStr, eStr);
+        renderIssueLogs(false);
+        renderAllSlaTables(false);
+      }
+      var sTime = sStr ? new Date(sStr + "T00:00:00").getTime() : null;
+      var eTime = eStr ? new Date(eStr + "T23:59:59").getTime() : null;
+      document.getElementById("day-count").innerText = calcDaysLabel(sStr, eStr);
+
+      var grandSmu = 0;
+      var grandGw = 0, grandParcel = 0, grandOut = 0, grandIn = 0, grandTotal = 0;
+      var vendorMap = {}, routeMap = {}, anomalyList = [], smuList = [];
+
+      for (var i = 0; i < allRows.length; i++) {
+        var r = allRows[i];
+        if (sTime || eTime) {
+          if (!r.cTime) continue;
+          if (sTime && r.cTime < sTime) continue;
+          if (eTime && r.cTime > eTime) continue;
+        }
+
+        var smuCount = r.smu !== "" ? 1 : 0;
+        var routeName = r.origin + " - " + r.dest;
+
+        grandSmu += smuCount;
+        grandGw += r.gw;
+        grandParcel += r.parcel;
+        grandOut += r.costOut;
+        grandIn += r.costIn;
+        grandTotal += r.costTotal;
+
+        if (!vendorMap[r.vendor]) vendorMap[r.vendor] = { smu: 0, gw: 0, parcel: 0, out: 0, inc: 0, tot: 0, routes: {} };
+        vendorMap[r.vendor].smu += smuCount;
+        vendorMap[r.vendor].gw += r.gw;
+        vendorMap[r.vendor].parcel += r.parcel;
+        vendorMap[r.vendor].out += r.costOut;
+        vendorMap[r.vendor].inc += r.costIn;
+        vendorMap[r.vendor].tot += r.costTotal;
+        if (r.origin !== "UNKNOWN" && r.dest !== "UNKNOWN") {
+          vendorMap[r.vendor].routes[routeName] = (vendorMap[r.vendor].routes[routeName] || 0) + smuCount;
+        }
+
+        if (!routeMap[routeName]) routeMap[routeName] = { smu: 0, gw: 0, parcel: 0, out: 0, inc: 0, tot: 0 };
+        routeMap[routeName].smu += smuCount;
+        routeMap[routeName].gw += r.gw;
+        routeMap[routeName].parcel += r.parcel;
+        routeMap[routeName].out += r.costOut;
+        routeMap[routeName].inc += r.costIn;
+        routeMap[routeName].tot += r.costTotal;
+
+        if (r.smu !== "") smuList.push(r);
+        if (r.issues.length > 0) anomalyList.push(r);
+      }
+
+      document.getElementById("kpi-smu").innerText = grandSmu.toLocaleString("id-ID");
+      document.getElementById("kpi-cat-split").innerText = "Service: SD (Same Day)";
+      document.getElementById("kpi-gw").innerText = Math.round(grandGw).toLocaleString("id-ID") + " KG";
+      document.getElementById("kpi-avg-gw").innerText = "Avg: " + (grandSmu > 0 ? (grandGw / grandSmu).toFixed(1) : "0") + " KG/SMU";
+      document.getElementById("kpi-parcel").innerText = grandParcel.toLocaleString("id-ID");
+      document.getElementById("kpi-cpp").innerText = "CPP: " + fmtRp(grandParcel > 0 ? grandTotal / grandParcel : 0);
+      document.getElementById("kpi-cost-out").innerText = fmtRp(grandOut);
+      document.getElementById("kpi-out-share").innerText = (grandTotal > 0 ? ((grandOut / grandTotal) * 100).toFixed(1) : "0") + "% of Total";
+      document.getElementById("kpi-cost-in").innerText = fmtRp(grandIn);
+      document.getElementById("kpi-in-share").innerText = (grandTotal > 0 ? ((grandIn / grandTotal) * 100).toFixed(1) : "0") + "% of Total";
+      document.getElementById("kpi-cost-total").innerText = fmtRp(grandTotal);
+      document.getElementById("kpi-cpkg").innerText = "CPKG: " + fmtRp(grandGw > 0 ? grandTotal / grandGw : 0);
+
+      // BREAKDOWN BY VENDOR (SORT BY HIGHEST EST. TOTAL COST)
+      var vHtml = "";
+      var vendorKeys = Object.keys(vendorMap).sort(function(a, b) { return vendorMap[b].tot - vendorMap[a].tot; });
+      for (var vk = 0; vk < vendorKeys.length; vk++) {
+        var vName = vendorKeys[vk];
+        var vd = vendorMap[vName];
+        vHtml += "<tr><td class='align-left'><b>" + vName + "</b></td>" +
+          "<td>" + vd.smu.toLocaleString("id-ID") + "</td>" +
+          "<td>" + Math.round(vd.gw).toLocaleString("id-ID") + " KG</td>" +
+          "<td>" + vd.parcel.toLocaleString("id-ID") + "</td>" +
+          "<td style='color:var(--primary); font-weight:800;'>" + fmtRp(vd.tot) + "</td>" +
+          "<td>" + fmtRp(vd.gw > 0 ? vd.tot / vd.gw : 0) + "</td>" +
+          "<td>" + fmtRp(vd.parcel > 0 ? vd.tot / vd.parcel : 0) + "</td></tr>";
+      }
+      document.getElementById("vendor-table-body").innerHTML = vHtml || "<tr><td colspan='7' class='loading-text'>No data found in selected period.</td></tr>";
+
+      // VENDOR COVERED ROUTE (SORT BY MOST ROUTES COVERED)
+      var vrHtml = "";
+      var vendorRouteKeys = Object.keys(vendorMap).sort(function(a, b) {
+        var countDiff = Object.keys(vendorMap[b].routes).length - Object.keys(vendorMap[a].routes).length;
+        return countDiff !== 0 ? countDiff : (vendorMap[b].smu - vendorMap[a].smu);
+      });
+      for (var vrk = 0; vrk < vendorRouteKeys.length; vrk++) {
+        var vrName = vendorRouteKeys[vrk];
+        var vrd = vendorMap[vrName];
+        var coveredList = Object.keys(vrd.routes).sort();
+        var pillsHtml = coveredList.map(function(rt) {
+          return "<span class='route-pill'>" + rt + " (" + vrd.routes[rt] + ")</span>";
+        }).join(" ");
+        vrHtml += "<tr><td class='align-left'><b>" + vrName + "</b></td>" +
+          "<td><span class='route-count-badge'>" + coveredList.length + " Routes</span></td>" +
+          "<td>" + vrd.smu.toLocaleString("id-ID") + " SMU</td>" +
+          "<td class='route-tags-cell'>" + (pillsHtml || "-") + "</td></tr>";
+      }
+      document.getElementById("vendor-routes-table-body").innerHTML = vrHtml || "<tr><td colspan='4' class='loading-text'>No route coverage data found.</td></tr>";
+
+      // BREAKDOWN BY ROUTE (SORT BY HIGHEST CPP)
+      var rHtml = "";
+      var routeKeys = Object.keys(routeMap).sort(function(a, b) {
+        var cppA = routeMap[a].parcel > 0 ? (routeMap[a].tot / routeMap[a].parcel) : 0;
+        var cppB = routeMap[b].parcel > 0 ? (routeMap[b].tot / routeMap[b].parcel) : 0;
+        return cppB - cppA;
+      });
+      for (var rk = 0; rk < routeKeys.length; rk++) {
+        var rName = routeKeys[rk];
+        var rd = routeMap[rName];
+        var rCpp = rd.parcel > 0 ? (rd.tot / rd.parcel) : 0;
+        rHtml += "<tr><td class='align-left'><b>" + rName + "</b></td>" +
+          "<td>" + rd.smu.toLocaleString("id-ID") + "</td>" +
+          "<td>" + Math.round(rd.gw).toLocaleString("id-ID") + " KG</td>" +
+          "<td>" + rd.parcel.toLocaleString("id-ID") + "</td>" +
+          "<td>" + fmtRp(rd.out) + "</td>" +
+          "<td>" + fmtRp(rd.inc) + "</td>" +
+          "<td>" + fmtRp(rd.tot) + "</td>" +
+          "<td>" + fmtRp(rd.gw > 0 ? rd.tot / rd.gw : 0) + "</td>" +
+          "<td style='color:var(--primary); font-weight:800;'>" + fmtRp(rCpp) + "</td></tr>";
+      }
+      document.getElementById("route-table-body").innerHTML = rHtml || "<tr><td colspan='9' class='loading-text'>No data found in selected period.</td></tr>";
+
+      // TOP 10 HEAVIEST SMUS
+      smuList.sort(function(a, b) { return b.gw - a.gw; });
+      var top10 = smuList.slice(0, 10);
+      var tHtml = "";
+      for (var t = 0; t < top10.length; t++) {
+        var it = top10[t];
+        var cpkg = it.gw > 0 ? Math.round(it.costTotal / it.gw) : 0;
+        tHtml += "<tr><td><b>#" + (t + 1) + "</b></td>" +
+          "<td class='align-left'><b>" + it.smu + "</b></td>" +
+          "<td>" + sdBadgeHtml() + "</td>" +
+          "<td class='align-left'>" + it.vendor + "</td>" +
+          "<td>" + (it.flight || "-") + "</td>" +
+          "<td class='align-left'>" + it.origin + " - " + it.dest + "</td>" +
+          "<td style='color:var(--primary); font-weight:800;'>" + Math.round(it.gw).toLocaleString("id-ID") + " KG</td>" +
+          "<td>" + it.parcel.toLocaleString("id-ID") + "</td>" +
+          "<td>" + fmtRp(it.costTotal) + "</td>" +
+          "<td>" + fmtRp(cpkg) + "</td></tr>";
+      }
+      document.getElementById("top10-table-body").innerHTML = tHtml || "<tr><td colspan='10' class='loading-text'>No data found in selected period.</td></tr>";
+
+      document.getElementById("anomaly-count-badge").innerText = anomalyList.length + " Errors";
+      if (anomalyList.length === 0) {
+        document.getElementById("anomaly-summary-text").innerText = "All data entries are complete (No anomaly detected).";
+      } else {
+        document.getElementById("anomaly-summary-text").innerText = "Found " + anomalyList.length + " record(s) with missing or invalid data (check Update & Issue tab for details).";
+      }
+    }
+
+    /* 2. WEEKLY ANALYSIS */
+    function switchWeeklyView(viewType) {
+      activeWeeklyView = viewType;
+      document.getElementById("btn-view-vendor").classList.toggle("active", viewType === "vendor");
+      document.getElementById("btn-view-route").classList.toggle("active", viewType === "route");
+      renderWeeklyTable();
+    }
+
+    function switchMetricView(metricType) {
+      activeMetricView = metricType;
+      var btns = ["all", "weight", "parcel", "smu", "cost"];
+      for (var i = 0; i < btns.length; i++) {
+        document.getElementById("btn-metric-" + btns[i]).classList.toggle("active", btns[i] === metricType);
+      }
+      renderWeeklyTable();
+    }
+
+    function renderWeeklyTable() {
+      var m = parseInt(document.getElementById("weekly-month").value, 10);
+      var y = parseInt(document.getElementById("weekly-year").value, 10);
+      var firstColName = activeWeeklyView === "vendor" ? "VENDOR" : "ROUTE";
+
+      var headHtml = "";
+      if (activeMetricView === "all") {
+        headHtml = "<tr><th style='background:#FFECF0; color:#ED0677; font-weight:800;'>" + firstColName + "</th>" +
+          "<th colspan='4' style='background:#FFEFA3; color:#524245;'>WEEK 1 (Day 1–7)</th>" +
+          "<th colspan='4' style='background:#7ECCEE; color:#fff;'>WEEK 2 (Day 8–14)</th>" +
+          "<th colspan='4' style='background:#FF84A1; color:#fff;'>WEEK 3 (Day 15–21)</th>" +
+          "<th colspan='4' style='background:#ED0677; color:#fff;'>WEEK 4+ (Day 22–End)</th>" +
+          "<th colspan='4' style='background:#524245; color:#fff;'>TOTAL FULL MONTH</th></tr>" +
+          "<tr><th style='background:#FFECF0;'></th>" +
+          "<th>SMU</th><th>WEIGHT</th><th>PARCEL</th><th>EST. COST</th>" +
+          "<th>SMU</th><th>WEIGHT</th><th>PARCEL</th><th>EST. COST</th>" +
+          "<th>SMU</th><th>WEIGHT</th><th>PARCEL</th><th>EST. COST</th>" +
+          "<th>SMU</th><th>WEIGHT</th><th>PARCEL</th><th>EST. COST</th>" +
+          "<th>SMU</th><th>WEIGHT</th><th>PARCEL</th><th>EST. COST</th></tr>";
+      } else {
+        var mLabel = activeMetricView === "weight" ? "WEIGHT (KG)" : (activeMetricView === "parcel" ? "PARCEL" : (activeMetricView === "cost" ? "EST. TOTAL COST" : "SMU"));
+        headHtml = "<tr><th style='background:#FFECF0; color:#ED0677; font-weight:800;'>" + firstColName + "</th>" +
+          "<th style='background:#FFEFA3; color:#524245;'>WEEK 1 (Day 1–7)</th>" +
+          "<th style='background:#7ECCEE; color:#fff;'>WEEK 2 (Day 8–14)</th>" +
+          "<th style='background:#FF84A1; color:#fff;'>WEEK 3 (Day 15–21)</th>" +
+          "<th style='background:#ED0677; color:#fff;'>WEEK 4+ (Day 22–End)</th>" +
+          "<th style='background:#524245; color:#fff;'>TOTAL FULL MONTH (" + mLabel + ")</th></tr>";
+      }
+      document.getElementById("weekly-table-head").innerHTML = headHtml;
+
+      var dataset = {};
+      for (var i = 0; i < allRows.length; i++) {
+        var r = allRows[i];
+        if (!r.cTime) continue;
+        if (r.cMonth !== m || r.cYear !== y) continue;
+        var key = activeWeeklyView === "vendor" ? r.vendor : (r.origin + " - " + r.dest);
+        if (!dataset[key]) {
+          dataset[key] = {
+            w1: { smu:0, gw:0, parcel:0, cost:0 },
+            w2: { smu:0, gw:0, parcel:0, cost:0 },
+            w3: { smu:0, gw:0, parcel:0, cost:0 },
+            w4: { smu:0, gw:0, parcel:0, cost:0 },
+            total: { smu:0, gw:0, parcel:0, cost:0 }
+          };
+        }
+        var wk = r.cDay <= 7 ? "w1" : (r.cDay <= 14 ? "w2" : (r.cDay <= 21 ? "w3" : "w4"));
+        var smuVal = r.smu !== "" ? 1 : 0;
+        dataset[key][wk].smu += smuVal; dataset[key][wk].gw += r.gw; dataset[key][wk].parcel += r.parcel; dataset[key][wk].cost += r.costTotal;
+        dataset[key].total.smu += smuVal; dataset[key].total.gw += r.gw; dataset[key].total.parcel += r.parcel; dataset[key].total.cost += r.costTotal;
+      }
+
+      var keys = Object.keys(dataset).sort();
+      if (keys.length === 0) {
+        document.getElementById("weekly-table-body").innerHTML = "<tr><td colspan='21' style='text-align:center; padding:20px; color:#888;'>No records found for selected month &amp; year.</td></tr>";
+        return;
+      }
+
+      var html = "";
+      var totals = {
+        w1: { smu:0, gw:0, parcel:0, cost:0 },
+        w2: { smu:0, gw:0, parcel:0, cost:0 },
+        w3: { smu:0, gw:0, parcel:0, cost:0 },
+        w4: { smu:0, gw:0, parcel:0, cost:0 },
+        total: { smu:0, gw:0, parcel:0, cost:0 }
+      };
+
+      for (var kIdx = 0; kIdx < keys.length; kIdx++) {
+        var name = keys[kIdx];
+        var w = dataset[name];
+        totals.w1.smu += w.w1.smu; totals.w1.gw += w.w1.gw; totals.w1.parcel += w.w1.parcel; totals.w1.cost += w.w1.cost;
+        totals.w2.smu += w.w2.smu; totals.w2.gw += w.w2.gw; totals.w2.parcel += w.w2.parcel; totals.w2.cost += w.w2.cost;
+        totals.w3.smu += w.w3.smu; totals.w3.gw += w.w3.gw; totals.w3.parcel += w.w3.parcel; totals.w3.cost += w.w3.cost;
+        totals.w4.smu += w.w4.smu; totals.w4.gw += w.w4.gw; totals.w4.parcel += w.w4.parcel; totals.w4.cost += w.w4.cost;
+        totals.total.smu += w.total.smu; totals.total.gw += w.total.gw; totals.total.parcel += w.total.parcel; totals.total.cost += w.total.cost;
+
+        if (activeMetricView === "all") {
+          html += "<tr><td class='align-left'><b>" + name + "</b></td>" +
+            "<td>" + w.w1.smu + "</td><td>" + Math.round(w.w1.gw).toLocaleString("id-ID") + "</td><td>" + w.w1.parcel.toLocaleString("id-ID") + "</td><td>" + fmtRp(w.w1.cost) + "</td>" +
+            "<td>" + w.w2.smu + "</td><td>" + Math.round(w.w2.gw).toLocaleString("id-ID") + "</td><td>" + w.w2.parcel.toLocaleString("id-ID") + "</td><td>" + fmtRp(w.w2.cost) + "</td>" +
+            "<td>" + w.w3.smu + "</td><td>" + Math.round(w.w3.gw).toLocaleString("id-ID") + "</td><td>" + w.w3.parcel.toLocaleString("id-ID") + "</td><td>" + fmtRp(w.w3.cost) + "</td>" +
+            "<td>" + w.w4.smu + "</td><td>" + Math.round(w.w4.gw).toLocaleString("id-ID") + "</td><td>" + w.w4.parcel.toLocaleString("id-ID") + "</td><td>" + fmtRp(w.w4.cost) + "</td>" +
+            "<td style='color:var(--primary); font-weight:800;'>" + w.total.smu + "</td>" +
+            "<td style='color:var(--primary); font-weight:800;'>" + Math.round(w.total.gw).toLocaleString("id-ID") + " KG</td>" +
+            "<td style='color:var(--primary); font-weight:800;'>" + w.total.parcel.toLocaleString("id-ID") + "</td>" +
+            "<td style='color:var(--primary); font-weight:800;'>" + fmtRp(w.total.cost) + "</td></tr>";
+        } else if (activeMetricView === "weight") {
+          html += "<tr><td class='align-left'><b>" + name + "</b></td><td>" + Math.round(w.w1.gw).toLocaleString("id-ID") + "</td><td>" + Math.round(w.w2.gw).toLocaleString("id-ID") + "</td><td>" + Math.round(w.w3.gw).toLocaleString("id-ID") + "</td><td>" + Math.round(w.w4.gw).toLocaleString("id-ID") + "</td><td style='color:var(--primary); font-weight:800;'>" + Math.round(w.total.gw).toLocaleString("id-ID") + " KG</td></tr>";
+        } else if (activeMetricView === "parcel") {
+          html += "<tr><td class='align-left'><b>" + name + "</b></td><td>" + w.w1.parcel.toLocaleString("id-ID") + "</td><td>" + w.w2.parcel.toLocaleString("id-ID") + "</td><td>" + w.w3.parcel.toLocaleString("id-ID") + "</td><td>" + w.w4.parcel.toLocaleString("id-ID") + "</td><td style='color:var(--primary); font-weight:800;'>" + w.total.parcel.toLocaleString("id-ID") + "</td></tr>";
+        } else if (activeMetricView === "smu") {
+          html += "<tr><td class='align-left'><b>" + name + "</b></td><td>" + w.w1.smu + "</td><td>" + w.w2.smu + "</td><td>" + w.w3.smu + "</td><td>" + w.w4.smu + "</td><td style='color:var(--primary); font-weight:800;'>" + w.total.smu + "</td></tr>";
+        } else if (activeMetricView === "cost") {
+          html += "<tr><td class='align-left'><b>" + name + "</b></td><td>" + fmtRp(w.w1.cost) + "</td><td>" + fmtRp(w.w2.cost) + "</td><td>" + fmtRp(w.w3.cost) + "</td><td>" + fmtRp(w.w4.cost) + "</td><td style='color:var(--primary); font-weight:800;'>" + fmtRp(w.total.cost) + "</td></tr>";
+        }
+      }
+
+      if (activeMetricView === "all") {
+        html += "<tr class='grand-total'><td class='align-left'><b>GRAND TOTAL</b></td>" +
+          "<td>" + totals.w1.smu + "</td><td>" + Math.round(totals.w1.gw).toLocaleString("id-ID") + " KG</td><td>" + totals.w1.parcel.toLocaleString("id-ID") + "</td><td>" + fmtRp(totals.w1.cost) + "</td>" +
+          "<td>" + totals.w2.smu + "</td><td>" + Math.round(totals.w2.gw).toLocaleString("id-ID") + " KG</td><td>" + totals.w2.parcel.toLocaleString("id-ID") + "</td><td>" + fmtRp(totals.w2.cost) + "</td>" +
+          "<td>" + totals.w3.smu + "</td><td>" + Math.round(totals.w3.gw).toLocaleString("id-ID") + " KG</td><td>" + totals.w3.parcel.toLocaleString("id-ID") + "</td><td>" + fmtRp(totals.w3.cost) + "</td>" +
+          "<td>" + totals.w4.smu + "</td><td>" + Math.round(totals.w4.gw).toLocaleString("id-ID") + " KG</td><td>" + totals.w4.parcel.toLocaleString("id-ID") + "</td><td>" + fmtRp(totals.w4.cost) + "</td>" +
+          "<td>" + totals.total.smu + "</td><td>" + Math.round(totals.total.gw).toLocaleString("id-ID") + " KG</td><td>" + totals.total.parcel.toLocaleString("id-ID") + "</td><td>" + fmtRp(totals.total.cost) + "</td></tr>";
+      } else if (activeMetricView === "weight") {
+        html += "<tr class='grand-total'><td class='align-left'><b>GRAND TOTAL</b></td><td>" + Math.round(totals.w1.gw).toLocaleString("id-ID") + " KG</td><td>" + Math.round(totals.w2.gw).toLocaleString("id-ID") + " KG</td><td>" + Math.round(totals.w3.gw).toLocaleString("id-ID") + " KG</td><td>" + Math.round(totals.w4.gw).toLocaleString("id-ID") + " KG</td><td>" + Math.round(totals.total.gw).toLocaleString("id-ID") + " KG</td></tr>";
+      } else if (activeMetricView === "parcel") {
+        html += "<tr class='grand-total'><td class='align-left'><b>GRAND TOTAL</b></td><td>" + totals.w1.parcel.toLocaleString("id-ID") + "</td><td>" + totals.w2.parcel.toLocaleString("id-ID") + "</td><td>" + totals.w3.parcel.toLocaleString("id-ID") + "</td><td>" + totals.w4.parcel.toLocaleString("id-ID") + "</td><td>" + totals.total.parcel.toLocaleString("id-ID") + "</td></tr>";
+      } else if (activeMetricView === "smu") {
+        html += "<tr class='grand-total'><td class='align-left'><b>GRAND TOTAL</b></td><td>" + totals.w1.smu + "</td><td>" + totals.w2.smu + "</td><td>" + totals.w3.smu + "</td><td>" + totals.w4.smu + "</td><td>" + totals.total.smu + "</td></tr>";
+      } else if (activeMetricView === "cost") {
+        html += "<tr class='grand-total'><td class='align-left'><b>GRAND TOTAL</b></td><td>" + fmtRp(totals.w1.cost) + "</td><td>" + fmtRp(totals.w2.cost) + "</td><td>" + fmtRp(totals.w3.cost) + "</td><td>" + fmtRp(totals.w4.cost) + "</td><td>" + fmtRp(totals.total.cost) + "</td></tr>";
+      }
+      document.getElementById("weekly-table-body").innerHTML = html;
+    }
+
+    function exportWeeklyImage() {
+      exportElementToPng("weekly-export-area", "AF_Kalbar_Weekly_" + activeMetricView.toUpperCase() + ".png");
+    }
+
+    /* 3. UPDATE & ISSUE */
+    function renderIssueLogs(syncOthers) {
+      var sStr = document.getElementById("issue-start-date").value;
+      var eStr = document.getElementById("issue-end-date").value;
+      if (syncOthers) {
+        syncDateInputs(sStr, eStr);
+        applyFilter(false);
+        renderAllSlaTables(false);
+      }
+      var sTime = sStr ? new Date(sStr + "T00:00:00").getTime() : null;
+      var eTime = eStr ? new Date(eStr + "T23:59:59").getTime() : null;
+      document.getElementById("issue-day-count").innerText = calcDaysLabel(sStr, eStr);
+
+      var list = [];
+      for (var i = 0; i < allRows.length; i++) {
+        var r = allRows[i];
+        if (sTime || eTime) {
+          if (!r.cTime) continue;
+          if (sTime && r.cTime < sTime) continue;
+          if (eTime && r.cTime > eTime) continue;
+        }
+        if (r.issues.length > 0) list.push(r);
+      }
+
+      document.getElementById("issue-count-badge").innerText = list.length + " Issues";
+      if (list.length === 0) {
+        document.getElementById("issue-summary-text").innerText = "No issues detected in this period.";
+        document.getElementById("issue-table-body").innerHTML = "<tr><td colspan='9' style='text-align:center; padding:20px; color:green;'><b>Clean data! No issues found.</b></td></tr>";
+      } else {
+        document.getElementById("issue-summary-text").innerText = "Found " + list.length + " issue record(s) requiring attention.";
+        var iHtml = "";
+        for (var j = 0; j < list.length; j++) {
+          var item = list[j];
+          var badges = item.issues.map(function(x){ return "<span class='badge-error'>" + x + "</span>"; }).join(" ");
+          iHtml += "<tr><td class='align-left'><b>" + (item.smu || "[NO SMU]") + "</b></td>" +
+            "<td>" + item.cDisp + "</td>" +
+            "<td>" + sdBadgeHtml() + "</td>" +
+            "<td class='align-left'>" + item.origin + " - " + item.dest + "</td>" +
+            "<td class='align-left'>" + item.vendor + "</td>" +
+            "<td>" + (item.flight || "-") + "</td>" +
+            "<td>" + item.gw + " KG / " + item.parcel + " Pcs</td>" +
+            "<td style='font-size:0.75rem;'>ATD: " + item.atdDisp + " | ATA: " + item.ataDisp + "</td>" +
+            "<td>" + badges + "</td></tr>";
+        }
+        document.getElementById("issue-table-body").innerHTML = iHtml;
+      }
+    }
+
+    /* 4. SLA PERFORMANCE (SD ONLY: PA == ATD -> H+0) */
+    function renderAllSlaTables(syncOthers) {
+      var sStr = document.getElementById("sla-start-date").value;
+      var eStr = document.getElementById("sla-end-date").value;
+
+      if (syncOthers) {
+        syncDateInputs(sStr, eStr);
+        applyFilter(false);
+        renderIssueLogs(false);
+      }
+      var sTime = sStr ? new Date(sStr + "T00:00:00").getTime() : null;
+      var eTime = eStr ? new Date(eStr + "T23:59:59").getTime() : null;
+      document.getElementById("sla-day-count").innerText = calcDaysLabel(sStr, eStr);
+
+      var summary = { totalSmu: 0, hitSmu: 0, notHitSmu: 0, totalDays: 0 };
+      var byRoute = {}, byVendor = {};
+      var byWeek = {
+        "Week 1 (Day 1–7)": { total: 0, hit: 0, notHit: 0, sumDays: 0 },
+        "Week 2 (Day 8–14)": { total: 0, hit: 0, notHit: 0, sumDays: 0 },
+        "Week 3 (Day 15–21)": { total: 0, hit: 0, notHit: 0, sumDays: 0 },
+        "Week 4+ (Day 22–End)": { total: 0, hit: 0, notHit: 0, sumDays: 0 }
+      };
+      currentSlaRawList = [];
+
+      for (var i = 0; i < allRows.length; i++) {
+        var r = allRows[i];
+        if (!r.cTime || !r.atdTime || r.smu === "") continue;
+        if (sTime && r.cTime < sTime) continue;
+        if (eTime && r.cTime > eTime) continue;
+
+        var routeName = r.origin + " - " + r.dest;
+        var targetDays = 0; // SD = H+0 (hari yang sama)
+        var actualDays = Math.floor((r.atdTime - r.cTime) / 86400000);
+        if (actualDays < 0) actualDays = 0;
+        var isHit = actualDays <= targetDays;
+        var delayDays = isHit ? 0 : (actualDays - targetDays);
+        var wKey = r.cDay <= 7 ? "Week 1 (Day 1–7)" : (r.cDay <= 14 ? "Week 2 (Day 8–14)" : (r.cDay <= 21 ? "Week 3 (Day 15–21)" : "Week 4+ (Day 22–End)"));
+
+        summary.totalSmu += 1; summary.totalDays += actualDays;
+        if (isHit) summary.hitSmu += 1; else summary.notHitSmu += 1;
+
+        if (!byRoute[routeName]) byRoute[routeName] = { total: 0, hit: 0, notHit: 0, sumDays: 0 };
+        byRoute[routeName].total += 1; byRoute[routeName].sumDays += actualDays;
+        if (isHit) byRoute[routeName].hit += 1; else byRoute[routeName].notHit += 1;
+
+        if (!byVendor[r.vendor]) byVendor[r.vendor] = { total: 0, hit: 0, notHit: 0, sumDays: 0, routes: {} };
+        byVendor[r.vendor].total += 1; byVendor[r.vendor].sumDays += actualDays;
+        if (isHit) byVendor[r.vendor].hit += 1; else byVendor[r.vendor].notHit += 1;
+
+        if (!byVendor[r.vendor].routes[routeName]) {
+          byVendor[r.vendor].routes[routeName] = { total: 0, hit: 0, notHit: 0, sumDays: 0 };
+        }
+        byVendor[r.vendor].routes[routeName].total += 1;
+        byVendor[r.vendor].routes[routeName].sumDays += actualDays;
+        if (isHit) byVendor[r.vendor].routes[routeName].hit += 1; else byVendor[r.vendor].routes[routeName].notHit += 1;
+
+        byWeek[wKey].total += 1; byWeek[wKey].sumDays += actualDays;
+        if (isHit) byWeek[wKey].hit += 1; else byWeek[wKey].notHit += 1;
+
+        currentSlaRawList.push({
+          smu: r.smu, category: 'SD', origin: r.origin, dest: r.dest,
+          route: routeName, vendor: r.vendor, flight: r.flight, gw: r.gw, parcel: r.parcel,
+          preAlert: r.cDisp, atd: r.atdDisp, ata: r.ataDisp, weekPeriod: wKey,
+          target: targetDays, actual: actualDays, delayDays: delayDays,
+          isHit: isHit, status: isHit ? "HIT SLA" : "NOT HIT", sheetPerf: r.afPerf
+        });
+      }
+
+      document.getElementById("sla-kpi-total").innerText = summary.totalSmu.toLocaleString("id-ID");
+      document.getElementById("sla-kpi-hit").innerText = summary.hitSmu.toLocaleString("id-ID");
+      document.getElementById("sla-kpi-nothit").innerText = summary.notHitSmu.toLocaleString("id-ID");
+      document.getElementById("sla-kpi-pct").innerText = (summary.totalSmu > 0 ? ((summary.hitSmu / summary.totalSmu) * 100).toFixed(1) : "0.0") + "%";
+      document.getElementById("sla-kpi-avg").innerText = (summary.totalSmu > 0 ? (summary.totalDays / summary.totalSmu).toFixed(2) : "0.00") + " Days";
+
+      // 1. Route Table
+      var rHtml = "";
+      var routeKeys = Object.keys(byRoute).sort();
+      for (var rIdx = 0; rIdx < routeKeys.length; rIdx++) {
+        var rk = routeKeys[rIdx];
+        var ri = byRoute[rk];
+        var rRate = (ri.total > 0 ? ((ri.hit / ri.total) * 100).toFixed(1) : "0.0");
+        var rAvg = (ri.total > 0 ? (ri.sumDays / ri.total).toFixed(2) : "0.00");
+        rHtml += "<tr><td class='align-left'><b>" + rk + "</b></td><td>" + ri.total + " SMU</td><td style='color:#1E561E; font-weight:800;'>" + ri.hit + "</td><td style='color:#ED0677; font-weight:800;'>" + ri.notHit + "</td><td>" + rAvg + " Days</td><td><span class='" + (parseFloat(rRate) >= 90 ? "badge-hit" : "badge-nothit") + "'>" + rRate + "%</span></td></tr>";
+      }
+      document.getElementById("sla-route-body").innerHTML = rHtml || "<tr><td colspan='6' class='loading-text'>No completed SLA data.</td></tr>";
+
+      // 2. Vendor Detail Table
+      var vHtml = "";
+      var vendorRouteEvalList = [];
+      var vendorKeys = Object.keys(byVendor).sort();
+      for (var vIdx = 0; vIdx < vendorKeys.length; vIdx++) {
+        var vk = vendorKeys[vIdx];
+        var vi = byVendor[vk];
+        var vRate = (vi.total > 0 ? ((vi.hit / vi.total) * 100).toFixed(1) : "0.0");
+        var vAvg = (vi.total > 0 ? (vi.sumDays / vi.total).toFixed(2) : "0.00");
+
+        vHtml += "<tr class='vendor-parent-row'>" +
+          "<td class='align-left' style='color:var(--primary);'><i class='fa-solid fa-truck-fast'></i> " + vk + " (TOTAL VENDOR)</td>" +
+          "<td>" + vi.total + " SMU</td>" +
+          "<td style='color:#1E561E;'>" + vi.hit + "</td>" +
+          "<td style='color:#ED0677;'>" + vi.notHit + "</td>" +
+          "<td>" + vAvg + " Days</td>" +
+          "<td><span class='" + (parseFloat(vRate) >= 90 ? "badge-hit" : "badge-nothit") + "'>" + vRate + "%</span></td>" +
+          "</tr>";
+
+        var vRouteKeys = Object.keys(vi.routes).sort();
+        for (var vrIdx = 0; vrIdx < vRouteKeys.length; vrIdx++) {
+          var vrName = vRouteKeys[vrIdx];
+          var vri = vi.routes[vrName];
+          var vrRateNum = vri.total > 0 ? ((vri.hit / vri.total) * 100) : 0;
+          var vrRate = vrRateNum.toFixed(1);
+          var vrAvg = (vri.total > 0 ? (vri.sumDays / vri.total).toFixed(2) : "0.00");
+          vHtml += "<tr class='vendor-child-row'>" +
+            "<td class='align-left route-indent'>↳ " + vrName + "</td>" +
+            "<td>" + vri.total + " SMU</td>" +
+            "<td style='color:#1E561E;'>" + vri.hit + "</td>" +
+            "<td style='color:#ED0677;'>" + vri.notHit + "</td>" +
+            "<td>" + vrAvg + " Days</td>" +
+            "<td><span class='" + (vrRateNum >= 90 ? "badge-hit" : "badge-nothit") + "' style='opacity:0.9;'>" + vrRate + "%</span></td>" +
+            "</tr>";
+
+          vendorRouteEvalList.push({
+            vendor: vk, route: vrName, total: vri.total,
+            hit: vri.hit, notHit: vri.notHit, avgDays: vrAvg, rateNum: vrRateNum, rateStr: vrRate
+          });
+        }
+      }
+      document.getElementById("sla-vendor-body").innerHTML = vHtml || "<tr><td colspan='6' class='loading-text'>No completed SLA data.</td></tr>";
+
+      // 3. Week Table
+      var wHtml = "";
+      for (var wkKey in byWeek) {
+        var wi = byWeek[wkKey];
+        var wRate = (wi.total > 0 ? ((wi.hit / wi.total) * 100).toFixed(1) : "0.0");
+        var wAvg = (wi.total > 0 ? (wi.sumDays / wi.total).toFixed(2) : "0.00");
+        wHtml += "<tr><td class='align-left'><b>" + wkKey + "</b></td><td>" + wi.total + " SMU</td><td style='color:#1E561E; font-weight:800;'>" + wi.hit + "</td><td style='color:#ED0677; font-weight:800;'>" + wi.notHit + "</td><td>" + wAvg + " Days</td><td><span class='" + (parseFloat(wRate) >= 90 ? "badge-hit" : "badge-nothit") + "'>" + wRate + "%</span></td></tr>";
+      }
+      document.getElementById("sla-week-body").innerHTML = wHtml;
+
+      // 4. Top 5 Lowest
+      vendorRouteEvalList.sort(function(a, b) {
+        if (a.rateNum !== b.rateNum) return a.rateNum - b.rateNum;
+        return b.notHit - a.notHit;
+      });
+      var top5Lowest = vendorRouteEvalList.slice(0, 5);
+      var lowHtml = "";
+      for (var l = 0; l < top5Lowest.length; l++) {
+        var li = top5Lowest[l];
+        lowHtml += "<tr>" +
+          "<td><span class='rank-badge " + (l === 0 ? "top1" : "") + "'>#" + (l + 1) + "</span></td>" +
+          "<td class='align-left'><b>" + li.vendor + "</b></td>" +
+          "<td class='align-left'>" + li.route + "</td>" +
+          "<td>" + li.total + " SMU</td>" +
+          "<td style='color:#1E561E; font-weight:800;'>" + li.hit + "</td>" +
+          "<td style='color:#ED0677; font-weight:800;'>" + li.notHit + "</td>" +
+          "<td>" + li.avgDays + " Days</td>" +
+          "<td><span class='" + (li.rateNum >= 90 ? "badge-hit" : "badge-nothit") + "'>" + li.rateStr + "%</span></td>" +
+          "</tr>";
+      }
+      document.getElementById("sla-lowest-vendor-body").innerHTML = lowHtml || "<tr><td colspan='8' class='loading-text'>No completed vendor data available.</td></tr>";
+
+      // 5. Delay List
+      var delayOnly = currentSlaRawList.filter(function(item) { return !item.isHit; });
+      delayOnly.sort(function(a, b) { return b.delayDays - a.delayDays; });
+      document.getElementById("delay-list-counter").innerText = delayOnly.length > 0 ? "(Showing " + delayOnly.length + " SMUs — scroll box to view all)" : "";
+      var dHtml = "";
+      if (delayOnly.length === 0) {
+        dHtml = "<tr><td colspan='11' style='text-align:center; padding:20px; color:green;'><b>100% On-Time! No Not-Hit SMU found.</b></td></tr>";
+      } else {
+        for (var d = 0; d < delayOnly.length; d++) {
+          var di = delayOnly[d];
+          dHtml += "<tr><td class='align-left'><b>" + di.smu + "</b></td>" +
+            "<td>" + sdBadgeHtml() + "</td>" +
+            "<td class='align-left'>" + di.route + "</td>" +
+            "<td class='align-left'>" + di.vendor + "</td>" +
+            "<td>" + (di.flight || "-") + "</td>" +
+            "<td>" + di.preAlert + "</td>" +
+            "<td>" + di.atd + "</td>" +
+            "<td>H+0</td>" +
+            "<td><b>H+" + di.actual + "</b></td>" +
+            "<td style='color:#ED0677; font-weight:800;'>+" + di.delayDays + " Days</td>" +
+            "<td><span class='badge-nothit'>NOT HIT</span></td></tr>";
+        }
+      }
+      document.getElementById("sla-delay-table-body").innerHTML = dHtml;
+    }
+
+    function downloadSlaRawCsv(mode) {
+      if (!currentSlaRawList || currentSlaRawList.length === 0) {
+        alert("No completed SLA data available to download.");
+        return;
+      }
+      var listToExport = currentSlaRawList.slice();
+      var fileName = "AF_Kalbar_Raw_SLA_All.csv";
+
+      if (mode === "ROUTE") {
+        listToExport.sort(function(a, b) { return a.route.localeCompare(b.route) || a.vendor.localeCompare(b.vendor); });
+        fileName = "AF_Kalbar_Raw_SLA_By_Route.csv";
+      } else if (mode === "VENDOR") {
+        listToExport.sort(function(a, b) { return a.vendor.localeCompare(b.vendor) || a.route.localeCompare(b.route); });
+        fileName = "AF_Kalbar_Raw_SLA_By_Vendor.csv";
+      } else if (mode === "WEEK") {
+        listToExport.sort(function(a, b) { return a.weekPeriod.localeCompare(b.weekPeriod) || a.route.localeCompare(b.route); });
+        fileName = "AF_Kalbar_Raw_SLA_By_Week.csv";
+      } else if (mode === "NOT_HIT") {
+        listToExport = listToExport.filter(function(item) { return !item.isHit; });
+        listToExport.sort(function(a, b) { return b.delayDays - a.delayDays; });
+        fileName = "AF_Kalbar_Raw_SMU_Not_Hit.csv";
+        if (listToExport.length === 0) {
+          alert("No Not-Hit SMU data available to download.");
+          return;
+        }
+      }
+
+      var q = String.fromCharCode(34);
+      var csvRows = ["SMU No.,Service,Origin,Destination,Route,Vendor,Flight Number,Gross Weight (KG),Parcel,Week Period,Pre-Alert Date (C),ATD (T),ATA (U),Target SLA (Days),Actual PA->ATD (Days),Delay (Days),SLA Status"];
+      for (var i = 0; i < listToExport.length; i++) {
+        var item = listToExport[i];
+        var row = [
+          q + item.smu + q, q + "SD" + q, q + item.origin + q, q + item.dest + q,
+          q + item.route + q, q + item.vendor + q, q + item.flight + q, item.gw, item.parcel,
+          q + item.weekPeriod + q, q + item.preAlert + q, q + item.atd + q, q + item.ata + q,
+          item.target, item.actual, item.delayDays, q + item.status + q
+        ];
+        csvRows.push(row.join(","));
+      }
+
+      var blob = new Blob([csvRows.join("\n")], { type: "text/csv;charset=utf-8;" });
+      var url = URL.createObjectURL(blob);
+      var link = document.createElement("a");
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function downloadTableCsv(tableId, filename) {
+      var table = document.getElementById(tableId);
+      if (!table) return;
+      var q = String.fromCharCode(34);
+      var csv = [];
+      var rows = table.querySelectorAll("tr");
+      for (var i = 0; i < rows.length; i++) {
+        var row = [], cols = rows[i].querySelectorAll("td, th");
+        for (var j = 0; j < cols.length; j++) {
+          var text = cols[j].innerText.replace(/\s+/g, " ").trim();
+          row.push(q + text.replace(/"/g, q + q) + q);
+        }
+        if (row.length > 0) csv.push(row.join(","));
+      }
+      var blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
+      var url = URL.createObjectURL(blob);
+      var link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function exportElementToPng(elemId, fileName) {
+      var exportArea = document.getElementById(elemId);
+      if (!exportArea) return;
+      var tableContainers = exportArea.querySelectorAll(".table-container");
+      var originalAreaStyle = exportArea.style.cssText;
+      var originalBoxStyles = [];
+      var maxW = 1100;
+      for (var i = 0; i < tableContainers.length; i++) {
+        originalBoxStyles.push(tableContainers[i].style.cssText);
+        if (tableContainers[i].scrollWidth > maxW) maxW = tableContainers[i].scrollWidth;
+        tableContainers[i].style.overflow = "visible";
+        tableContainers[i].style.maxHeight = "none";
+      }
+      exportArea.style.width = (maxW + 40) + "px";
+
+      html2canvas(exportArea, { scale: 2, windowWidth: maxW + 100, useCORS: true }).then(function(canvas) {
+        exportArea.style.cssText = originalAreaStyle;
+        for (var j = 0; j < tableContainers.length; j++) {
+          tableContainers[j].style.cssText = originalBoxStyles[j];
+        }
+        var link = document.createElement("a");
+        link.download = fileName;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      });
+    }
+  </script>
+</body>
+</html>
