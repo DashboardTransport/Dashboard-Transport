@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Monitoring Airfreight — Jakarta</title>
+  <title>Monitoring Airfreight — Jabodetabek</title>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -142,7 +142,7 @@
     .badge-hit { background: #D8EAD8; color: #1E561E; padding: 4px 10px; border-radius: 4px; font-size: 0.78rem; font-weight: 800; }
     .badge-nothit { background: #FFE0E6; color: #ED0677; padding: 4px 10px; border-radius: 4px; font-size: 0.78rem; font-weight: 800; }
     .badge-cat-sd { background: #FFEFA3; color: #524245; border: 1px solid #FFCB05; padding: 3px 8px; border-radius: 4px; font-size: 0.74rem; font-weight: 800; }
-    .badge-cat-nd { background: #E0F2FE; color: #0369A1; border: 1px solid #7ECCEE; padding: 3px 8px; border-radius: 4px; font-size: 0.74rem; font-weight: 800; }
+    .badge-cat-nd { background: #E0F4FC; color: #0E4F6E; border: 1px solid #7ECCEE; padding: 3px 8px; border-radius: 4px; font-size: 0.74rem; font-weight: 800; }
     .rank-badge { background: #524245; color: #fff; padding: 3px 9px; border-radius: 12px; font-size: 0.75rem; font-weight: 800; }
     .rank-badge.top1 { background: var(--primary); }
     .loading-text { padding: 20px; text-align: center; color: #888; font-weight: 600; }
@@ -214,7 +214,7 @@
   <div id="login-screen">
     <div class="login-box">
       <div class="login-icon"><i class="fa-solid fa-plane-up"></i></div>
-      <h2>Airfreight Jakarta</h2>
+      <h2>Airfreight Jabodetabek</h2>
       <p>Monitoring Dashboard — Sign In Required</p>
       <form onsubmit="handleLogin(event)">
         <div class="login-field">
@@ -237,7 +237,7 @@
     <header>
       <div class="brand">
         <div class="module-title"><i class="fa-solid fa-plane-up"></i> AIRFREIGHT MONITORING</div>
-        <span class="region-pill">JAKARTA</span>
+        <span class="region-pill">JABODETABEK</span>
         <span id="sync-badge" class="sync-status"><i class="fa-solid fa-spinner fa-spin"></i> Loading DB...</span>
       </div>
       <nav>
@@ -256,14 +256,11 @@
         <div class="filter-card">
           <div class="filter-group"><span>START DATE</span><input type="date" id="start-date"></div>
           <div class="filter-group"><span>END DATE</span><input type="date" id="end-date"></div>
-          <div class="filter-group"><span>BATCH</span>
-            <select id="filter-batch"><option value="ALL">All Batches</option></select>
-          </div>
           <div class="filter-group"><span>CATEGORY</span>
-            <select id="filter-category">
+            <select id="dash-cat-filter" onchange="syncCategoryFilter('dash-cat-filter'); applyFilter(true);">
               <option value="ALL">All (SD &amp; ND)</option>
-              <option value="SD">SD (Same Day)</option>
-              <option value="ND">ND (Next Day)</option>
+              <option value="SD">SD / SDS (H+0)</option>
+              <option value="ND">ND / NDS (H+1)</option>
             </select>
           </div>
           <button onclick="applyFilter(true)" class="btn-action"><i class="fa-solid fa-filter"></i> Apply Filter</button>
@@ -271,7 +268,7 @@
           <div class="day-badge" id="day-count">-</div>
         </div>
 
-        <div class="section-banner">AIRFREIGHT JAKARTA — OVERALL STATISTICS</div>
+        <div class="section-banner">AIRFREIGHT JABODETABEK — OVERALL STATISTICS</div>
         <div class="kpi-grid">
           <div class="kpi-card"><div class="label">Total SMU</div><div class="value" id="kpi-smu">0</div><div class="sub-val" id="kpi-cat-split">SD: 0 | ND: 0</div></div>
           <div class="kpi-card"><div class="label">Gross Weight (KG)</div><div class="value" id="kpi-gw">0 KG</div><div class="sub-val" id="kpi-avg-gw">Avg: 0 KG/SMU</div></div>
@@ -286,12 +283,12 @@
           <span class="anomaly-badge" id="anomaly-count-badge">0 Errors</span>
         </div>
 
-        <!-- 1. BREAKDOWN BY VENDOR (SORT BY HIGHEST EST. TOTAL COST) -->
+        <!-- 1. BREAKDOWN BY VENDOR -->
         <div class="section-header-bar">
           <h3 class="sub-heading"><i class="fa-solid fa-truck-ramp-box"></i> Breakdown By Vendor <span class="sub-note">(Sorted by Highest Est. Total Cost)</span></h3>
           <div class="action-btns">
-            <button onclick="downloadTableCsv('dash-vendor-table', 'AF_Jakarta_Breakdown_Vendor.csv')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
-            <button onclick="exportElementToPng('wrap-dash-vendor', 'AF_Jakarta_Breakdown_Vendor.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
+            <button onclick="downloadTableCsv('dash-vendor-table', 'AF_Jabodetabek_Breakdown_Vendor.csv')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
+            <button onclick="exportElementToPng('wrap-dash-vendor', 'AF_Jabodetabek_Breakdown_Vendor.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
           </div>
         </div>
         <div id="wrap-dash-vendor" class="export-wrapper">
@@ -317,8 +314,8 @@
         <div class="section-header-bar">
           <h3 class="sub-heading"><i class="fa-solid fa-map-signs"></i> Vendor Covered Route <span class="sub-note">(Route Quantity &amp; Destination Coverage)</span></h3>
           <div class="action-btns">
-            <button onclick="downloadTableCsv('dash-vendor-routes-table', 'AF_Jakarta_Vendor_Covered_Routes.csv')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
-            <button onclick="exportElementToPng('wrap-dash-vendor-routes', 'AF_Jakarta_Vendor_Covered_Routes.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
+            <button onclick="downloadTableCsv('dash-vendor-routes-table', 'AF_Jabodetabek_Vendor_Covered_Routes.csv')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
+            <button onclick="exportElementToPng('wrap-dash-vendor-routes', 'AF_Jabodetabek_Vendor_Covered_Routes.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
           </div>
         </div>
         <div id="wrap-dash-vendor-routes" class="export-wrapper">
@@ -337,12 +334,12 @@
           </div>
         </div>
 
-        <!-- 3. BREAKDOWN BY ROUTE (SORT BY HIGHEST CPP, DI ATAS TOP 10 HEAVIEST SMU) -->
+        <!-- 3. BREAKDOWN BY ROUTE -->
         <div class="section-header-bar">
           <h3 class="sub-heading"><i class="fa-solid fa-route"></i> Breakdown By Route <span class="sub-note">(Sorted by Highest CPP)</span></h3>
           <div class="action-btns">
-            <button onclick="downloadTableCsv('dash-route-table', 'AF_Jakarta_Breakdown_Route.csv')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
-            <button onclick="exportElementToPng('wrap-dash-route', 'AF_Jakarta_Breakdown_Route.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
+            <button onclick="downloadTableCsv('dash-route-table', 'AF_Jabodetabek_Breakdown_Route.csv')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
+            <button onclick="exportElementToPng('wrap-dash-route', 'AF_Jabodetabek_Breakdown_Route.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
           </div>
         </div>
         <div id="wrap-dash-route" class="export-wrapper">
@@ -370,8 +367,8 @@
         <div class="section-header-bar">
           <h3 class="sub-heading"><i class="fa-solid fa-trophy"></i> Top 10 Heaviest SMUs</h3>
           <div class="action-btns">
-            <button onclick="downloadTableCsv('dash-top10-table', 'AF_Jakarta_Top10_Heaviest_SMU.csv')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
-            <button onclick="exportElementToPng('wrap-dash-top10', 'AF_Jakarta_Top10_Heaviest_SMU.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
+            <button onclick="downloadTableCsv('dash-top10-table', 'AF_Jabodetabek_Top10_Heaviest_SMU.csv')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
+            <button onclick="exportElementToPng('wrap-dash-top10', 'AF_Jabodetabek_Top10_Heaviest_SMU.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
           </div>
         </div>
         <div id="wrap-dash-top10" class="export-wrapper">
@@ -427,13 +424,13 @@
             </div>
           </div>
           <div class="action-btns">
-            <button onclick="downloadTableCsv('weekly-table-elem', 'AF_Jakarta_Weekly_Analysis.csv')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
+            <button onclick="downloadTableCsv('weekly-table-elem', 'AF_Jabodetabek_Weekly_Analysis.csv')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
             <button onclick="exportWeeklyImage()" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
           </div>
         </div>
 
         <div id="weekly-export-area" style="background:#F9FAFC; padding:10px; border-radius:8px;">
-          <div class="section-banner" id="weekly-banner-title">JAKARTA — FULL MONTH WEEKLY BREAKDOWN</div>
+          <div class="section-banner" id="weekly-banner-title">JABODETABEK — FULL MONTH WEEKLY BREAKDOWN</div>
           <div class="table-container">
             <table id="weekly-table-elem">
               <thead id="weekly-table-head"></thead>
@@ -448,6 +445,13 @@
         <div class="filter-card-inline">
           <div class="filter-group"><span>START DATE</span><input type="date" id="issue-start-date"></div>
           <div class="filter-group"><span>END DATE</span><input type="date" id="issue-end-date"></div>
+          <div class="filter-group"><span>CATEGORY</span>
+            <select id="issue-cat-filter" onchange="syncCategoryFilter('issue-cat-filter'); renderIssueLogs(true);">
+              <option value="ALL">All (SD &amp; ND)</option>
+              <option value="SD">SD / SDS (H+0)</option>
+              <option value="ND">ND / NDS (H+1)</option>
+            </select>
+          </div>
           <button onclick="renderIssueLogs(true)" class="btn-action"><i class="fa-solid fa-magnifying-glass"></i> Check Anomaly Logs</button>
           <button onclick="resetAllDates()" class="btn-secondary">Show All</button>
           <div class="day-badge" id="issue-day-count">-</div>
@@ -462,8 +466,8 @@
         <div class="section-header-bar">
           <h3 class="sub-heading" style="color: var(--primary);"><i class="fa-solid fa-list-check"></i> Incomplete / Problematic Data Details</h3>
           <div class="action-btns">
-            <button onclick="downloadTableCsv('issue-table-elem', 'AF_Jakarta_Anomalies.csv')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
-            <button onclick="exportElementToPng('wrap-issue-table', 'AF_Jakarta_Anomalies.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
+            <button onclick="downloadTableCsv('issue-table-elem', 'AF_Jabodetabek_Anomalies.csv')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
+            <button onclick="exportElementToPng('wrap-issue-table', 'AF_Jabodetabek_Anomalies.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
           </div>
         </div>
         <div id="wrap-issue-table" class="export-wrapper">
@@ -473,7 +477,6 @@
                 <tr>
                   <th class="align-left">SMU No.</th>
                   <th>Pre-Alert Date</th>
-                  <th>Batch</th>
                   <th>Category</th>
                   <th class="align-left">Route</th>
                   <th class="align-left">Vendor</th>
@@ -483,7 +486,7 @@
                   <th>Anomaly Detail</th>
                 </tr>
               </thead>
-              <tbody id="issue-table-body"><tr><td colspan="10" class="loading-text">Loading logs...</td></tr></tbody>
+              <tbody id="issue-table-body"><tr><td colspan="9" class="loading-text">Loading logs...</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -496,10 +499,10 @@
             <div class="filter-group"><span>START DATE</span><input type="date" id="sla-start-date"></div>
             <div class="filter-group"><span>END DATE</span><input type="date" id="sla-end-date"></div>
             <div class="filter-group"><span>CATEGORY</span>
-              <select id="sla-filter-category">
+              <select id="sla-cat-filter" onchange="syncCategoryFilter('sla-cat-filter'); renderAllSlaTables(true);">
                 <option value="ALL">All (SD &amp; ND)</option>
-                <option value="SD">SD Only (H+0)</option>
-                <option value="ND">ND Only (H+1)</option>
+                <option value="SD">SD / SDS (Target H+0)</option>
+                <option value="ND">ND / NDS (Target H+1)</option>
               </select>
             </div>
             <button onclick="renderAllSlaTables(true)" class="btn-action"><i class="fa-solid fa-stopwatch"></i> Calculate SLA</button>
@@ -508,12 +511,12 @@
           </div>
           <div class="action-btns">
             <button onclick="downloadSlaRawCsv('ALL')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download All SLA Raw (.CSV)</button>
-            <button onclick="exportElementToPng('sla-export-area', 'AF_Jakarta_SLA_Summary.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download All Summary PNG</button>
+            <button onclick="exportElementToPng('sla-export-area', 'AF_Jabodetabek_SLA_Summary.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download All Summary PNG</button>
           </div>
         </div>
 
         <div id="sla-export-area" style="background:#F9FAFC; padding:10px; border-radius:8px;">
-          <div class="section-banner">AIRFREIGHT JAKARTA SLA PERFORMANCE (PRE-ALERT TO ATD: SD = H+0 | ND = H+1)</div>
+          <div class="section-banner">AIRFREIGHT JABODETABEK SLA PERFORMANCE (SD = H+0 | ND = H+1)</div>
           <div class="kpi-grid-5">
             <div class="kpi-card"><div class="label">Evaluated SMU</div><div class="value" id="sla-kpi-total">0</div></div>
             <div class="kpi-card"><div class="label">Hit SLA (On-Time)</div><div class="value" style="color:#1E561E;" id="sla-kpi-hit">0</div></div>
@@ -523,10 +526,10 @@
           </div>
 
           <div class="section-header-bar">
-            <h3 class="sub-heading"><i class="fa-solid fa-tags"></i> 1. SLA Performance By Service Category (SD vs ND)</h3>
+            <h3 class="sub-heading"><i class="fa-solid fa-tags"></i> 1. SLA Performance By Service Category</h3>
             <div class="action-btns">
-              <button onclick="downloadTableCsv('sla-cat-table', 'AF_Jakarta_SLA_By_Category.csv')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
-              <button onclick="exportElementToPng('wrap-sla-cat', 'AF_Jakarta_SLA_By_Category.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
+              <button onclick="downloadSlaRawCsv('CATEGORY')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download Raw (.CSV)</button>
+              <button onclick="exportElementToPng('wrap-sla-cat', 'AF_Jabodetabek_SLA_By_Category.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
             </div>
           </div>
           <div id="wrap-sla-cat" class="export-wrapper">
@@ -534,8 +537,8 @@
               <table id="sla-cat-table">
                 <thead>
                   <tr>
-                    <th class="align-left">Category</th><th>Target SLA</th><th>Evaluated SMU</th>
-                    <th>Hit SLA (On-Time)</th><th>Not Hit (Delay)</th><th>Avg Actual Days</th><th>SLA Achievement (%)</th>
+                    <th class="align-left">Service Category</th><th>Service Scope &amp; Target</th><th>Evaluated SMU</th>
+                    <th>Hit SLA</th><th>Not Hit (Delay)</th><th>Avg Actual Days</th><th>SLA Achievement (%)</th>
                   </tr>
                 </thead>
                 <tbody id="sla-cat-body"><tr><td colspan="7" class="loading-text">Loading data...</td></tr></tbody>
@@ -547,7 +550,7 @@
             <h3 class="sub-heading"><i class="fa-solid fa-route"></i> 2. SLA Performance By Route</h3>
             <div class="action-btns">
               <button onclick="downloadSlaRawCsv('ROUTE')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download Raw (.CSV)</button>
-              <button onclick="exportElementToPng('wrap-sla-route', 'AF_Jakarta_SLA_By_Route.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
+              <button onclick="exportElementToPng('wrap-sla-route', 'AF_Jabodetabek_SLA_By_Route.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
             </div>
           </div>
           <div id="wrap-sla-route" class="export-wrapper">
@@ -556,7 +559,7 @@
                 <thead>
                   <tr>
                     <th class="align-left">Route</th><th>Evaluated SMU</th>
-                    <th>Hit SLA (On-Time)</th><th>Not Hit (Delay)</th><th>Avg Actual Days</th><th>SLA Achievement (%)</th>
+                    <th>Hit SLA</th><th>Not Hit (Delay)</th><th>Avg Actual Days</th><th>SLA Achievement (%)</th>
                   </tr>
                 </thead>
                 <tbody id="sla-route-body"><tr><td colspan="6" class="loading-text">Loading data...</td></tr></tbody>
@@ -568,7 +571,7 @@
             <h3 class="sub-heading"><i class="fa-solid fa-truck"></i> 3. SLA Performance By Vendor (Detail Per Route)</h3>
             <div class="action-btns">
               <button onclick="downloadSlaRawCsv('VENDOR')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download Raw (.CSV)</button>
-              <button onclick="exportElementToPng('wrap-sla-vendor', 'AF_Jakarta_SLA_By_Vendor.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
+              <button onclick="exportElementToPng('wrap-sla-vendor', 'AF_Jabodetabek_SLA_By_Vendor.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
             </div>
           </div>
           <div id="wrap-sla-vendor" class="export-wrapper">
@@ -577,7 +580,7 @@
                 <thead>
                   <tr>
                     <th class="align-left">Vendor / Route Detail</th><th>Evaluated SMU</th>
-                    <th>Hit SLA (On-Time)</th><th>Not Hit (Delay)</th><th>Avg Actual Days</th><th>SLA Achievement (%)</th>
+                    <th>Hit SLA</th><th>Not Hit (Delay)</th><th>Avg Actual Days</th><th>SLA Achievement (%)</th>
                   </tr>
                 </thead>
                 <tbody id="sla-vendor-body"><tr><td colspan="6" class="loading-text">Loading data...</td></tr></tbody>
@@ -589,7 +592,7 @@
             <h3 class="sub-heading"><i class="fa-solid fa-calendar-week"></i> 4. SLA Performance By Week</h3>
             <div class="action-btns">
               <button onclick="downloadSlaRawCsv('WEEK')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download Raw (.CSV)</button>
-              <button onclick="exportElementToPng('wrap-sla-week', 'AF_Jakarta_SLA_By_Week.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
+              <button onclick="exportElementToPng('wrap-sla-week', 'AF_Jabodetabek_SLA_By_Week.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
             </div>
           </div>
           <div id="wrap-sla-week" class="export-wrapper">
@@ -597,7 +600,7 @@
               <table id="sla-week-table">
                 <thead>
                   <tr>
-                    <th class="align-left">Week Period</th><th>Evaluated SMU</th><th>Hit SLA (On-Time)</th>
+                    <th class="align-left">Week Period</th><th>Evaluated SMU</th><th>Hit SLA</th>
                     <th>Not Hit (Delay)</th><th>Avg Actual Days</th><th>SLA Achievement (%)</th>
                   </tr>
                 </thead>
@@ -609,8 +612,8 @@
           <div class="section-header-bar">
             <h3 class="sub-heading" style="color: var(--primary);"><i class="fa-solid fa-arrow-trend-down"></i> 5. Top 5 Lowest Vendor Performance (By Route)</h3>
             <div class="action-btns">
-              <button onclick="downloadTableCsv('sla-lowest-vendor-table', 'AF_Jakarta_Top5_Lowest_Vendor.csv')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
-              <button onclick="exportElementToPng('wrap-sla-lowest', 'AF_Jakarta_Top5_Lowest_Vendor.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
+              <button onclick="downloadTableCsv('sla-lowest-vendor-table', 'AF_Jabodetabek_Top5_Lowest_Vendor.csv')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
+              <button onclick="exportElementToPng('wrap-sla-lowest', 'AF_Jabodetabek_Top5_Lowest_Vendor.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
             </div>
           </div>
           <div id="wrap-sla-lowest" class="export-wrapper">
@@ -632,7 +635,7 @@
           <h3 class="sub-heading" style="color: var(--primary);"><i class="fa-solid fa-clock-rotate-left"></i> 6. Detail SMU Not Hit SLA (Delay List) <span class="sub-note" id="delay-list-counter"></span></h3>
           <div class="action-btns">
             <button onclick="downloadSlaRawCsv('NOT_HIT')" class="btn-export-csv"><i class="fa-solid fa-file-csv"></i> Download Raw (.CSV)</button>
-            <button onclick="exportElementToPng('wrap-sla-delay', 'AF_Jakarta_SLA_Delay_List.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
+            <button onclick="exportElementToPng('wrap-sla-delay', 'AF_Jabodetabek_SLA_Delay_List.png')" class="btn-export-img"><i class="fa-solid fa-image"></i> Download PNG</button>
           </div>
         </div>
         <div id="wrap-sla-delay" class="export-wrapper">
@@ -710,19 +713,33 @@
       return dd + "/" + mm + "/" + d.getFullYear();
     }
 
+    function normalizeCategory(catStr) {
+      var up = String(catStr || '').toUpperCase().trim();
+      if (up === 'SD' || up === 'SDS' || up.indexOf('SAME') !== -1) return 'SD';
+      return 'ND';
+    }
+
     async function showAppAndFetchData() {
       document.getElementById("login-screen").style.display = "none";
       document.getElementById("app-wrapper").style.display = "block";
       var badge = document.getElementById("sync-badge");
+
+      const SELECTED_COLS = [
+        'row_num', 'pre_alert_date', 'smu_no', 'origin', 'destination',
+        'gross_weight', 'parcel_qty', 'vendor', 'flight_number',
+        'category', 'af_performance', 'atd_date', 'ata_date',
+        'rate_outgoing', 'est_cost_outgoing', 'est_cost_incoming', 'est_total_cost'
+      ].join(',');
 
       try {
         let fetched = [];
         let from = 0;
         const step = 1000;
         while (true) {
+          badge.innerHTML = "<i class='fa-solid fa-spinner fa-spin'></i> Loading (" + fetched.length.toLocaleString("en-US") + " rows)...";
           const { data, error } = await sbClient
             .from('airfreight_jabodetabek')
-            .select('*')
+            .select(SELECTED_COLS)
             .order('row_num', { ascending: true })
             .range(from, from + step - 1);
           if (error) throw error;
@@ -734,16 +751,12 @@
 
         allRows = [];
         var maxDate = null;
-        var batchSet = {};
 
         for (var i = 0; i < fetched.length; i++) {
           var item = fetched[i];
           var cDate = parseIsoToLocal(item.pre_alert_date);
           var atdDate = parseIsoToLocal(item.atd_date);
           var ataDate = parseIsoToLocal(item.ata_date);
-
-          var batchVal = item.batch || '';
-          if (batchVal) batchSet[batchVal] = true;
 
           var smuVal = item.smu_no || '';
           var originRaw = item.origin || 'UNKNOWN';
@@ -752,7 +765,7 @@
           var parcel = parseFloat(item.parcel_qty) || 0;
           var vendorRaw = item.vendor || 'Unassigned Vendor';
           var flightVal = item.flight_number || '';
-          var catVal = (item.category || '').toUpperCase().trim();
+          var catVal = normalizeCategory(item.category);
           var afPerfVal = item.af_performance || '';
           var rateOut = parseFloat(item.rate_outgoing) || 0;
           var costOut = parseFloat(item.est_cost_outgoing) || 0;
@@ -769,7 +782,6 @@
           if (destRaw === 'UNKNOWN') issues.push("Missing Destination");
           if (vendorRaw === 'Unassigned Vendor') issues.push("Missing Vendor");
           if (flightVal === '') issues.push("Missing Flight");
-          if (catVal !== 'SD' && catVal !== 'ND') issues.push("Invalid/Missing Category");
           if (gw <= 0) issues.push("Missing/0 Weight");
           if (parcel <= 0) issues.push("Missing/0 Parcel");
           if (!atdDate) issues.push("Missing ATD");
@@ -784,7 +796,6 @@
             atdTime: atdDate ? atdDate.getTime() : null,
             atdDisp: fmtDisplayDate(atdDate),
             ataDisp: fmtDisplayDate(ataDate),
-            batch: batchVal,
             smu: smuVal,
             origin: originRaw,
             dest: destRaw,
@@ -800,16 +811,6 @@
             costTotal: costTotal,
             issues: issues
           });
-        }
-
-        // Populate Batch Dropdown
-        var batchSelect = document.getElementById("filter-batch");
-        var batches = Object.keys(batchSet).sort();
-        for (var b = 0; b < batches.length; b++) {
-          var opt = document.createElement("option");
-          opt.value = batches[b];
-          opt.innerText = batches[b];
-          batchSelect.appendChild(opt);
         }
 
         badge.style.background = "#D8EAD8";
@@ -837,6 +838,13 @@
       }
     }
 
+    function syncCategoryFilter(sourceId) {
+      var val = document.getElementById(sourceId).value;
+      document.getElementById("dash-cat-filter").value = val;
+      document.getElementById("issue-cat-filter").value = val;
+      document.getElementById("sla-cat-filter").value = val;
+    }
+
     function syncDateInputs(sVal, eVal) {
       document.getElementById("start-date").value = sVal;
       document.getElementById("end-date").value = eVal;
@@ -848,9 +856,9 @@
 
     function resetAllDates() {
       syncDateInputs("", "");
-      document.getElementById("filter-batch").value = "ALL";
-      document.getElementById("filter-category").value = "ALL";
-      document.getElementById("sla-filter-category").value = "ALL";
+      document.getElementById("dash-cat-filter").value = "ALL";
+      document.getElementById("issue-cat-filter").value = "ALL";
+      document.getElementById("sla-cat-filter").value = "ALL";
       applyFilter(false);
       renderIssueLogs(false);
       renderAllSlaTables(false);
@@ -879,20 +887,17 @@
 
     function catBadgeHtml(cat) {
       if (cat === "SD") return "<span class='badge-cat-sd'>SD (H+0)</span>";
-      if (cat === "ND") return "<span class='badge-cat-nd'>ND (H+1)</span>";
-      return "<span class='badge-error'>" + (cat || "N/A") + "</span>";
+      return "<span class='badge-cat-nd'>ND (H+1)</span>";
     }
 
     /* 1. DASHBOARD */
     function applyFilter(syncOthers) {
       var sStr = document.getElementById("start-date").value;
       var eStr = document.getElementById("end-date").value;
-      var batchFilter = document.getElementById("filter-batch").value;
-      var catFilter = document.getElementById("filter-category").value;
+      var catFilter = document.getElementById("dash-cat-filter").value;
 
       if (syncOthers) {
         syncDateInputs(sStr, eStr);
-        document.getElementById("sla-filter-category").value = catFilter;
         renderIssueLogs(false);
         renderAllSlaTables(false);
       }
@@ -900,7 +905,7 @@
       var eTime = eStr ? new Date(eStr + "T23:59:59").getTime() : null;
       document.getElementById("day-count").innerText = calcDaysLabel(sStr, eStr);
 
-      var grandSmu = 0, sdCount = 0, ndCount = 0;
+      var grandSmu = 0, sdSmu = 0, ndSmu = 0;
       var grandGw = 0, grandParcel = 0, grandOut = 0, grandIn = 0, grandTotal = 0;
       var vendorMap = {}, routeMap = {}, anomalyList = [], smuList = [];
 
@@ -911,15 +916,15 @@
           if (sTime && r.cTime < sTime) continue;
           if (eTime && r.cTime > eTime) continue;
         }
-        if (batchFilter !== "ALL" && r.batch !== batchFilter) continue;
         if (catFilter !== "ALL" && r.category !== catFilter) continue;
 
         var smuCount = r.smu !== "" ? 1 : 0;
         var routeName = r.origin + " - " + r.dest;
 
         grandSmu += smuCount;
-        if (r.category === "SD") sdCount += smuCount;
-        if (r.category === "ND") ndCount += smuCount;
+        if (r.category === "SD") sdSmu += smuCount;
+        else ndSmu += smuCount;
+
         grandGw += r.gw;
         grandParcel += r.parcel;
         grandOut += r.costOut;
@@ -950,7 +955,7 @@
       }
 
       document.getElementById("kpi-smu").innerText = grandSmu.toLocaleString("id-ID");
-      document.getElementById("kpi-cat-split").innerText = "SD: " + sdCount.toLocaleString("id-ID") + " | ND: " + ndCount.toLocaleString("id-ID");
+      document.getElementById("kpi-cat-split").innerText = "SD: " + sdSmu.toLocaleString("id-ID") + " | ND: " + ndSmu.toLocaleString("id-ID");
       document.getElementById("kpi-gw").innerText = Math.round(grandGw).toLocaleString("id-ID") + " KG";
       document.getElementById("kpi-avg-gw").innerText = "Avg: " + (grandSmu > 0 ? (grandGw / grandSmu).toFixed(1) : "0") + " KG/SMU";
       document.getElementById("kpi-parcel").innerText = grandParcel.toLocaleString("id-ID");
@@ -962,7 +967,7 @@
       document.getElementById("kpi-cost-total").innerText = fmtRp(grandTotal);
       document.getElementById("kpi-cpkg").innerText = "CPKG: " + fmtRp(grandGw > 0 ? grandTotal / grandGw : 0);
 
-      // BREAKDOWN BY VENDOR (SORT BY HIGHEST EST. TOTAL COST)
+      // BREAKDOWN BY VENDOR
       var vHtml = "";
       var vendorKeys = Object.keys(vendorMap).sort(function(a, b) { return vendorMap[b].tot - vendorMap[a].tot; });
       for (var vk = 0; vk < vendorKeys.length; vk++) {
@@ -978,7 +983,7 @@
       }
       document.getElementById("vendor-table-body").innerHTML = vHtml || "<tr><td colspan='7' class='loading-text'>No data found in selected period.</td></tr>";
 
-      // VENDOR COVERED ROUTE (SORT BY MOST ROUTES COVERED)
+      // VENDOR COVERED ROUTE
       var vrHtml = "";
       var vendorRouteKeys = Object.keys(vendorMap).sort(function(a, b) {
         var countDiff = Object.keys(vendorMap[b].routes).length - Object.keys(vendorMap[a].routes).length;
@@ -998,7 +1003,7 @@
       }
       document.getElementById("vendor-routes-table-body").innerHTML = vrHtml || "<tr><td colspan='4' class='loading-text'>No route coverage data found.</td></tr>";
 
-      // BREAKDOWN BY ROUTE (SORT BY HIGHEST CPP)
+      // BREAKDOWN BY ROUTE
       var rHtml = "";
       var routeKeys = Object.keys(routeMap).sort(function(a, b) {
         var cppA = routeMap[a].parcel > 0 ? (routeMap[a].tot / routeMap[a].parcel) : 0;
@@ -1182,13 +1187,15 @@
     }
 
     function exportWeeklyImage() {
-      exportElementToPng("weekly-export-area", "AF_Jakarta_Weekly_" + activeMetricView.toUpperCase() + ".png");
+      exportElementToPng("weekly-export-area", "AF_Jabodetabek_Weekly_" + activeMetricView.toUpperCase() + ".png");
     }
 
     /* 3. UPDATE & ISSUE */
     function renderIssueLogs(syncOthers) {
       var sStr = document.getElementById("issue-start-date").value;
       var eStr = document.getElementById("issue-end-date").value;
+      var catFilter = document.getElementById("issue-cat-filter").value;
+
       if (syncOthers) {
         syncDateInputs(sStr, eStr);
         applyFilter(false);
@@ -1206,13 +1213,14 @@
           if (sTime && r.cTime < sTime) continue;
           if (eTime && r.cTime > eTime) continue;
         }
+        if (catFilter !== "ALL" && r.category !== catFilter) continue;
         if (r.issues.length > 0) list.push(r);
       }
 
       document.getElementById("issue-count-badge").innerText = list.length + " Issues";
       if (list.length === 0) {
         document.getElementById("issue-summary-text").innerText = "No issues detected in this period.";
-        document.getElementById("issue-table-body").innerHTML = "<tr><td colspan='10' style='text-align:center; padding:20px; color:green;'><b>Clean data! No issues found.</b></td></tr>";
+        document.getElementById("issue-table-body").innerHTML = "<tr><td colspan='9' style='text-align:center; padding:20px; color:green;'><b>Clean data! No issues found.</b></td></tr>";
       } else {
         document.getElementById("issue-summary-text").innerText = "Found " + list.length + " issue record(s) requiring attention.";
         var iHtml = "";
@@ -1221,7 +1229,6 @@
           var badges = item.issues.map(function(x){ return "<span class='badge-error'>" + x + "</span>"; }).join(" ");
           iHtml += "<tr><td class='align-left'><b>" + (item.smu || "[NO SMU]") + "</b></td>" +
             "<td>" + item.cDisp + "</td>" +
-            "<td>" + (item.batch || "-") + "</td>" +
             "<td>" + catBadgeHtml(item.category) + "</td>" +
             "<td class='align-left'>" + item.origin + " - " + item.dest + "</td>" +
             "<td class='align-left'>" + item.vendor + "</td>" +
@@ -1234,15 +1241,14 @@
       }
     }
 
-    /* 4. SLA PERFORMANCE (PA -> ATD | SD = H+0, ND = H+1) */
+    /* 4. SLA PERFORMANCE (SD = H+0 | ND = H+1) */
     function renderAllSlaTables(syncOthers) {
       var sStr = document.getElementById("sla-start-date").value;
       var eStr = document.getElementById("sla-end-date").value;
-      var catFilter = document.getElementById("sla-filter-category").value;
+      var catFilter = document.getElementById("sla-cat-filter").value;
 
       if (syncOthers) {
         syncDateInputs(sStr, eStr);
-        document.getElementById("filter-category").value = catFilter;
         applyFilter(false);
         renderIssueLogs(false);
       }
@@ -1252,8 +1258,8 @@
 
       var summary = { totalSmu: 0, hitSmu: 0, notHitSmu: 0, totalDays: 0 };
       var byCategory = {
-        "SD": { label: "SD (Same Day)", targetText: "H+0 (0 Days)", total: 0, hit: 0, notHit: 0, sumDays: 0 },
-        "ND": { label: "ND (Next Day)", targetText: "H+1 (Max 1 Day)", total: 0, hit: 0, notHit: 0, sumDays: 0 }
+        "SD": { label: "SD / SDS (Same Day)", scope: "Same Day Service (Target H+0)", total: 0, hit: 0, notHit: 0, sumDays: 0 },
+        "ND": { label: "ND / NDS (Next Day)", scope: "Next Day / Regular Service (Target H+1)", total: 0, hit: 0, notHit: 0, sumDays: 0 }
       };
       var byRoute = {}, byVendor = {};
       var byWeek = {
@@ -1267,7 +1273,6 @@
       for (var i = 0; i < allRows.length; i++) {
         var r = allRows[i];
         if (!r.cTime || !r.atdTime || r.smu === "") continue;
-        if (r.category !== "SD" && r.category !== "ND") continue;
         if (sTime && r.cTime < sTime) continue;
         if (eTime && r.cTime > eTime) continue;
         if (catFilter !== "ALL" && r.category !== catFilter) continue;
@@ -1306,7 +1311,7 @@
         if (isHit) byWeek[wKey].hit += 1; else byWeek[wKey].notHit += 1;
 
         currentSlaRawList.push({
-          smu: r.smu, batch: r.batch, category: r.category, origin: r.origin, dest: r.dest,
+          smu: r.smu, category: r.category, origin: r.origin, dest: r.dest,
           route: routeName, vendor: r.vendor, flight: r.flight, gw: r.gw, parcel: r.parcel,
           preAlert: r.cDisp, atd: r.atdDisp, ata: r.ataDisp, weekPeriod: wKey,
           target: targetDays, actual: actualDays, delayDays: delayDays,
@@ -1324,10 +1329,10 @@
       var cHtml = "";
       ["SD", "ND"].forEach(function(ck) {
         var ci = byCategory[ck];
-        var cRate = ci.total > 0 ? ((ci.hit / ci.total) * 100).toFixed(1) : "0.0";
-        var cAvg = ci.total > 0 ? (ci.sumDays / ci.total).toFixed(2) : "0.00";
-        cHtml += "<tr><td class='align-left'>" + catBadgeHtml(ck) + " <b>" + ci.label + "</b></td>" +
-          "<td><b>" + ci.targetText + "</b></td>" +
+        var cRate = (ci.total > 0 ? ((ci.hit / ci.total) * 100).toFixed(1) : "0.0");
+        var cAvg = (ci.total > 0 ? (ci.sumDays / ci.total).toFixed(2) : "0.00");
+        cHtml += "<tr><td class='align-left'><b>" + ci.label + "</b></td>" +
+          "<td>" + ci.scope + "</td>" +
           "<td>" + ci.total.toLocaleString("id-ID") + " SMU</td>" +
           "<td style='color:#1E561E; font-weight:800;'>" + ci.hit.toLocaleString("id-ID") + "</td>" +
           "<td style='color:#ED0677; font-weight:800;'>" + ci.notHit.toLocaleString("id-ID") + "</td>" +
@@ -1455,21 +1460,24 @@
         return;
       }
       var listToExport = currentSlaRawList.slice();
-      var fileName = "AF_Jakarta_Raw_SLA_All.csv";
+      var fileName = "AF_Jabodetabek_Raw_SLA_All.csv";
 
-      if (mode === "ROUTE") {
+      if (mode === "CATEGORY") {
+        listToExport.sort(function(a, b) { return a.category.localeCompare(b.category) || a.route.localeCompare(b.route); });
+        fileName = "AF_Jabodetabek_Raw_SLA_By_Category.csv";
+      } else if (mode === "ROUTE") {
         listToExport.sort(function(a, b) { return a.route.localeCompare(b.route) || a.vendor.localeCompare(b.vendor); });
-        fileName = "AF_Jakarta_Raw_SLA_By_Route.csv";
+        fileName = "AF_Jabodetabek_Raw_SLA_By_Route.csv";
       } else if (mode === "VENDOR") {
         listToExport.sort(function(a, b) { return a.vendor.localeCompare(b.vendor) || a.route.localeCompare(b.route); });
-        fileName = "AF_Jakarta_Raw_SLA_By_Vendor.csv";
+        fileName = "AF_Jabodetabek_Raw_SLA_By_Vendor.csv";
       } else if (mode === "WEEK") {
         listToExport.sort(function(a, b) { return a.weekPeriod.localeCompare(b.weekPeriod) || a.route.localeCompare(b.route); });
-        fileName = "AF_Jakarta_Raw_SLA_By_Week.csv";
+        fileName = "AF_Jabodetabek_Raw_SLA_By_Week.csv";
       } else if (mode === "NOT_HIT") {
         listToExport = listToExport.filter(function(item) { return !item.isHit; });
         listToExport.sort(function(a, b) { return b.delayDays - a.delayDays; });
-        fileName = "AF_Jakarta_Raw_SMU_Not_Hit.csv";
+        fileName = "AF_Jabodetabek_Raw_SMU_Not_Hit.csv";
         if (listToExport.length === 0) {
           alert("No Not-Hit SMU data available to download.");
           return;
@@ -1477,14 +1485,14 @@
       }
 
       var q = String.fromCharCode(34);
-      var csvRows = ["SMU No.,Batch,Category,Origin,Destination,Route,Vendor,Flight Number,Gross Weight (KG),Parcel,Week Period,Pre-Alert Date (C),ATD (T),ATA (U),Target SLA (Days),Actual PA->ATD (Days),Delay (Days),SLA Status,Sheet AF Performance"];
+      var csvRows = ["SMU No.,Category,Origin,Destination,Route,Vendor,Flight Number,Gross Weight (KG),Parcel,Week Period,Pre-Alert Date (C),ATD (T),ATA (U),Target SLA (Days),Actual PA->ATD (Days),Delay (Days),SLA Status"];
       for (var i = 0; i < listToExport.length; i++) {
         var item = listToExport[i];
         var row = [
-          q + item.smu + q, q + item.batch + q, q + item.category + q, q + item.origin + q, q + item.dest + q,
+          q + item.smu + q, q + item.category + q, q + item.origin + q, q + item.dest + q,
           q + item.route + q, q + item.vendor + q, q + item.flight + q, item.gw, item.parcel,
           q + item.weekPeriod + q, q + item.preAlert + q, q + item.atd + q, q + item.ata + q,
-          item.target, item.actual, item.delayDays, q + item.status + q, q + item.sheetPerf + q
+          item.target, item.actual, item.delayDays, q + item.status + q
         ];
         csvRows.push(row.join(","));
       }
