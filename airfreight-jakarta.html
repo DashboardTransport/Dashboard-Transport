@@ -143,6 +143,7 @@
     .badge-nothit { background: #FFE0E6; color: #ED0677; padding: 4px 10px; border-radius: 4px; font-size: 0.78rem; font-weight: 800; }
     .badge-cat-sd { background: #FFEFA3; color: #524245; border: 1px solid #FFCB05; padding: 3px 8px; border-radius: 4px; font-size: 0.74rem; font-weight: 800; }
     .badge-cat-nd { background: #E0F4FC; color: #0E4F6E; border: 1px solid #7ECCEE; padding: 3px 8px; border-radius: 4px; font-size: 0.74rem; font-weight: 800; }
+    .badge-batch { background: #F1F5F9; color: #334155; border: 1px solid #CBD5E1; padding: 2px 7px; border-radius: 4px; font-size: 0.72rem; font-weight: 800; }
     .rank-badge { background: #524245; color: #fff; padding: 3px 9px; border-radius: 12px; font-size: 0.75rem; font-weight: 800; }
     .rank-badge.top1 { background: var(--primary); }
     .loading-text { padding: 20px; text-align: center; color: #888; font-weight: 600; }
@@ -259,8 +260,8 @@
           <div class="filter-group"><span>CATEGORY</span>
             <select id="dash-cat-filter" onchange="syncCategoryFilter('dash-cat-filter'); applyFilter(true);">
               <option value="ALL">All (SD &amp; ND)</option>
-              <option value="SD">SD / SDS (H+0)</option>
-              <option value="ND">ND / NDS (H+1)</option>
+              <option value="SD">SD — Batch 1 Priority (H+0)</option>
+              <option value="ND">ND — Regular / Batch 2–3 (H+1)</option>
             </select>
           </div>
           <button onclick="applyFilter(true)" class="btn-action"><i class="fa-solid fa-filter"></i> Apply Filter</button>
@@ -378,6 +379,7 @@
                 <tr>
                   <th>Rank</th>
                   <th class="align-left">SMU No.</th>
+                  <th>Batch</th>
                   <th>Category</th>
                   <th class="align-left">Vendor</th>
                   <th>Flight</th>
@@ -388,7 +390,7 @@
                   <th>CPKG</th>
                 </tr>
               </thead>
-              <tbody id="top10-table-body"><tr><td colspan="10" class="loading-text">Loading data...</td></tr></tbody>
+              <tbody id="top10-table-body"><tr><td colspan="11" class="loading-text">Loading data...</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -448,8 +450,8 @@
           <div class="filter-group"><span>CATEGORY</span>
             <select id="issue-cat-filter" onchange="syncCategoryFilter('issue-cat-filter'); renderIssueLogs(true);">
               <option value="ALL">All (SD &amp; ND)</option>
-              <option value="SD">SD / SDS (H+0)</option>
-              <option value="ND">ND / NDS (H+1)</option>
+              <option value="SD">SD — Batch 1 Priority (H+0)</option>
+              <option value="ND">ND — Regular / Batch 2–3 (H+1)</option>
             </select>
           </div>
           <button onclick="renderIssueLogs(true)" class="btn-action"><i class="fa-solid fa-magnifying-glass"></i> Check Anomaly Logs</button>
@@ -477,6 +479,7 @@
                 <tr>
                   <th class="align-left">SMU No.</th>
                   <th>Pre-Alert Date</th>
+                  <th>Batch</th>
                   <th>Category</th>
                   <th class="align-left">Route</th>
                   <th class="align-left">Vendor</th>
@@ -486,7 +489,7 @@
                   <th>Anomaly Detail</th>
                 </tr>
               </thead>
-              <tbody id="issue-table-body"><tr><td colspan="9" class="loading-text">Loading logs...</td></tr></tbody>
+              <tbody id="issue-table-body"><tr><td colspan="10" class="loading-text">Loading logs...</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -501,8 +504,8 @@
             <div class="filter-group"><span>CATEGORY</span>
               <select id="sla-cat-filter" onchange="syncCategoryFilter('sla-cat-filter'); renderAllSlaTables(true);">
                 <option value="ALL">All (SD &amp; ND)</option>
-                <option value="SD">SD / SDS (Target H+0)</option>
-                <option value="ND">ND / NDS (Target H+1)</option>
+                <option value="SD">SD — Batch 1 Priority (Target H+0)</option>
+                <option value="ND">ND — Regular / Batch 2–3 (Target H+1)</option>
               </select>
             </div>
             <button onclick="renderAllSlaTables(true)" class="btn-action"><i class="fa-solid fa-stopwatch"></i> Calculate SLA</button>
@@ -516,7 +519,7 @@
         </div>
 
         <div id="sla-export-area" style="background:#F9FAFC; padding:10px; border-radius:8px;">
-          <div class="section-banner">AIRFREIGHT JABODETABEK SLA PERFORMANCE (SD = H+0 | ND = H+1)</div>
+          <div class="section-banner">AIRFREIGHT JABODETABEK SLA PERFORMANCE (SD = H+0 | ND = H+1 BY BATCH &amp; CITY)</div>
           <div class="kpi-grid-5">
             <div class="kpi-card"><div class="label">Evaluated SMU</div><div class="value" id="sla-kpi-total">0</div></div>
             <div class="kpi-card"><div class="label">Hit SLA (On-Time)</div><div class="value" style="color:#1E561E;" id="sla-kpi-hit">0</div></div>
@@ -643,11 +646,11 @@
             <table id="sla-delay-table">
               <thead>
                 <tr>
-                  <th class="align-left">SMU No.</th><th>Category</th><th class="align-left">Route</th><th class="align-left">Vendor</th>
+                  <th class="align-left">SMU No.</th><th>Batch</th><th>Category</th><th class="align-left">Route</th><th class="align-left">Vendor</th>
                   <th>Flight</th><th>Pre-Alert (C)</th><th>ATD (T)</th><th>Target</th><th>Actual</th><th>Delay</th><th>Status</th>
                 </tr>
               </thead>
-              <tbody id="sla-delay-table-body"><tr><td colspan="11" class="loading-text">No delay data.</td></tr></tbody>
+              <tbody id="sla-delay-table-body"><tr><td colspan="12" class="loading-text">No delay data.</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -662,11 +665,55 @@
     const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const SELECTED_COLS = [
-      'row_num', 'pre_alert_date', 'smu_no', 'origin', 'destination',
+      'row_num', 'batch', 'pre_alert_date', 'smu_no', 'origin', 'destination',
       'gross_weight', 'parcel_qty', 'vendor', 'flight_number',
       'category', 'af_performance', 'atd_date', 'ata_date',
       'rate_outgoing', 'est_cost_outgoing', 'est_cost_incoming', 'est_total_cost'
     ].join(',');
+
+    /* ================= JABODETABEK SLA CHEAT SHEET =================
+       - Batch 2 & Batch 3: Semua kota = ND (H+1)
+       - Batch 1: Hanya 16 kota di bawah ini = SD (H+0), sisanya = ND (H+1)
+    ================================================================== */
+    const BATCH1_SD_CITIES = [
+      'BALIKPAPAN',
+      'BANJARMASIN',
+      'BATAM',
+      'BENGKULU',
+      'JAMBI',
+      'LOMBOK',
+      'MAKASSAR',
+      'MANADO',
+      'MEDAN',
+      'PADANG',
+      'PALANGKARAYA',
+      'PALEMBANG',
+      'PANGKAL PINANG',
+      'PEKANBARU',
+      'PONTIANAK',
+      'TANJUNG PINANG'
+    ];
+
+    function normalizeBatch(batchVal) {
+      var b = String(batchVal || '').toUpperCase().replace('BATCH', '').trim();
+      if (b === '1' || b === '2' || b === '3') return b;
+      return b || '-';
+    }
+
+    function determineJaboCategory(batchVal, destCity) {
+      var bNorm = normalizeBatch(batchVal);
+      if (bNorm !== '1') return 'ND';
+      var cityNorm = String(destCity || '').toUpperCase().replace(/\s+/g, ' ').trim();
+      // Toleransi variasi penulisan tanpa spasi (misal PALANGKA RAYA / PANGKALPINANG / TANJUNGPINANG)
+      var cityNoSpace = cityNorm.replace(/\s+/g, '');
+      for (var i = 0; i < BATCH1_SD_CITIES.length; i++) {
+        var targetCity = BATCH1_SD_CITIES[i];
+        if (cityNorm === targetCity || cityNoSpace === targetCity.replace(/\s+/g, '')) {
+          return 'SD';
+        }
+      }
+      return 'ND';
+    }
 
     var allRows = [];
     var loadedStartIso = null;
@@ -725,25 +772,20 @@
       return dd + "/" + mm + "/" + d.getFullYear();
     }
 
-    function normalizeCategory(catStr) {
-      var up = String(catStr || '').toUpperCase().trim();
-      if (up === 'SD' || up === 'SDS' || up.indexOf('SAME') !== -1) return 'SD';
-      return 'ND';
-    }
-
     function mapRawItem(item) {
       var cDate = parseIsoToLocal(item.pre_alert_date);
       var atdDate = parseIsoToLocal(item.atd_date);
       var ataDate = parseIsoToLocal(item.ata_date);
 
       var smuVal = item.smu_no || '';
+      var batchVal = normalizeBatch(item.batch);
       var originRaw = item.origin || 'UNKNOWN';
       var destRaw = item.destination || 'UNKNOWN';
       var gw = parseFloat(item.gross_weight) || 0;
       var parcel = parseFloat(item.parcel_qty) || 0;
       var vendorRaw = item.vendor || 'Unassigned Vendor';
       var flightVal = item.flight_number || '';
-      var catVal = normalizeCategory(item.category);
+      var catVal = determineJaboCategory(batchVal, destRaw);
       var afPerfVal = item.af_performance || '';
       var rateOut = parseFloat(item.rate_outgoing) || 0;
       var costOut = parseFloat(item.est_cost_outgoing) || 0;
@@ -752,6 +794,7 @@
 
       var issues = [];
       if (smuVal === '') issues.push("Missing SMU");
+      if (batchVal === '-') issues.push("Missing Batch");
       if (originRaw === 'UNKNOWN') issues.push("Missing Origin");
       if (destRaw === 'UNKNOWN') issues.push("Missing Destination");
       if (vendorRaw === 'Unassigned Vendor') issues.push("Missing Vendor");
@@ -771,6 +814,7 @@
         atdDisp: fmtDisplayDate(atdDate),
         ataDisp: fmtDisplayDate(ataDate),
         smu: smuVal,
+        batch: batchVal,
         origin: originRaw,
         dest: destRaw,
         gw: gw,
@@ -941,6 +985,10 @@
       return "<span class='badge-cat-nd'>ND (H+1)</span>";
     }
 
+    function batchBadgeHtml(b) {
+      return "<span class='badge-batch'>B" + (b || "-") + "</span>";
+    }
+
     /* 1. DASHBOARD */
     async function applyFilter(syncOthers) {
       var sStr = document.getElementById("start-date").value;
@@ -1098,6 +1146,7 @@
         var cpkg = it.gw > 0 ? Math.round(it.costTotal / it.gw) : 0;
         tHtml += "<tr><td><b>#" + (t + 1) + "</b></td>" +
           "<td class='align-left'><b>" + it.smu + "</b></td>" +
+          "<td>" + batchBadgeHtml(it.batch) + "</td>" +
           "<td>" + catBadgeHtml(it.category) + "</td>" +
           "<td class='align-left'>" + it.vendor + "</td>" +
           "<td>" + (it.flight || "-") + "</td>" +
@@ -1107,7 +1156,7 @@
           "<td>" + fmtRp(it.costTotal) + "</td>" +
           "<td>" + fmtRp(cpkg) + "</td></tr>";
       }
-      document.getElementById("top10-table-body").innerHTML = tHtml || "<tr><td colspan='10' class='loading-text'>No data found in selected period.</td></tr>";
+      document.getElementById("top10-table-body").innerHTML = tHtml || "<tr><td colspan='11' class='loading-text'>No data found in selected period.</td></tr>";
 
       document.getElementById("anomaly-count-badge").innerText = anomalyList.length + " Errors";
       if (anomalyList.length === 0) {
@@ -1301,7 +1350,7 @@
       document.getElementById("issue-count-badge").innerText = list.length + " Issues";
       if (list.length === 0) {
         document.getElementById("issue-summary-text").innerText = "No issues detected in this period.";
-        document.getElementById("issue-table-body").innerHTML = "<tr><td colspan='9' style='text-align:center; padding:20px; color:green;'><b>Clean data! No issues found.</b></td></tr>";
+        document.getElementById("issue-table-body").innerHTML = "<tr><td colspan='10' style='text-align:center; padding:20px; color:green;'><b>Clean data! No issues found.</b></td></tr>";
       } else {
         document.getElementById("issue-summary-text").innerText = "Found " + list.length + " issue record(s) requiring attention.";
         var iHtml = "";
@@ -1310,6 +1359,7 @@
           var badges = item.issues.map(function(x){ return "<span class='badge-error'>" + x + "</span>"; }).join(" ");
           iHtml += "<tr><td class='align-left'><b>" + (item.smu || "[NO SMU]") + "</b></td>" +
             "<td>" + item.cDisp + "</td>" +
+            "<td>" + batchBadgeHtml(item.batch) + "</td>" +
             "<td>" + catBadgeHtml(item.category) + "</td>" +
             "<td class='align-left'>" + item.origin + " - " + item.dest + "</td>" +
             "<td class='align-left'>" + item.vendor + "</td>" +
@@ -1345,8 +1395,8 @@
 
       var summary = { totalSmu: 0, hitSmu: 0, notHitSmu: 0, totalDays: 0 };
       var byCategory = {
-        "SD": { label: "SD / SDS (Same Day)", scope: "Same Day Service (Target H+0)", total: 0, hit: 0, notHit: 0, sumDays: 0 },
-        "ND": { label: "ND / NDS (Next Day)", scope: "Next Day / Regular Service (Target H+1)", total: 0, hit: 0, notHit: 0, sumDays: 0 }
+        "SD": { label: "SD — Batch 1 Priority (16 Cities)", scope: "Same Day Target (H+0)", total: 0, hit: 0, notHit: 0, sumDays: 0 },
+        "ND": { label: "ND — Regular / Batch 2 & 3", scope: "Next Day Target (H+1)", total: 0, hit: 0, notHit: 0, sumDays: 0 }
       };
       var byRoute = {}, byVendor = {};
       var byWeek = {
@@ -1398,7 +1448,7 @@
         if (isHit) byWeek[wKey].hit += 1; else byWeek[wKey].notHit += 1;
 
         currentSlaRawList.push({
-          smu: r.smu, category: r.category, origin: r.origin, dest: r.dest,
+          smu: r.smu, batch: r.batch, category: r.category, origin: r.origin, dest: r.dest,
           route: routeName, vendor: r.vendor, flight: r.flight, gw: r.gw, parcel: r.parcel,
           preAlert: r.cDisp, atd: r.atdDisp, ata: r.ataDisp, weekPeriod: wKey,
           target: targetDays, actual: actualDays, delayDays: delayDays,
@@ -1521,11 +1571,12 @@
       document.getElementById("delay-list-counter").innerText = delayOnly.length > 0 ? "(Showing " + delayOnly.length + " SMUs — scroll box to view all)" : "";
       var dHtml = "";
       if (delayOnly.length === 0) {
-        dHtml = "<tr><td colspan='11' style='text-align:center; padding:20px; color:green;'><b>100% On-Time! No Not-Hit SMU found.</b></td></tr>";
+        dHtml = "<tr><td colspan='12' style='text-align:center; padding:20px; color:green;'><b>100% On-Time! No Not-Hit SMU found.</b></td></tr>";
       } else {
         for (var d = 0; d < delayOnly.length; d++) {
           var di = delayOnly[d];
           dHtml += "<tr><td class='align-left'><b>" + di.smu + "</b></td>" +
+            "<td>" + batchBadgeHtml(di.batch) + "</td>" +
             "<td>" + catBadgeHtml(di.category) + "</td>" +
             "<td class='align-left'>" + di.route + "</td>" +
             "<td class='align-left'>" + di.vendor + "</td>" +
@@ -1572,11 +1623,11 @@
       }
 
       var q = String.fromCharCode(34);
-      var csvRows = ["SMU No.,Category,Origin,Destination,Route,Vendor,Flight Number,Gross Weight (KG),Parcel,Week Period,Pre-Alert Date (C),ATD (T),ATA (U),Target SLA (Days),Actual PA->ATD (Days),Delay (Days),SLA Status"];
+      var csvRows = ["SMU No.,Batch,Category,Origin,Destination,Route,Vendor,Flight Number,Gross Weight (KG),Parcel,Week Period,Pre-Alert Date (C),ATD (T),ATA (U),Target SLA (Days),Actual PA->ATD (Days),Delay (Days),SLA Status"];
       for (var i = 0; i < listToExport.length; i++) {
         var item = listToExport[i];
         var row = [
-          q + item.smu + q, q + item.category + q, q + item.origin + q, q + item.dest + q,
+          q + item.smu + q, q + item.batch + q, q + item.category + q, q + item.origin + q, q + item.dest + q,
           q + item.route + q, q + item.vendor + q, q + item.flight + q, item.gw, item.parcel,
           q + item.weekPeriod + q, q + item.preAlert + q, q + item.atd + q, q + item.ata + q,
           item.target, item.actual, item.delayDays, q + item.status + q
