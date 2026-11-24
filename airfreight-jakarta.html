@@ -264,7 +264,7 @@
             </select>
           </div>
           <button onclick="applyFilter(true)" class="btn-action"><i class="fa-solid fa-filter"></i> Apply Filter</button>
-          <button onclick="resetAllDates()" class="btn-secondary">Show All</button>
+          <button onclick="resetAllDates()" class="btn-secondary">Latest Month</button>
           <div class="day-badge" id="day-count">-</div>
         </div>
 
@@ -406,7 +406,7 @@
             </select>
           </div>
           <div class="filter-group"><span>YEAR</span><input type="number" id="weekly-year" value="2026" style="width: 90px;"></div>
-          <button onclick="renderWeeklyTable()" class="btn-action"><i class="fa-solid fa-chart-line"></i> Generate Report</button>
+          <button onclick="loadWeeklyMonth()" class="btn-action"><i class="fa-solid fa-chart-line"></i> Generate Report</button>
         </div>
 
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px; flex-wrap:wrap; gap:10px;">
@@ -453,7 +453,7 @@
             </select>
           </div>
           <button onclick="renderIssueLogs(true)" class="btn-action"><i class="fa-solid fa-magnifying-glass"></i> Check Anomaly Logs</button>
-          <button onclick="resetAllDates()" class="btn-secondary">Show All</button>
+          <button onclick="resetAllDates()" class="btn-secondary">Latest Month</button>
           <div class="day-badge" id="issue-day-count">-</div>
         </div>
 
@@ -506,7 +506,7 @@
               </select>
             </div>
             <button onclick="renderAllSlaTables(true)" class="btn-action"><i class="fa-solid fa-stopwatch"></i> Calculate SLA</button>
-            <button onclick="resetAllDates()" class="btn-secondary">Show All</button>
+            <button onclick="resetAllDates()" class="btn-secondary">Latest Month</button>
             <div class="day-badge" id="sla-day-count">-</div>
           </div>
           <div class="action-btns">
@@ -661,15 +661,27 @@
     const SUPABASE_ANON_KEY = 'sb_publishable_HFq9qTmT2ccAehYXVeUNWw_tPeFBmO1';
     const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    const SELECTED_COLS = [
+      'row_num', 'pre_alert_date', 'smu_no', 'origin', 'destination',
+      'gross_weight', 'parcel_qty', 'vendor', 'flight_number',
+      'category', 'af_performance', 'atd_date', 'ata_date',
+      'rate_outgoing', 'est_cost_outgoing', 'est_cost_incoming', 'est_total_cost'
+    ].join(',');
+
     var allRows = [];
+    var loadedStartIso = null;
+    var loadedEndIso = null;
+    var defaultStartIso = null;
+    var defaultEndIso = null;
     var activeWeeklyView = "vendor";
     var activeMetricView = "all";
     var currentSlaRawList = [];
+    var isFetching = false;
 
     window.onload = async function() {
       const { data: { session } } = await sbClient.auth.getSession();
       if (session) {
-        showAppAndFetchData();
+        initLatestMonthAndLoad();
       }
     };
 
@@ -690,7 +702,7 @@
       if (error) {
         errEl.innerText = "Login failed: " + error.message;
       } else {
-        showAppAndFetchData();
+        initLatestMonthAndLoad();
       }
     }
 
@@ -719,29 +731,132 @@
       return 'ND';
     }
 
-    async function showAppAndFetchData() {
+    function mapRawItem(item) {
+      var cDate = parseIsoToLocal(item.pre_alert_date);
+      var atdDate = parseIsoToLocal(item.atd_date);
+      var ataDate = parseIsoToLocal(item.ata_date);
+
+      var smuVal = item.smu_no || '';
+      var originRaw = item.origin || 'UNKNOWN';
+      var destRaw = item.destination || 'UNKNOWN';
+      var gw = parseFloat(item.gross_weight) || 0;
+      var parcel = parseFloat(item.parcel_qty) || 0;
+      var vendorRaw = item.vendor || 'Unassigned Vendor';
+      var flightVal = item.flight_number || '';
+      var catVal = normalizeCategory(item.category);
+      var afPerfVal = item.af_performance || '';
+      var rateOut = parseFloat(item.rate_outgoing) || 0;
+      var costOut = parseFloat(item.est_cost_outgoing) || 0;
+      var costIn = parseFloat(item.est_cost_incoming) || 0;
+      var costTotal = parseFloat(item.est_total_cost) || 0;
+
+      var issues = [];
+      if (smuVal === '') issues.push("Missing SMU");
+      if (originRaw === 'UNKNOWN') issues.push("Missing Origin");
+      if (destRaw === 'UNKNOWN') issues.push("Missing Destination");
+      if (vendorRaw === 'Unassigned Vendor') issues.push("Missing Vendor");
+      if (flightVal === '') issues.push("Missing Flight");
+      if (gw <= 0) issues.push("Missing/0 Weight");
+      if (parcel <= 0) issues.push("Missing/0 Parcel");
+      if (!atdDate) issues.push("Missing ATD");
+      if (costTotal <= 0) issues.push("Missing/0 Total Cost");
+
+      return {
+        cTime: cDate ? cDate.getTime() : null,
+        cDisp: fmtDisplayDate(cDate),
+        cYear: cDate ? cDate.getFullYear() : null,
+        cMonth: cDate ? (cDate.getMonth() + 1) : null,
+        cDay: cDate ? cDate.getDate() : null,
+        atdTime: atdDate ? atdDate.getTime() : null,
+        atdDisp: fmtDisplayDate(atdDate),
+        ataDisp: fmtDisplayDate(ataDate),
+        smu: smuVal,
+        origin: originRaw,
+        dest: destRaw,
+        gw: gw,
+        parcel: parcel,
+        vendor: vendorRaw,
+        flight: flightVal,
+        category: catVal,
+        afPerf: afPerfVal,
+        rateOut: rateOut,
+        costOut: costOut,
+        costIn: costIn,
+        costTotal: costTotal,
+        issues: issues
+      };
+    }
+
+    /* STEP 1: CEK TANGGAL TERBARU (1 ROW SAJA) LALU FETCH BULAN TERSEBUT */
+    async function initLatestMonthAndLoad() {
       document.getElementById("login-screen").style.display = "none";
       document.getElementById("app-wrapper").style.display = "block";
       var badge = document.getElementById("sync-badge");
+      badge.innerHTML = "<i class='fa-solid fa-spinner fa-spin'></i> Detecting latest period...";
 
-      const SELECTED_COLS = [
-        'row_num', 'pre_alert_date', 'smu_no', 'origin', 'destination',
-        'gross_weight', 'parcel_qty', 'vendor', 'flight_number',
-        'category', 'af_performance', 'atd_date', 'ata_date',
-        'rate_outgoing', 'est_cost_outgoing', 'est_cost_incoming', 'est_total_cost'
-      ].join(',');
+      try {
+        const { data: latestData, error: latestErr } = await sbClient
+          .from('airfreight_jabodetabek')
+          .select('pre_alert_date')
+          .not('pre_alert_date', 'is', null)
+          .order('pre_alert_date', { ascending: false })
+          .limit(1);
+
+        if (latestErr) throw latestErr;
+
+        var refDate = new Date();
+        if (latestData && latestData.length > 0 && latestData[0].pre_alert_date) {
+          var parsedMax = parseIsoToLocal(latestData[0].pre_alert_date);
+          if (parsedMax) refDate = parsedMax;
+        }
+
+        var y = refDate.getFullYear();
+        var m = refDate.getMonth();
+        var lastDay = new Date(y, m + 1, 0);
+        defaultStartIso = y + "-" + String(m + 1).padStart(2, "0") + "-01";
+        defaultEndIso = y + "-" + String(m + 1).padStart(2, "0") + "-" + String(lastDay.getDate()).padStart(2, "0");
+
+        syncDateInputs(defaultStartIso, defaultEndIso);
+        document.getElementById("weekly-month").value = String(m + 1);
+        document.getElementById("weekly-year").value = String(y);
+
+        await ensureDataLoadedForRange(defaultStartIso, defaultEndIso);
+        renderAllViews();
+      } catch (err) {
+        badge.style.background = "#FFE0E6";
+        badge.style.color = "#ED0677";
+        badge.innerHTML = "<i class='fa-solid fa-triangle-exclamation'></i> DB Error: " + err.message;
+      }
+    }
+
+    /* STEP 2: SERVER-SIDE DATE RANGE FETCH (INSTAN VIA INDEX pre_alert_date) */
+    async function ensureDataLoadedForRange(sIso, eIso) {
+      if (!sIso || !eIso) return;
+      if (loadedStartIso && loadedEndIso && sIso >= loadedStartIso && eIso <= loadedEndIso && allRows.length > 0) {
+        return;
+      }
+      if (isFetching) return;
+      isFetching = true;
+
+      var badge = document.getElementById("sync-badge");
+      badge.style.background = "#FFF4F7";
+      badge.style.color = "var(--primary)";
+      badge.style.borderColor = "#FFD0DC";
 
       try {
         let fetched = [];
         let from = 0;
         const step = 1000;
+
         while (true) {
           badge.innerHTML = "<i class='fa-solid fa-spinner fa-spin'></i> Loading (" + fetched.length.toLocaleString("en-US") + " rows)...";
           const { data, error } = await sbClient
             .from('airfreight_jabodetabek')
             .select(SELECTED_COLS)
-            .order('row_num', { ascending: true })
+            .gte('pre_alert_date', sIso)
+            .lte('pre_alert_date', eIso)
             .range(from, from + step - 1);
+
           if (error) throw error;
           if (!data || data.length === 0) break;
           fetched = fetched.concat(data);
@@ -749,93 +864,29 @@
           from += step;
         }
 
-        allRows = [];
-        var maxDate = null;
-
-        for (var i = 0; i < fetched.length; i++) {
-          var item = fetched[i];
-          var cDate = parseIsoToLocal(item.pre_alert_date);
-          var atdDate = parseIsoToLocal(item.atd_date);
-          var ataDate = parseIsoToLocal(item.ata_date);
-
-          var smuVal = item.smu_no || '';
-          var originRaw = item.origin || 'UNKNOWN';
-          var destRaw = item.destination || 'UNKNOWN';
-          var gw = parseFloat(item.gross_weight) || 0;
-          var parcel = parseFloat(item.parcel_qty) || 0;
-          var vendorRaw = item.vendor || 'Unassigned Vendor';
-          var flightVal = item.flight_number || '';
-          var catVal = normalizeCategory(item.category);
-          var afPerfVal = item.af_performance || '';
-          var rateOut = parseFloat(item.rate_outgoing) || 0;
-          var costOut = parseFloat(item.est_cost_outgoing) || 0;
-          var costIn = parseFloat(item.est_cost_incoming) || 0;
-          var costTotal = parseFloat(item.est_total_cost) || 0;
-
-          if (cDate && (!maxDate || cDate.getTime() > maxDate.getTime())) {
-            maxDate = cDate;
-          }
-
-          var issues = [];
-          if (smuVal === '') issues.push("Missing SMU");
-          if (originRaw === 'UNKNOWN') issues.push("Missing Origin");
-          if (destRaw === 'UNKNOWN') issues.push("Missing Destination");
-          if (vendorRaw === 'Unassigned Vendor') issues.push("Missing Vendor");
-          if (flightVal === '') issues.push("Missing Flight");
-          if (gw <= 0) issues.push("Missing/0 Weight");
-          if (parcel <= 0) issues.push("Missing/0 Parcel");
-          if (!atdDate) issues.push("Missing ATD");
-          if (costTotal <= 0) issues.push("Missing/0 Total Cost");
-
-          allRows.push({
-            cTime: cDate ? cDate.getTime() : null,
-            cDisp: fmtDisplayDate(cDate),
-            cYear: cDate ? cDate.getFullYear() : null,
-            cMonth: cDate ? (cDate.getMonth() + 1) : null,
-            cDay: cDate ? cDate.getDate() : null,
-            atdTime: atdDate ? atdDate.getTime() : null,
-            atdDisp: fmtDisplayDate(atdDate),
-            ataDisp: fmtDisplayDate(ataDate),
-            smu: smuVal,
-            origin: originRaw,
-            dest: destRaw,
-            gw: gw,
-            parcel: parcel,
-            vendor: vendorRaw,
-            flight: flightVal,
-            category: catVal,
-            afPerf: afPerfVal,
-            rateOut: rateOut,
-            costOut: costOut,
-            costIn: costIn,
-            costTotal: costTotal,
-            issues: issues
-          });
-        }
+        allRows = fetched.map(mapRawItem);
+        loadedStartIso = sIso;
+        loadedEndIso = eIso;
 
         badge.style.background = "#D8EAD8";
         badge.style.color = "#1E561E";
         badge.style.borderColor = "#2D5B2D";
-        badge.innerHTML = "<i class='fa-solid fa-circle-check'></i> " + allRows.length.toLocaleString("en-US") + " Rows Loaded";
-
-        if (maxDate) {
-          var y = maxDate.getFullYear();
-          var m = maxDate.getMonth();
-          var lastDay = new Date(y, m + 1, 0);
-          var sIso = y + "-" + String(m + 1).padStart(2, "0") + "-01";
-          var eIso = y + "-" + String(m + 1).padStart(2, "0") + "-" + String(lastDay.getDate()).padStart(2, "0");
-          syncDateInputs(sIso, eIso);
-          document.getElementById("weekly-month").value = String(m + 1);
-          document.getElementById("weekly-year").value = String(y);
-        }
-
-        applyFilter(false);
-        renderWeeklyTable();
-        renderIssueLogs(false);
-        renderAllSlaTables(false);
+        badge.innerHTML = "<i class='fa-solid fa-circle-check'></i> " + allRows.length.toLocaleString("en-US") + " Rows (" + sIso + " → " + eIso + ")";
       } catch (err) {
+        badge.style.background = "#FFE0E6";
+        badge.style.color = "#ED0677";
         badge.innerHTML = "<i class='fa-solid fa-triangle-exclamation'></i> DB Error: " + err.message;
+        throw err;
+      } finally {
+        isFetching = false;
       }
+    }
+
+    function renderAllViews() {
+      applyFilter(false);
+      renderWeeklyTable();
+      renderIssueLogs(false);
+      renderAllSlaTables(false);
     }
 
     function syncCategoryFilter(sourceId) {
@@ -854,14 +905,14 @@
       document.getElementById("sla-end-date").value = eVal;
     }
 
-    function resetAllDates() {
-      syncDateInputs("", "");
+    async function resetAllDates() {
+      if (!defaultStartIso || !defaultEndIso) return;
+      syncDateInputs(defaultStartIso, defaultEndIso);
       document.getElementById("dash-cat-filter").value = "ALL";
       document.getElementById("issue-cat-filter").value = "ALL";
       document.getElementById("sla-cat-filter").value = "ALL";
-      applyFilter(false);
-      renderIssueLogs(false);
-      renderAllSlaTables(false);
+      await ensureDataLoadedForRange(defaultStartIso, defaultEndIso);
+      renderAllViews();
     }
 
     function switchTab(tabName, btnElem) {
@@ -891,16 +942,28 @@
     }
 
     /* 1. DASHBOARD */
-    function applyFilter(syncOthers) {
+    async function applyFilter(syncOthers) {
       var sStr = document.getElementById("start-date").value;
       var eStr = document.getElementById("end-date").value;
       var catFilter = document.getElementById("dash-cat-filter").value;
 
       if (syncOthers) {
+        if (!sStr || !eStr) {
+          alert("Pilih Start Date dan End Date terlebih dahulu.");
+          return;
+        }
+        await ensureDataLoadedForRange(sStr, eStr);
         syncDateInputs(sStr, eStr);
+        var pDate = parseIsoToLocal(sStr);
+        if (pDate) {
+          document.getElementById("weekly-month").value = String(pDate.getMonth() + 1);
+          document.getElementById("weekly-year").value = String(pDate.getFullYear());
+        }
+        renderWeeklyTable();
         renderIssueLogs(false);
         renderAllSlaTables(false);
       }
+
       var sTime = sStr ? new Date(sStr + "T00:00:00").getTime() : null;
       var eTime = eStr ? new Date(eStr + "T23:59:59").getTime() : null;
       document.getElementById("day-count").innerText = calcDaysLabel(sStr, eStr);
@@ -1055,6 +1118,18 @@
     }
 
     /* 2. WEEKLY ANALYSIS */
+    async function loadWeeklyMonth() {
+      var m = parseInt(document.getElementById("weekly-month").value, 10);
+      var y = parseInt(document.getElementById("weekly-year").value, 10);
+      var lastDay = new Date(y, m, 0);
+      var sIso = y + "-" + String(m).padStart(2, "0") + "-01";
+      var eIso = y + "-" + String(m).padStart(2, "0") + "-" + String(lastDay.getDate()).padStart(2, "0");
+
+      await ensureDataLoadedForRange(sIso, eIso);
+      syncDateInputs(sIso, eIso);
+      renderAllViews();
+    }
+
     function switchWeeklyView(viewType) {
       activeWeeklyView = viewType;
       document.getElementById("btn-view-vendor").classList.toggle("active", viewType === "vendor");
@@ -1191,16 +1266,22 @@
     }
 
     /* 3. UPDATE & ISSUE */
-    function renderIssueLogs(syncOthers) {
+    async function renderIssueLogs(syncOthers) {
       var sStr = document.getElementById("issue-start-date").value;
       var eStr = document.getElementById("issue-end-date").value;
       var catFilter = document.getElementById("issue-cat-filter").value;
 
       if (syncOthers) {
+        if (!sStr || !eStr) {
+          alert("Pilih Start Date dan End Date terlebih dahulu.");
+          return;
+        }
+        await ensureDataLoadedForRange(sStr, eStr);
         syncDateInputs(sStr, eStr);
         applyFilter(false);
         renderAllSlaTables(false);
       }
+
       var sTime = sStr ? new Date(sStr + "T00:00:00").getTime() : null;
       var eTime = eStr ? new Date(eStr + "T23:59:59").getTime() : null;
       document.getElementById("issue-day-count").innerText = calcDaysLabel(sStr, eStr);
@@ -1242,16 +1323,22 @@
     }
 
     /* 4. SLA PERFORMANCE (SD = H+0 | ND = H+1) */
-    function renderAllSlaTables(syncOthers) {
+    async function renderAllSlaTables(syncOthers) {
       var sStr = document.getElementById("sla-start-date").value;
       var eStr = document.getElementById("sla-end-date").value;
       var catFilter = document.getElementById("sla-cat-filter").value;
 
       if (syncOthers) {
+        if (!sStr || !eStr) {
+          alert("Pilih Start Date dan End Date terlebih dahulu.");
+          return;
+        }
+        await ensureDataLoadedForRange(sStr, eStr);
         syncDateInputs(sStr, eStr);
         applyFilter(false);
         renderIssueLogs(false);
       }
+
       var sTime = sStr ? new Date(sStr + "T00:00:00").getTime() : null;
       var eTime = eStr ? new Date(eStr + "T23:59:59").getTime() : null;
       document.getElementById("sla-day-count").innerText = calcDaysLabel(sStr, eStr);
