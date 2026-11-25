@@ -3,246 +3,158 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Transport &amp; Logistics Monitoring Portal</title>
+  <title>Transport Monitoring Portal</title>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
       --primary: #ED0677;
       --primary-yellow: #FFCB05;
-      --sec-pink-light: #FF84A1;
-      --sec-blue: #7ECCEE;
-      --sec-yellow-light: #FFEFA3;
       --sec-bg-pink: #FFECF0;
       --sec-dark: #524245;
       --bg-body: #F9FAFC;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Plus Jakarta Sans", sans-serif; }
     body {
-      background: linear-gradient(135deg, #FFF4F7 0%, #F9FAFC 50%, #FFFBEB 100%);
-      color: var(--sec-dark);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
+      background: linear-gradient(135deg, #FFF4F7 0%, #F9FAFC 50%, #FFEFA3 100%);
+      color: var(--sec-dark); min-height: 100vh; display: flex; flex-direction: column;
     }
-
-    /* LOGIN SCREEN */
-    #login-screen {
-      position: fixed; inset: 0; background: linear-gradient(135deg, #FFF4F7 0%, #FFEFA3 100%);
-      display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px;
-    }
-    .login-box {
-      background: #fff; padding: 36px 32px; border-radius: 16px; width: 100%; max-width: 400px;
-      box-shadow: 0 12px 32px rgba(237, 6, 119, 0.12); border: 1px solid #FFD0DC; text-align: center;
-    }
-    .login-icon {
-      width: 52px; height: 52px; background: var(--sec-bg-pink); border-radius: 14px;
-      display: inline-grid; place-items: center; color: var(--primary); font-size: 1.45rem; margin-bottom: 14px;
-    }
-    .login-box h2 { color: var(--primary); font-weight: 800; font-size: 1.35rem; margin-bottom: 4px; }
-    .login-box p { color: #777; font-size: 0.85rem; margin-bottom: 24px; }
-    .login-field { text-align: left; margin-bottom: 16px; }
-    .login-field label { display: block; font-size: 0.78rem; font-weight: 700; margin-bottom: 6px; color: var(--sec-dark); }
-    .login-field input {
-      width: 100%; padding: 11px 14px; border: 1.5px solid #DDD; border-radius: 8px; font-size: 0.9rem; font-weight: 600;
-    }
-    .login-field input:focus { outline: none; border-color: var(--primary); }
-    .btn-login {
-      width: 100%; padding: 12px; background: var(--primary); color: #fff; border: none;
-      border-radius: 8px; font-weight: 800; font-size: 0.95rem; cursor: pointer; transition: 0.2s;
-    }
-    .btn-login:hover { opacity: 0.9; }
-    #login-error { color: var(--primary); font-size: 0.8rem; font-weight: 700; margin-top: 12px; min-height: 18px; }
-
-    /* PORTAL WRAPPER */
-    #portal-wrapper { display: none; flex: 1; flex-direction: column; min-height: 100vh; }
-
     header {
-      background: #fff; border-bottom: 1px solid #EFEFEF; padding: 14px 28px;
-      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+      background: #fff; border-bottom: 1px solid #EFEFEF; padding: 16px 32px;
+      display: flex; align-items: center; justify-content: space-between;
     }
-    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.05rem; color: var(--primary); }
-    .user-actions { display: flex; align-items: center; gap: 10px; }
-    .user-pill {
-      background: var(--sec-bg-pink); color: var(--primary); border: 1px solid #FFD0DC;
-      font-size: 0.76rem; font-weight: 700; padding: 5px 12px; border-radius: 20px;
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.15rem; color: var(--primary); }
+    .container {
+      max-width: 1120px; width: 100%; margin: 40px auto; padding: 0 20px; flex: 1;
     }
-    .btn-logout {
-      background: #524245; color: #fff; border: none; padding: 8px 14px; border-radius: 6px;
-      font-size: 0.8rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+    .hero { text-align: center; margin-bottom: 36px; }
+    .hero h1 { font-size: 1.85rem; font-weight: 800; color: var(--sec-dark); margin-bottom: 8px; }
+    .hero p { color: #64748B; font-size: 0.95rem; font-weight: 500; }
+    .section-label {
+      font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--primary); margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
     }
-    .btn-logout:hover { opacity: 0.9; }
-
-    main {
-      flex: 1; max-width: 1080px; width: 100%; margin: 0 auto; padding: 44px 24px;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    .grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 18px; margin-bottom: 36px;
     }
-    .hero-text { text-align: center; margin-bottom: 40px; }
-    .hero-badge {
-      display: inline-block; background: var(--sec-yellow-light); color: var(--sec-dark);
-      border: 1px solid var(--primary-yellow); font-size: 0.75rem; font-weight: 800;
-      padding: 4px 14px; border-radius: 20px; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px;
+    .card {
+      background: #fff; border: 1.5px solid #EFEFEF; border-radius: 14px; padding: 24px;
+      text-decoration: none; color: inherit; transition: all 0.2s ease;
+      display: flex; flex-direction: column; justify-content: space-between;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
     }
-    .hero-text h1 { font-size: 2.15rem; font-weight: 800; color: var(--sec-dark); margin-bottom: 10px; letter-spacing: -0.5px; }
-    .hero-text h1 span { color: var(--primary); }
-    .hero-text p { font-size: 0.94rem; color: #777; font-weight: 500; max-width: 580px; }
-
-    .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; width: 100%; max-width: 860px; }
-
-    .menu-card {
-      background: #fff; border: 2px solid #EFEFEF; border-radius: 18px; padding: 32px 28px;
-      text-decoration: none; color: var(--sec-dark); display: flex; flex-direction: column;
-      align-items: flex-start; position: relative; transition: all 0.22s ease;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+    .card:hover {
+      border-color: var(--primary); transform: translateY(-3px);
+      box-shadow: 0 12px 24px rgba(237, 6, 119, 0.12);
     }
-    .menu-card.active-module { border-color: var(--primary); cursor: pointer; }
-    .menu-card.active-module:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 14px 28px rgba(237, 6, 119, 0.14);
-      background: #FFF9FB;
-    }
+    .card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
     .icon-box {
-      width: 56px; height: 56px; border-radius: 14px; background: var(--sec-bg-pink);
-      color: var(--primary); display: grid; place-items: center; font-size: 1.5rem; margin-bottom: 20px;
+      width: 46px; height: 46px; border-radius: 12px; background: var(--sec-bg-pink);
+      color: var(--primary); display: grid; place-items: center; font-size: 1.25rem;
     }
-    .card-badge {
-      position: absolute; top: 24px; right: 24px; font-size: 0.72rem; font-weight: 800;
-      padding: 4px 12px; border-radius: 20px; text-transform: uppercase;
-      background: #D8EAD8; color: #1E561E; border: 1px solid #A3D9A3;
+    .icon-box.sea { background: #E0F4FC; color: #0284C7; }
+    .badge-status {
+      font-size: 0.7rem; font-weight: 800; padding: 4px 10px; border-radius: 20px;
+      background: #D8EAD8; color: #1E561E;
     }
-    .menu-card h2 { font-size: 1.25rem; font-weight: 800; color: var(--primary); margin-bottom: 8px; letter-spacing: 0.2px; }
-    .menu-card p { font-size: 0.86rem; color: #666; line-height: 1.5; font-weight: 500; }
+    .badge-status.soon { background: #F1F5F9; color: #64748B; }
+    .card h3 { font-size: 1.1rem; font-weight: 800; margin-bottom: 6px; color: var(--sec-dark); }
+    .card p { font-size: 0.82rem; color: #64748B; line-height: 1.5; margin-bottom: 18px; }
     .card-footer {
-      margin-top: 24px; font-size: 0.82rem; font-weight: 800; color: var(--primary);
+      font-size: 0.8rem; font-weight: 800; color: var(--primary);
       display: flex; align-items: center; gap: 6px;
     }
-
+    .card.sea-card .card-footer { color: #0284C7; }
     footer {
-      text-align: center; padding: 18px; font-size: 0.78rem; color: #888;
-      border-top: 1px solid #EFEFEF; background: #fff;
-    }
-
-    @media (max-width: 680px) {
-      header { padding: 12px 16px; }
-      main { padding: 28px 16px; }
-      .hero-text h1 { font-size: 1.65rem; }
-      .menu-grid { grid-template-columns: 1fr; gap: 16px; }
-      .menu-card { padding: 24px 20px; }
+      text-align: center; padding: 20px; font-size: 0.78rem; color: #94A3B8; font-weight: 600;
     }
   </style>
 </head>
 <body>
 
-  <!-- LOGIN SCREEN -->
-  <div id="login-screen">
-    <div class="login-box">
-      <div class="login-icon"><i class="fa-solid fa-truck-fast"></i></div>
-      <h2>Transport Portal</h2>
-      <p>Sign in with your operational account</p>
-      <form onsubmit="handleLogin(event)">
-        <div class="login-field">
-          <label>EMAIL (ID)</label>
-          <input type="email" id="login-email" placeholder="ops@company.com" required>
+  <header>
+    <div class="brand"><i class="fa-solid fa-layer-group"></i> TRANSPORT MONITORING PORTAL</div>
+    <span style="font-size:0.78rem; font-weight:700; color:#64748B;">Airfreight &amp; Seafreight Control Tower</span>
+  </header>
+
+  <div class="container">
+    <div class="hero">
+      <h1>Monitoring &amp; SLA Performance</h1>
+      <p>Pilih regional operasional untuk membuka dashboard tracking, biaya, anomali data, dan pencapaian SLA.</p>
+    </div>
+
+    <div class="section-label"><i class="fa-solid fa-plane-up"></i> Airfreight Regional</div>
+    <div class="grid">
+      <!-- 1. JABODETABEK -->
+      <a href="airfreight-jabodetabek.html" class="card">
+        <div>
+          <div class="card-top">
+            <div class="icon-box"><i class="fa-solid fa-plane-departure"></i></div>
+            <span class="badge-status">ACTIVE</span>
+          </div>
+          <h3>Airfreight Jabodetabek</h3>
+          <p>Monitoring SMU, biaya outgoing/incoming, weekly breakdown, dan SLA Jakarta/Tangerang.</p>
         </div>
-        <div class="login-field">
-          <label>PASSWORD</label>
-          <input type="password" id="login-password" placeholder="••••••••" required>
+        <div class="card-footer">Open Dashboard <i class="fa-solid fa-arrow-right"></i></div>
+      </a>
+
+      <!-- 2. JATIMBALINUSRA -->
+      <a href="airfreight-jatimbalinusra.html" class="card">
+        <div>
+          <div class="card-top">
+            <div class="icon-box"><i class="fa-solid fa-plane-up"></i></div>
+            <span class="badge-status">ACTIVE</span>
+          </div>
+          <h3>Airfreight Jatimbalinusra</h3>
+          <p>Monitoring Jawa Timur, Bali &amp; Nusa Tenggara dengan aturan SLA SD (H+0) &amp; ND (H+1).</p>
         </div>
-        <button type="submit" class="btn-login" id="btn-login-submit">Sign In</button>
-        <div id="login-error"></div>
-      </form>
+        <div class="card-footer">Open Dashboard <i class="fa-solid fa-arrow-right"></i></div>
+      </a>
+
+      <!-- 3. KALBAR -->
+      <a href="airfreight-kalbar.html" class="card">
+        <div>
+          <div class="card-top">
+            <div class="icon-box"><i class="fa-solid fa-plane"></i></div>
+            <span class="badge-status soon">NEXT</span>
+          </div>
+          <h3>Airfreight Kalbar</h3>
+          <p>Monitoring operasional dan pencapaian SLA airfreight regional Kalimantan Barat.</p>
+        </div>
+        <div class="card-footer">Open Dashboard <i class="fa-solid fa-arrow-right"></i></div>
+      </a>
+
+      <!-- 4. SUMATERA -->
+      <a href="airfreight-sumatera.html" class="card">
+        <div>
+          <div class="card-top">
+            <div class="icon-box"><i class="fa-solid fa-plane-arrival"></i></div>
+            <span class="badge-status soon">NEXT</span>
+          </div>
+          <h3>Airfreight Sumatera</h3>
+          <p>Monitoring operasional dan pencapaian SLA airfreight regional Sumatera.</p>
+        </div>
+        <div class="card-footer">Open Dashboard <i class="fa-solid fa-arrow-right"></i></div>
+      </a>
+    </div>
+
+    <div class="section-label" style="color:#0284C7;"><i class="fa-solid fa-ship"></i> Seafreight</div>
+    <div class="grid">
+      <a href="seafreight.html" class="card sea-card">
+        <div>
+          <div class="card-top">
+            <div class="icon-box sea"><i class="fa-solid fa-ferry"></i></div>
+            <span class="badge-status">ACTIVE</span>
+          </div>
+          <h3>Seafreight Monitoring</h3>
+          <p>Monitoring pengiriman jalur laut, lead time pelayaran, dan performa vendor seafreight.</p>
+        </div>
+        <div class="card-footer">Open Seafreight <i class="fa-solid fa-arrow-right"></i></div>
+      </a>
     </div>
   </div>
 
-  <!-- MAIN PORTAL -->
-  <div id="portal-wrapper">
-    <header>
-      <div class="brand"><i class="fa-solid fa-route"></i> TRANSPORT &amp; LOGISTICS MONITORING</div>
-      <div class="user-actions">
-        <span class="user-pill" id="user-email-pill"><i class="fa-solid fa-user-check"></i> Authenticated</span>
-        <button onclick="handleLogout()" class="btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
-      </div>
-    </header>
-
-    <main>
-      <div class="hero-text">
-        <div class="hero-badge">Operations Command Center</div>
-        <h1>Select <span>Transport</span> Mode</h1>
-        <p>Choose a freight division below to monitor shipment volume, vendor performance, cost efficiency, and SLA achievement.</p>
-      </div>
-
-      <div class="menu-grid">
-        <!-- SEAFREIGHT MODULE -->
-        <a href="seafreight.html" class="menu-card active-module">
-          <span class="card-badge"><i class="fa-solid fa-circle-check"></i> Live</span>
-          <div class="icon-box"><i class="fa-solid fa-ship"></i></div>
-          <h2>SEAFREIGHT</h2>
-          <p>Inter-island sea cargo monitoring, vendor &amp; route breakdown, weekly volume analysis, anomaly detection, and SLA performance tracking.</p>
-          <div class="card-footer">Open Seafreight Dashboard <i class="fa-solid fa-arrow-right"></i></div>
-        </a>
-
-        <!-- AIRFREIGHT MODULE -->
-        <a href="airfreight.html" class="menu-card active-module">
-          <span class="card-badge"><i class="fa-solid fa-circle-check"></i> Live</span>
-          <div class="icon-box"><i class="fa-solid fa-plane-up"></i></div>
-          <h2>AIRFREIGHT</h2>
-          <p>Regional air cargo portal (Active Hub: Jakarta) with vendor cost breakdown, route coverage, SD/ND SLA tracking, and weekly reports.</p>
-          <div class="card-footer">Select Airfreight Region <i class="fa-solid fa-arrow-right"></i></div>
-        </a>
-      </div>
-    </main>
-
-    <footer>Transport &amp; Logistics Monitoring System — Powered by Supabase</footer>
-  </div>
-
-  <script>
-    const SUPABASE_URL = 'https://jskezklvpaxgkyuynmqe.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_HFq9qTmT2ccAehYXVeUNWw_tPeFBmO1';
-    const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    window.onload = async function() {
-      const { data: { session } } = await sbClient.auth.getSession();
-      if (session) {
-        showPortal(session.user);
-      }
-    };
-
-    function showPortal(user) {
-      document.getElementById("login-screen").style.display = "none";
-      document.getElementById("portal-wrapper").style.display = "flex";
-      if (user && user.email) {
-        document.getElementById("user-email-pill").innerHTML = "<i class='fa-solid fa-user-check'></i> " + user.email;
-      }
-    }
-
-    async function handleLogin(e) {
-      e.preventDefault();
-      const email = document.getElementById("login-email").value.trim();
-      const password = document.getElementById("login-password").value;
-      const btn = document.getElementById("btn-login-submit");
-      const errEl = document.getElementById("login-error");
-
-      btn.disabled = true;
-      btn.innerText = "Signing in...";
-      errEl.innerText = "";
-
-      const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
-      btn.disabled = false;
-      btn.innerText = "Sign In";
-
-      if (error) {
-        errEl.innerText = "Login failed: " + error.message;
-      } else {
-        showPortal(data.user);
-      }
-    }
-
-    async function handleLogout() {
-      await sbClient.auth.signOut();
-      document.getElementById("portal-wrapper").style.display = "none";
-      document.getElementById("login-screen").style.display = "flex";
-    }
-  </script>
+  <footer>Transport Operations Dashboard &bull; Powered by Supabase</footer>
 </body>
 </html>
